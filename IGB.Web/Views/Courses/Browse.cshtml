@@ -1,0 +1,63 @@
+@model List<IGB.Domain.Entities.Course>
+@{
+    ViewData["Title"] = "Browse Courses";
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Browse Courses</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">Browse Courses</h1>
+    <p class="breadcrumb-subtitle">Request booking for a course (Admin approval required).</p>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Curriculum</th>
+                        <th>Grade</th>
+                        <th>Course</th>
+                        <th>Credits</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td>@c.Grade?.Curriculum?.Name</td>
+                            <td>@c.Grade?.Name</td>
+                            <td>@c.Name</td>
+                            <td>@c.CreditCost</td>
+                            <td class="text-end">
+                                <form asp-action="Book" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="courseId" value="@c.Id" />
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-calendar-plus me-1"></i>Book
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-controller="CourseBookings" asp-action="My" class="btn btn-outline-secondary">
+            <i class="fas fa-list me-2"></i>My Bookings
+        </a>
+    </div>
+</div>
+
+

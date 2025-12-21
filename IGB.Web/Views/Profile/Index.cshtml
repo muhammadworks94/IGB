@@ -1,0 +1,154 @@
+@model IGB.Web.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Profile</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">My Profile</h1>
+</div>
+
+<div class="container-fluid">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <form asp-action="Index" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <img class="rounded-circle mb-2" style="width:120px;height:120px;object-fit:cover;"
+                                 src="@(string.IsNullOrWhiteSpace(Model.ProfileImagePath) ? "/img/avatar.png" : Model.ProfileImagePath)"
+                                 alt="Profile" />
+                            <div class="mb-2">
+                                <label class="form-label">Profile Image</label>
+                                <input asp-for="ProfileImage" type="file" class="form-control" />
+                                <span asp-validation-for="ProfileImage" class="text-danger"></span>
+                            </div>
+                            <small class="text-muted">JPG/PNG/WEBP, max 2MB</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input asp-for="Email" class="form-control" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Role</label>
+                                <input class="form-control" value="@Model.Role" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">First Name</label>
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name</label>
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Local Number</label>
+                                <input asp-for="LocalNumber" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">WhatsApp Number</label>
+                                <input asp-for="WhatsappNumber" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Country Code</label>
+                                <input asp-for="CountryCode" class="form-control" placeholder="AE" />
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Time Zone</label>
+                                <input asp-for="TimeZoneId" class="form-control" placeholder="UTC" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (string.Equals(Model.Role, "Student", StringComparison.OrdinalIgnoreCase))
+                {
+                    <hr class="my-4" />
+                    <h5 class="mb-3">Guardians (up to 2)</h5>
+                    <div class="row g-3">
+                        @{
+                            // Ensure two rows are rendered
+                            while (Model.Guardians.Count < 2) { Model.Guardians.Add(new IGB.Web.ViewModels.GuardianInputViewModel()); }
+                        }
+
+                        @for (var i = 0; i < 2; i++)
+                        {
+                            <div class="col-12">
+                                <div class="card border">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div class="fw-semibold">Guardian @(i + 1)</div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" asp-for="Guardians[i].IsPrimary" />
+                                                <label class="form-check-label" asp-for="Guardians[i].IsPrimary">Primary</label>
+                                            </div>
+                                        </div>
+
+                                        <input type="hidden" asp-for="Guardians[i].Id" />
+
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Full Name</label>
+                                                <input class="form-control" asp-for="Guardians[i].FullName" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Relationship</label>
+                                                <input class="form-control" asp-for="Guardians[i].Relationship" placeholder="Father / Mother / Guardian" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Email</label>
+                                                <input class="form-control" asp-for="Guardians[i].Email" />
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">Local Number</label>
+                                                <input class="form-control" asp-for="Guardians[i].LocalNumber" placeholder="+971..." />
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">WhatsApp</label>
+                                                <input class="form-control" asp-for="Guardians[i].WhatsappNumber" placeholder="+971..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

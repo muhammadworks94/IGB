@@ -1,0 +1,17 @@
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\bin\Debug\net8.0\IGB.Domain.deps.json
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\bin\Debug\net8.0\IGB.Domain.dll
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\bin\Debug\net8.0\IGB.Domain.pdb
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\obj\Debug\net8.0\IGB.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\obj\Debug\net8.0\IGB.Domain.AssemblyInfoInputs.cache
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\obj\Debug\net8.0\IGB.Domain.AssemblyInfo.cs
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\obj\Debug\net8.0\IGB.Domain.csproj.CoreCompileInputs.cache
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\obj\Debug\net8.0\IGB.Domain.dll
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\obj\Debug\net8.0\refint\IGB.Domain.dll
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\obj\Debug\net8.0\IGB.Domain.pdb
+D:\Projects\IGBApp\igb-new-version\IGB.Domain\obj\Debug\net8.0\ref\IGB.Domain.dll
+D:\Projects\IGBApp\igb-new-version\_build_tmp\IGB.Web\IGB.Domain.deps.json
+D:\Projects\IGBApp\igb-new-version\_build_tmp\IGB.Web\IGB.Domain.dll
+D:\Projects\IGBApp\igb-new-version\_build_tmp\IGB.Web\IGB.Domain.pdb
+D:\Projects\IGBApp\igb-new-version\_build_tmp\solution\IGB.Domain.deps.json
+D:\Projects\IGBApp\igb-new-version\_build_tmp\solution\IGB.Domain.dll
+D:\Projects\IGBApp\igb-new-version\_build_tmp\solution\IGB.Domain.pdb

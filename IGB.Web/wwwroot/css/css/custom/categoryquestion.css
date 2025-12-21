@@ -1,0 +1,177 @@
+﻿
+
+.question-text-truncated {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+    .question-text-truncated:hover {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: initial;
+        position: relative;
+        z-index: 1000;
+       
+        padding: 5px;
+      
+        max-width: 400px;
+    }
+        
+/* Responsive card layout */
+@media (max-width: 576px) {
+    .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+    .col-md-4 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (min-width: 768px) {
+    .col-md-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+}
+
+@media (min-width: 992px) {
+    .col-lg-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+}
+/* Custom pagination colors */
+.pagination .page-link {
+    color: #003366 !important;
+}
+
+    .pagination .page-link:hover {
+        color: #ffffff !important;
+        background-color: #003366 !important;
+    }
+
+.pagination .page-item.active .page-link {
+    background-color: #003366 !important;
+    color: #ffffff !important;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d !important;
+    border-color: #dee2e6 !important;
+}
+
+/* Text truncation for expandable content */
+.truncated-text {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.truncated-text:hover {
+  
+    border-radius: 4px;
+    padding: 2px 4px;
+}
+
+.truncated-text::after {
+    content: " ...";
+    color: #6c757d;
+    font-weight: bold;
+}
+
+/* Modal styling for full text display */
+.text-modal .modal-dialog {
+    max-width: 800px;
+}
+
+.text-modal .modal-content {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.text-modal .modal-header {
+    background-color: #003366;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 10px 10px 0 0;
+}
+
+.text-modal .modal-title {
+    color: white;
+    font-weight: 600;
+}
+
+.text-modal .modal-body {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+.text-modal .modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.text-modal .modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.text-modal .modal-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.text-modal .modal-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.text-modal .modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    border-radius: 0 0 10px 10px;
+}
+
+.text-content {
+    line-height: 1.6;
+    color: #495057;
+    font-size: 14px;
+}
+
+.text-content p {
+    margin-bottom: 15px;
+}
+
+.text-content strong {
+    color: #212529;
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .truncated-text {
+        max-width: 200px;
+    }
+    
+    .text-modal .modal-dialog {
+        max-width: 95%;
+        margin: 10px auto;
+    }
+    
+    .text-modal .modal-body {
+        max-height: 400px;
+        padding: 15px;
+    }
+}

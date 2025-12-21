@@ -1,0 +1,94 @@
+@model List<IGB.Domain.Entities.LessonBooking>
+@{
+    ViewData["Title"] = "My Lessons";
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Lessons</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">My Lessons</h1>
+</div>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-end mb-3">
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Request Lesson
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Status</th>
+                        <th>Scheduled</th>
+                        <th>Class Link</th>
+                        <th>Options</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var l in Model)
+                    {
+                        var badge = l.Status switch
+                        {
+                            IGB.Domain.Enums.LessonStatus.Scheduled => "bg-info",
+                            IGB.Domain.Enums.LessonStatus.Completed => "bg-success",
+                            IGB.Domain.Enums.LessonStatus.Cancelled => "bg-secondary",
+                            IGB.Domain.Enums.LessonStatus.RescheduleRequested => "bg-warning",
+                            _ => "bg-primary"
+                        };
+                        <tr>
+                            <td>@l.Course?.Name</td>
+                            <td><span class="badge @badge">@l.Status</span></td>
+                            <td>@(l.ScheduledStart?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(l.ZoomJoinUrl))
+                                {
+                                    <a href="@l.ZoomJoinUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-video me-1"></i>Join
+                                    </a>
+                                    @if (!string.IsNullOrWhiteSpace(l.ZoomPassword))
+                                    {
+                                        <div class="small text-muted mt-1">Pass: <span class="fw-semibold">@l.ZoomPassword</span></div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="small text-muted">
+                                    1) @l.Option1.ToString("yyyy-MM-dd HH:mm")<br/>
+                                    2) @l.Option2.ToString("yyyy-MM-dd HH:mm")<br/>
+                                    3) @l.Option3.ToString("yyyy-MM-dd HH:mm")
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <form asp-action="RequestReschedule" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@l.Id" />
+                                    <input type="hidden" name="note" value="Student requested reschedule" />
+                                    <button type="submit" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-rotate me-1"></i>Reschedule
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

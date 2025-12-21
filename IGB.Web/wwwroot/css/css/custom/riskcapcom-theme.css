@@ -1,0 +1,668 @@
+/* ===================================
+   RISK CAPCOM THEME CUSTOMIZATIONS
+   =================================== */
+
+/* CSS Variables for Risk Capcom Theme */
+:root {
+    /* Primary Colors */
+    --primary-navy: #003366;
+    --primary-blue: #0059e0;
+    --accent-blue: #007acc;
+    
+    /* Neutral Colors */
+    --white: #ffffff;
+    --off-white: #f8f9fa;
+    --light-gray: #f1f1f1;
+    --border-gray: #e6e6e6;
+    --medium-gray: #808080;
+    --dark-gray: #4d4d4d;
+    --charcoal: #333333;
+    
+    /* Status Colors */
+    --success-green: #28a745;
+    --success-green-dark: #1e7e34;
+    --error-red: #dc3545;
+    --warning-yellow: #ffc107;
+    --warning-yellow-dark: #e0a800;
+    --info-blue: #17a2b8;
+    --info-blue-dark: #138496;
+    
+    /* Shadow Colors */
+    --shadow-primary: rgba(0, 51, 102, 0.15);
+    --shadow-hover: rgba(0, 51, 102, 0.25);
+    --shadow-light: rgba(0, 0, 0, 0.08);
+    --shadow-medium: rgba(0, 0, 0, 0.12);
+    --shadow-dark: rgba(0, 0, 0, 0.3);
+    --shadow-spinner: rgba(0, 51, 102, 0.3);
+    
+    /* Legacy variables for compatibility */
+    --secondary-gray: var(--medium-gray);
+    --warning-orange: var(--warning-yellow);
+    --danger-red: var(--error-red);
+    --info-cyan: var(--info-blue);
+    --black: #000000;
+}
+
+/* ===================================
+   QUICK ACTION BUTTONS HOVER EFFECTS
+   =================================== */
+
+.action-buttons .btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: none;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0.5px;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.action-buttons .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px var(--shadow-light);
+}
+
+/* Primary button hover effects */
+.action-buttons .btn-primary {
+    background: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+.action-buttons .btn-primary:hover {
+    background: var(--primary-blue) !important;
+    color: var(--white) !important;
+}
+
+/* Success button hover effects */
+.action-buttons .btn-success {
+    background: var(--success-green) !important;
+    color: var(--white) !important;
+}
+
+.action-buttons .btn-success:hover {
+    background: var(--success-green-dark) !important;
+    color: var(--white) !important;
+}
+
+/* Secondary button hover effects */
+.action-buttons .btn-secondary {
+    background: var(--accent-blue) !important;
+    color: var(--white) !important;
+}
+
+.action-buttons .btn-secondary:hover {
+    background: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+/* Warning button hover effects */
+.action-buttons .btn-warning {
+    background: var(--warning-yellow) !important;
+    color: var(--charcoal) !important;
+}
+
+.action-buttons .btn-warning:hover {
+    background: var(--warning-yellow-dark) !important;
+    color: var(--charcoal) !important;
+}
+
+/* Info button hover effects */
+.action-buttons .btn-info {
+    background: var(--info-blue) !important;
+    color: var(--white) !important;
+}
+
+.action-buttons .btn-info:hover {
+    background: var(--info-blue-dark) !important;
+    color: var(--white) !important;
+}
+
+/* Icon animations */
+.action-buttons .btn i {
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover i {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Text animations */
+.action-buttons .btn span {
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover span {
+    transform: translateX(2px);
+}
+
+/* Ripple effect on click */
+.action-buttons .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.action-buttons .btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* ===================================
+   MODAL PRIMARY COLORS
+   =================================== */
+
+#disclaimerModal .modal-header {
+    background-color: var(--primary-navy) !important;
+    border-bottom-color: var(--primary-navy) !important;
+}
+
+#disclaimerModal .modal-header .modal-title {
+    color: var(--white) !important;
+}
+
+#disclaimerModal .modal-header .modal-title i {
+    color: var(--white) !important;
+}
+
+/* Terms and Conditions Modal Header - Primary Color */
+.modal-header.bg-primary {
+    background-color: var(--primary-navy) !important;
+    border-bottom-color: var(--primary-navy) !important;
+}
+
+.modal-header.bg-primary .modal-title {
+    color: var(--white) !important;
+}
+
+.modal-header.bg-primary .modal-title i {
+    color: var(--white) !important;
+}
+
+#disclaimerModal .btn-primary {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+#disclaimerModal .btn-primary:hover {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+#disclaimerModal .text-primary {
+    color: var(--primary-navy) !important;
+}
+
+#disclaimerModal .fw-bold.text-primary {
+    color: var(--primary-navy) !important;
+}
+
+/* Modal headings with primary color */
+#disclaimerModal h5,
+#disclaimerModal h6 {
+    color: var(--primary-navy) !important;
+}
+
+#disclaimerModal h5 i,
+#disclaimerModal h6 i {
+    color: var(--primary-navy) !important;
+}
+
+/* Checkbox styling with primary color */
+#disclaimerModal .form-check-input:checked {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+}
+
+#disclaimerModal .form-check-input:focus {
+    border-color: var(--primary-navy) !important;
+    box-shadow: 0 0 0 0.25rem rgba(30, 58, 138, 0.25) !important;
+}
+
+/* Cancel button with primary color */
+#disclaimerModal .btn-secondary {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+#disclaimerModal .btn-secondary:hover {
+    background-color: var(--primary-blue) !important;
+    border-color: var(--primary-blue) !important;
+    color: var(--white) !important;
+}
+
+/* ===================================
+   BUTTON TEXT VISIBILITY FIXES
+   =================================== */
+
+.btn-primary {
+    color: var(--white) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    color: var(--white) !important;
+}
+
+.action-buttons .btn {
+    color: var(--white) !important;
+}
+
+.action-buttons .btn:hover,
+.action-buttons .btn:focus,
+.action-buttons .btn:active {
+    color: var(--white) !important;
+}
+
+/* ===================================
+   NOBLEUI COMPONENT OVERRIDES
+   =================================== */
+
+/* Override NobleUI activity timeline colors */
+.activity-item:hover {
+    background-color: var(--light-gray);
+}
+
+.activity-title {
+    color: var(--dark-gray);
+}
+
+.activity-item:hover .activity-title {
+    color: var(--primary-navy);
+}
+
+.activity-user {
+    color: var(--primary-blue);
+}
+
+.activity-item:hover .activity-user {
+    color: var(--primary-navy);
+}
+
+/* Override NobleUI card colors */
+.card {
+    border-color: #e5e7eb;
+}
+
+.card-header {
+    background-color: var(--light-gray);
+    border-bottom-color: #e5e7eb;
+}
+
+/* Override NobleUI badge colors */
+.badge.bg-primary {
+    background-color: var(--primary-navy) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--success-green) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-yellow) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--info-blue) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--error-red) !important;
+}
+
+/* ===================================
+   CARD FOOTER STYLES
+   =================================== */
+
+.card-footer {
+    background-color: transparent;
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem;
+}
+
+.card-footer .btn {
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.card-footer .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ===================================
+   QUICK ACTION BUTTONS VISIBILITY FIX
+   =================================== */
+
+.action-buttons .btn-outline-primary {
+    color: var(--white) !important;
+    border-color: var(--primary-navy) !important;
+    background-color: var(--primary-navy) !important;
+}
+
+.action-buttons .btn-outline-primary:hover {
+    color: var(--white) !important;
+    background-color: var(--primary-blue) !important;
+    border-color: var(--primary-blue) !important;
+}
+
+.action-buttons .btn-outline-secondary {
+    color: var(--white) !important;
+    border-color: var(--accent-blue) !important;
+    background-color: var(--accent-blue) !important;
+}
+
+.action-buttons .btn-outline-secondary:hover {
+    color: var(--white) !important;
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+}
+
+.action-buttons .btn-outline-success {
+    color: var(--white) !important;
+    border-color: var(--success-green) !important;
+    background-color: var(--success-green) !important;
+}
+
+.action-buttons .btn-outline-success:hover {
+    color: var(--white) !important;
+    background-color: #1e7e34 !important;
+    border-color: #1e7e34 !important;
+}
+
+.action-buttons .btn-outline-warning {
+    color: var(--charcoal) !important;
+    border-color: var(--warning-yellow) !important;
+    background-color: var(--warning-yellow) !important;
+}
+
+.action-buttons .btn-outline-warning:hover {
+    color: var(--charcoal) !important;
+    background-color: #e0a800 !important;
+    border-color: #e0a800 !important;
+}
+
+.action-buttons .btn-outline-info {
+    color: var(--white) !important;
+    border-color: var(--info-blue) !important;
+    background-color: var(--info-blue) !important;
+}
+
+.action-buttons .btn-outline-info:hover {
+    color: var(--white) !important;
+    background-color: #138496 !important;
+    border-color: #138496 !important;
+}
+
+/* ===================================
+   VIEW DETAILS BUTTONS FIX
+   =================================== */
+
+/* Fix View Details buttons to have solid, darker colors */
+.btn-outline-primary {
+    color: var(--white) !important;
+    border-color: var(--primary-navy) !important;
+    background-color: var(--primary-navy) !important;
+}
+
+.btn-outline-primary:hover {
+    color: var(--white) !important;
+    background-color: var(--primary-blue) !important;
+    border-color: var(--primary-blue) !important;
+}
+
+.btn-outline-secondary {
+    color: var(--white) !important;
+    border-color: var(--accent-blue) !important;
+    background-color: var(--accent-blue) !important;
+}
+
+.btn-outline-secondary:hover {
+    color: var(--white) !important;
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+}
+
+.btn-outline-success {
+    color: var(--white) !important;
+    border-color: var(--success-green) !important;
+    background-color: var(--success-green) !important;
+}
+
+.btn-outline-success:hover {
+    color: var(--white) !important;
+    background-color: #1e7e34 !important;
+    border-color: #1e7e34 !important;
+}
+
+.btn-outline-warning {
+    color: var(--charcoal) !important;
+    border-color: var(--warning-yellow) !important;
+    background-color: var(--warning-yellow) !important;
+}
+
+.btn-outline-warning:hover {
+    color: var(--charcoal) !important;
+    background-color: #e0a800 !important;
+    border-color: #e0a800 !important;
+}
+
+.btn-outline-info {
+    color: var(--white) !important;
+    border-color: var(--info-blue) !important;
+    background-color: var(--info-blue) !important;
+}
+
+.btn-outline-info:hover {
+    color: var(--white) !important;
+    background-color: #138496 !important;
+    border-color: #138496 !important;
+}
+
+.btn-outline-danger {
+    color: var(--white) !important;
+    border-color: var(--error-red) !important;
+    background-color: var(--error-red) !important;
+}
+
+.btn-outline-danger:hover {
+    color: var(--white) !important;
+    background-color: #c82333 !important;
+    border-color: #c82333 !important;
+}
+
+/* ===================================
+   PREVENT WHITE BUTTON HOVER
+   =================================== */
+
+/* Prevent any buttons from turning white on hover */
+.btn:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+/* Specific override for secondary buttons to get darker */
+.btn-secondary:hover,
+button.btn-secondary:hover,
+input[type="submit"].btn-secondary:hover,
+input[type="button"].btn-secondary:hover {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+/* Specific override for outline buttons to get darker */
+.btn-outline-secondary:hover,
+button.btn-outline-secondary:hover,
+input[type="submit"].btn-outline-secondary:hover,
+input[type="button"].btn-outline-secondary:hover {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+/* ===================================
+   PRIMARY BUTTON HOVER FIX
+   =================================== */
+
+/* Ensure primary buttons are always visible */
+.btn.btn-primary,
+button.btn-primary,
+input[type="submit"].btn-primary,
+input[type="button"].btn-primary {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.btn.btn-primary:hover,
+button.btn-primary:hover,
+input[type="submit"].btn-primary:hover,
+input[type="button"].btn-primary:hover {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.btn.btn-primary:focus,
+button.btn-primary:focus,
+input[type="submit"].btn-primary:focus,
+input[type="button"].btn-primary:focus {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.25) !important;
+}
+
+.btn.btn-primary:active,
+button.btn-primary:active,
+input[type="submit"].btn-primary:active,
+input[type="button"].btn-primary:active {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* ===================================
+   NOBLEUI THEME COLOR OVERRIDES
+   =================================== */
+
+/* Override NobleUI primary colors with Risk Capcom theme */
+:root {
+    --bs-primary: var(--primary-navy);
+    --bs-primary-rgb: 0, 51, 102;
+    --bs-primary-text-emphasis: var(--primary-navy);
+    --bs-primary-bg-subtle: rgba(0, 51, 102, 0.1);
+    --bs-primary-border-subtle: rgba(0, 51, 102, 0.2);
+}
+
+/* Override NobleUI button colors */
+.btn-primary {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-blue) !important;
+    border-color: var(--primary-blue) !important;
+    color: var(--white) !important;
+}
+
+.btn-primary:focus {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.25) !important;
+}
+
+.btn-primary:active {
+    background-color: var(--primary-navy) !important;
+    border-color: var(--primary-navy) !important;
+    color: var(--white) !important;
+}
+
+/* Override NobleUI dropdown colors */
+.dropdown-item:hover {
+    background-color: var(--light-gray);
+    color: var(--primary-navy);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: var(--primary-navy);
+    color: var(--white);
+}
+
+/* Override NobleUI navbar colors */
+.navbar .navbar-nav .nav-link:hover {
+    color: var(--primary-navy);
+}
+
+.navbar .navbar-nav .nav-link.active {
+    color: var(--primary-navy);
+}
+
+/* Override NobleUI sidebar colors */
+.sidebar .nav-link:hover {
+    color: var(--primary-navy);
+}
+
+.sidebar .nav-link.active {
+    color: var(--primary-navy);
+    background-color: none !important;
+}
+
+/* Completely remove the blue bar on active sidebar items - just show light blue background */
+.sidebar .sidebar-body .nav .nav-item.active .nav-link::before {
+    display: none !important;
+}
+
+/* Completely remove the blue bar on active submenu items - just show light blue background */
+.sidebar .sidebar-body .nav.sub-menu .nav-item .nav-link.active::before {
+    display: none !important;
+}
+
+/* Override NobleUI card header colors */
+.card-header {
+    background-color: var(--light-gray);
+    border-bottom-color: #e5e7eb;
+}
+
+/* Override NobleUI text colors */
+.text-primary {
+    color: var(--primary-navy) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-navy) !important;
+}

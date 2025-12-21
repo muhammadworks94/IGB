@@ -1,0 +1,47 @@
+@model IGB.Domain.Entities.Grade
+@{
+    ViewData["Title"] = "Create Grade";
+    var curriculumId = (long)ViewBag.CurriculumId;
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-action="Index" asp-route-curriculumId="@curriculumId">Grades</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">Create Grade</h1>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="CurriculumId" />
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Level (optional)</label>
+                    <input asp-for="Level" class="form-control" type="number" />
+                </div>
+                <div class="form-check mb-3">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Active</label>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" asp-route-curriculumId="@curriculumId" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+
+

@@ -1,0 +1,172 @@
+/* ===================================
+   STANDARD ACTION ICONS FOR THEME CARDS
+   =================================== */
+
+/* Action Icons Container */
+.card-action-icons {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    gap: 0.25rem;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    margin-right: 60px; /* Add space to the right to avoid overlap with badge */
+}
+
+.theme-card:hover .card-action-icons {
+    opacity: 1;
+}
+
+/* Individual Action Icon */
+.action-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+/* Edit Icon Styling */
+.edit-icon {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.edit-icon:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+    color: var(--white);
+}
+
+/* Delete Icon Styling */
+.delete-icon {
+    background: rgba(220, 53, 69, 0.2);
+    color: var(--white);
+}
+
+.delete-icon:hover {
+    background: rgba(220, 53, 69, 0.4);
+    transform: scale(1.1);
+    color: var(--white);
+}
+
+/* Light Theme Card Action Icons */
+.theme-card-light .edit-icon {
+    background: rgba(0, 51, 102, 0.1);
+    color: var(--primary-navy);
+}
+
+.theme-card-light .edit-icon:hover {
+    background: rgba(0, 51, 102, 0.2);
+    color: var(--primary-navy);
+}
+
+.theme-card-light .delete-icon {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.theme-card-light .delete-icon:hover {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+/* Warning Theme Card Action Icons */
+.theme-card-warning .edit-icon {
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--charcoal);
+}
+
+.theme-card-warning .edit-icon:hover {
+    background: rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+    color: var(--charcoal);
+}
+
+.theme-card-warning .delete-icon {
+    background: rgba(220, 53, 69, 0.2);
+    color: var(--white);
+}
+
+.theme-card-warning .delete-icon:hover {
+    background: rgba(220, 53, 69, 0.4);
+    transform: scale(1.1);
+    color: var(--white);
+}
+
+/* ===================================
+   CLICKABLE CARD STYLES
+   =================================== */
+
+/* Clickable Card Styling */
+.clickable-card {
+    transition: all 0.3s ease;
+    transform: translateY(0);
+    cursor: pointer;
+}
+
+.clickable-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.clickable-card:active {
+    transform: translateY(-2px);
+}
+
+/* Ensure action icons and buttons don't trigger card click */
+.card-action-icons,
+.card-actions,
+.card-actions * {
+    pointer-events: auto;
+}
+
+.clickable-card .card-body {
+    pointer-events: none;
+}
+
+.clickable-card .card-actions {
+    pointer-events: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card-action-icons {
+        top: 0.5rem;
+        right: 0.5rem;
+        margin-right: 50px;
+    }
+    
+    .action-icon {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .clickable-card:hover {
+        transform: translateY(-3px);
+    }
+}
+
+@media (max-width: 576px) {
+    .card-action-icons {
+        top: 0.25rem;
+        right: 0.25rem;
+        margin-right: 40px;
+    }
+    
+    .action-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .clickable-card:hover {
+        transform: translateY(-2px);
+    }
+}

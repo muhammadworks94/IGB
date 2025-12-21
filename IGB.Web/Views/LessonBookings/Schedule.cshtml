@@ -1,0 +1,79 @@
+@model IGB.Web.ViewModels.LessonScheduleViewModel
+@{
+    var lesson = (IGB.Domain.Entities.LessonBooking)ViewBag.Lesson;
+    var tutors = ViewBag.Tutors as List<IGB.Domain.Entities.User> ?? new();
+    ViewData["Title"] = "Schedule Lesson";
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-action="Pending">Lesson Requests</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Schedule</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">Schedule Lesson</h1>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="mb-3">
+                <strong>Student:</strong> @(lesson.StudentUser?.FullName ?? lesson.StudentUser?.Email)<br/>
+                <strong>Course:</strong> @lesson.Course?.Name
+            </div>
+
+            <div class="alert alert-info">
+                <div class="small">
+                    <div><strong>Option 1:</strong> @lesson.Option1.ToString("yyyy-MM-dd HH:mm")</div>
+                    <div><strong>Option 2:</strong> @lesson.Option2.ToString("yyyy-MM-dd HH:mm")</div>
+                    <div><strong>Option 3:</strong> @lesson.Option3.ToString("yyyy-MM-dd HH:mm")</div>
+                </div>
+            </div>
+
+            <form asp-action="Schedule" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="LessonId" />
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Select Option</label>
+                        <select asp-for="SelectedOption" class="form-select">
+                            <option value="1">Option 1</option>
+                            <option value="2">Option 2</option>
+                            <option value="3">Option 3</option>
+                        </select>
+                        <span asp-validation-for="SelectedOption" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Assign Tutor</label>
+                        <select asp-for="TutorUserId" class="form-select">
+                            <option value="">-- Select tutor --</option>
+                            @foreach (var t in tutors)
+                            {
+                                <option value="@t.Id">@t.FullName (@t.Email)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="TutorUserId" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Duration (minutes)</label>
+                        <input asp-for="DurationMinutes" class="form-control" type="number" min="30" max="180" />
+                        <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a asp-action="Pending" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calendar-check me-2"></i>Schedule
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+
+

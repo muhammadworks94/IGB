@@ -1,0 +1,235 @@
+/* Perfect Submenu Styles - Fixed Positioning to Right of Arrow */
+
+/* Sidebar scrolling and submenu positioning */
+.sidebar {
+    overflow: visible !important;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-body {
+    overflow-y: auto !important;
+    overflow-x: visible !important;
+    flex: 1;
+    max-height: calc(100vh - 80px); /* Account for header height */
+    scrollbar-width: thin;
+    scrollbar-color: #ddd #f5f5f5;
+}
+
+/* Custom scrollbar for webkit browsers */
+.sidebar-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-body::-webkit-scrollbar-track {
+    background: #f5f5f5;
+}
+
+.sidebar-body::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+}
+
+.sidebar-body::-webkit-scrollbar-thumb:hover {
+    background: #ccc;
+}
+
+.sidebar .nav {
+    overflow: visible !important;
+}
+
+/* Ensure proper positioning for all nav items */
+.nav-item {
+    position: relative;
+    overflow: visible;
+}
+
+/* Target existing collapse submenus and transform them */
+    .nav-item .collapse {
+        position: fixed !important;
+        background: white !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        min-width: 220px !important;
+        z-index: 99999 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transition: opacity 0.3s ease, visibility 0.3s ease !important;
+        border: 1px solid #e9ecef !important;
+        display: none !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        pointer-events: none !important;
+        /* Ensure submenu appears to the right, not below */
+        transform: none !important;
+    }
+
+    /* When JS adds .show, make it visible and interactive */
+    .nav-item .collapse.show {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        display: block !important;
+    }
+
+/* IMPORTANT: Do not tie visibility to :hover; JS controls show/hide with a hover bridge */
+/* .nav-item:hover .collapse { ... } REMOVED to prevent flicker when moving pointer to popover */
+
+/* Bridge area between trigger and popover to keep hover alive while moving mouse */
+.submenu-bridge {
+    position: fixed !important;
+    z-index: 100000 !important;
+    background: transparent !important;
+    pointer-events: auto !important;
+}
+
+/* Style the submenu header - ::before pseudo-element removed */
+
+/* Style submenu container - Force override all existing styles */
+.nav-item .collapse .nav.sub-menu {
+    padding: 8px 0 !important;
+    background: white !important;
+    border: none !important;
+    margin: 0 !important;
+    list-style: none !important;
+    border-radius: 0 0 8px 8px;
+    position: relative;
+    z-index: 100000;
+}
+
+/* Override any existing sidebar submenu styles that might interfere */
+.sidebar .sidebar-body .nav.sub-menu,
+.sidebar .nav.sub-menu,
+.nav.sub-menu {
+    padding: 8px 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    border: none !important;
+    list-style: none !important;
+    border-radius: 0 0 8px 8px !important;
+    position: relative !important;
+    z-index: 100000 !important;
+}
+
+/* Ensure custom sidebar submenu containers also scroll internally and do not affect page layout */
+.sidebar-submenu {
+    max-height: calc(100vh - 16px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    box-sizing: border-box !important;
+}
+
+/* Force override any Bootstrap or NobleUI submenu styles */
+.nav-item .collapse .nav.sub-menu,
+.sidebar .nav-item .collapse .nav.sub-menu,
+.sidebar .sidebar-body .nav-item .collapse .nav.sub-menu {
+    padding: 8px 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    border: none !important;
+    list-style: none !important;
+    border-radius: 0 0 8px 8px !important;
+    position: relative !important;
+    z-index: 100000 !important;
+    /* Override any existing padding */
+    padding-top: 8px !important;
+    padding-right: 0 !important;
+    padding-bottom: 8px !important;
+    padding-left: 0 !important;
+}
+
+/* Style submenu items */
+.nav-item .collapse .nav.sub-menu .nav-item {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+    background: white !important;
+}
+
+.nav-item .collapse .nav.sub-menu .nav-item .nav-link {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 16px !important;
+    color: #495057 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    font-size: 14px !important;
+    border: none !important;
+    background: white !important;
+    width: 100% !important;
+    text-align: left !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    position: relative;
+    z-index: 100000;
+}
+
+.nav-item .collapse .nav.sub-menu .nav-item .nav-link:hover {
+    background-color: #f8f9fa !important;
+    color: #007bff !important;
+    text-decoration: none !important;
+}
+
+.nav-item .collapse .nav.sub-menu .nav-item .nav-link:active {
+    background-color: #e9ecef !important;
+}
+
+/* Add icons to submenu items */
+.nav-item .collapse .nav.sub-menu .nav-item .nav-link::before {
+    content: none !important; /* Remove the generic dots/arrows */
+    margin-right: 0 !important;
+    width: 0 !important;
+    text-align: center;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* Style submenu items with proper icons */
+.nav-item .collapse .nav.sub-menu .nav-item .nav-link i {
+    margin-right: 12px !important;
+    width: 16px !important;
+    text-align: center !important;
+    font-size: 14px !important;
+    color: #6c757d !important;
+    display: inline-block !important;
+}
+
+.nav-item .collapse .nav.sub-menu .nav-item .nav-link:hover i {
+    color: #007bff !important;
+}
+
+/* Override any Bootstrap or framework styles that might position submenu below */
+.nav-item .collapse.show,
+.nav-item .collapse.collapsing {
+    position: fixed !important;
+    transform: none !important;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    display: block !important;
+    float: none !important;
+    clear: none !important;
+    /* Allow JS to set exact coordinates */
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Fallback: Always reserve vertical scrollbar to avoid layout shifts (prevents flicker) */
+html, body {
+    overflow-y: scroll;
+}
+
+/* Prevent scroll chaining and layout jitter when popovers are tall */
+.nav-item .collapse {
+    max-height: calc(100vh - 16px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+}
+
+/* Reserve scrollbar space to avoid content width shift when body scrollbar toggles */
+html {
+    scrollbar-gutter: stable both-edges;
+}

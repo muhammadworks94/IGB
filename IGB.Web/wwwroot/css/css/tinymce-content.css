@@ -1,0 +1,217 @@
+/* TinyMCE Content Styling */
+
+/* Ensure TinyMCE editor is visible */
+.tinymce-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.tinymce-editor {
+    min-height: 100px;
+    border: 1px solid #ddd !important;
+}
+
+/* TinyMCE Editor Container */
+.tox-tinymce {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.tox .tox-edit-area {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.tox .tox-edit-area__iframe {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Debug info styling */
+.debug-info {
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--charcoal);
+    margin: 20px;
+    background-color: var(--white);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-navy);
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+h1 { font-size: 28px; }
+h2 { font-size: 24px; }
+h3 { font-size: 20px; }
+h4 { font-size: 18px; }
+h5 { font-size: 16px; }
+h6 { font-size: 14px; }
+
+p {
+    margin-bottom: 15px;
+}
+
+/* Lists */
+ul, ol {
+    margin-bottom: 15px;
+    padding-left: 30px;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+/* Links */
+a {
+    color: var(--primary-blue);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-blue);
+    text-decoration: underline;
+}
+
+/* Tables */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid var(--border-gray);
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: var(--off-white);
+    font-weight: 600;
+    color: var(--dark-gray);
+}
+
+tr:nth-child(even) {
+    background-color: var(--off-white);
+}
+
+tr:hover {
+    background-color: var(--light-gray);
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px var(--shadow-light);
+}
+
+/* Blockquotes */
+blockquote {
+    border-left: 4px solid var(--primary-blue);
+    margin: 20px 0;
+    padding: 10px 20px;
+    background-color: var(--off-white);
+    font-style: italic;
+    color: var(--medium-gray);
+}
+
+/* Code */
+code {
+    background-color: var(--off-white);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--error-red);
+}
+
+pre {
+    background-color: var(--off-white);
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+    border: 1px solid var(--light-gray);
+}
+
+pre code {
+    background-color: transparent;
+    padding: 0;
+    color: var(--charcoal);
+}
+
+/* Horizontal Rule */
+hr {
+    border: none;
+    border-top: 1px solid var(--border-gray);
+    margin: 20px 0;
+}
+
+/* Emphasis */
+strong, b {
+    font-weight: 600;
+    color: var(--primary-navy);
+}
+
+em, i {
+    font-style: italic;
+}
+
+/* Text Alignment */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+
+/* Colors */
+.text-primary { color: var(--primary-blue); }
+.text-success { color: var(--success-green); }
+.text-warning { color: var(--warning-yellow); }
+.text-danger { color: var(--error-red); }
+.text-info { color: var(--info-blue); }
+.text-muted { color: var(--medium-gray); }
+
+/* Background Colors */
+.bg-primary { background-color: var(--primary-blue); color: var(--white); }
+.bg-success { background-color: var(--success-green); color: var(--white); }
+.bg-warning { background-color: var(--warning-yellow); color: var(--charcoal); }
+.bg-danger { background-color: var(--error-red); color: var(--white); }
+.bg-info { background-color: var(--info-blue); color: var(--white); }
+.bg-light { background-color: var(--off-white); color: var(--charcoal); }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        margin: 10px;
+        font-size: 13px;
+    }
+    
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    h3 { font-size: 18px; }
+    
+    table {
+        font-size: 12px;
+    }
+    
+    th, td {
+        padding: 8px;
+    }
+}

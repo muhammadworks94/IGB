@@ -1,0 +1,254 @@
+﻿@using System.Globalization
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    var uiCulture = CultureInfo.CurrentUICulture;
+    var htmlLang = uiCulture?.Name ?? "en";
+    var htmlDir = (uiCulture?.TextInfo?.IsRightToLeft ?? false) ? "rtl" : "ltr";
+    var antiforgery = Antiforgery.GetAndStoreTokens(Context);
+}
+<!DOCTYPE html>
+<html lang="@htmlLang" dir="@htmlDir">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="request-verification-token" content="@antiforgery.RequestToken" />
+    <title>IGB System - @ViewData["Title"]</title>
+    <base href="/" />
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    
+    <!-- Noble UI Core CSS -->
+    <link rel="stylesheet" href="nobleui/vendors/core/core.css">
+    <link rel="stylesheet" href="nobleui/css/demo1/style.css">
+    
+    <!-- DataTable CSS -->
+    <link rel="stylesheet" href="nobleui/vendors/datatables.net-bs5/dataTables.bootstrap5.css">
+    
+    <!-- Google Fonts for Noble UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/app.css?v=@DateTime.Now.Ticks" />
+    <link rel="stylesheet" href="css/css/custom/admin-dashboard.css" asp-append-version="true" />
+    <link rel="icon" type="image/png" href="img/icon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css" />
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <partial name="_Sidebar" />
+
+        <div class="page-wrapper">
+            <!-- Top Nav -->
+            <partial name="_TopNav" />
+
+            <!-- Content -->
+            <div class="page-content">
+                <!-- Flash Messages -->
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @RenderBody()
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 border-top small">
+                <p class="text-muted mb-1 mb-md-0">Copyright © @DateTime.Now.Year IGB System. All rights reserved.</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- jQuery first -->
+    <script type="text/javascript"  src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <!-- Noble UI Core JS -->
+    <script src="nobleui/vendors/core/core.js"></script>
+    <script src="nobleui/vendors/feather-icons/feather.min.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="js/dropdown-guard.js" asp-append-version="true"></script>
+    
+    <!-- DataTable JS -->
+    <script src="nobleui/vendors/datatables.net/jquery.dataTables.js"></script>
+    <script src="nobleui/vendors/datatables.net-bs5/dataTables.bootstrap5.js"></script>
+    
+    <!-- Initialize Feather Icons safely -->
+    <script>
+        $(document).ready(function() {
+            // Safely initialize Feather Icons with error handling
+            if (typeof feather !== 'undefined') {
+                try {
+                    feather.replace();
+                } catch (error) {
+                    console.warn('Feather Icons initialization error:', error);
+                }
+            }
+            
+            // Fallback for navbar icons if Feather Icons fail
+            setTimeout(function() {
+                fixTopNavIcons();
+            }, 1000);
+        });
+        
+        // Function to fix top navigation icons
+        function fixTopNavIcons() {
+            // Check if Feather Icons are properly rendered
+            var featherElements = document.querySelectorAll('[data-feather]');
+            featherElements.forEach(function(element) {
+                // If the element still has data-feather but no SVG child, replace with Font Awesome
+                if (element.hasAttribute('data-feather') && !element.querySelector('svg')) {
+                    var iconName = element.getAttribute('data-feather');
+                    var fontAwesomeClass = getFeatherToFontAwesome(iconName);
+                    if (fontAwesomeClass) {
+                        element.innerHTML = '<i class="' + fontAwesomeClass + '"></i>';
+                        element.removeAttribute('data-feather');
+                    }
+                }
+            });
+        }
+        
+        // Mapping function for Feather to Font Awesome
+        function getFeatherToFontAwesome(iconName) {
+            var iconMap = {
+                'grid': 'fas fa-th',
+                'shield': 'fas fa-shield-alt',
+                'alert-triangle': 'fas fa-exclamation-triangle',
+                'pie-chart': 'fas fa-chart-pie',
+                'folder': 'fas fa-folder',
+                'mail': 'fas fa-envelope',
+                'message-square': 'fas fa-comment',
+                'check-circle': 'fas fa-check-circle',
+                'alert-circle': 'fas fa-exclamation-circle',
+                'bell': 'fas fa-bell',
+                'file-text': 'fas fa-file-alt',
+                'upload': 'fas fa-upload',
+                'x-circle': 'fas fa-times-circle',
+                'briefcase': 'fas fa-briefcase',
+                'user': 'fas fa-user',
+                'key': 'fas fa-key',
+                'settings': 'fas fa-cog',
+                'home': 'fas fa-home',
+                'log-out': 'fas fa-sign-out-alt',
+                'bars': 'fas fa-bars',
+                'search': 'fas fa-search'
+            };
+            return iconMap[iconName] || 'fas fa-question';
+        }
+    </script>
+    
+    <script src="nobleui/js/template.js"></script>
+    <script src="js/site.min.js" asp-append-version="true"></script>
+    <script src="js/nav-notifications.js" asp-append-version="true"></script>
+
+    <!-- SignalR (real-time notifications) -->
+    <script src="https://cdn.jsdelivr.net/npm/%40microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+    <script>
+        (function () {
+            if (typeof signalR === 'undefined') return;
+            if (!('@(User?.Identity?.IsAuthenticated == true)'.toLowerCase() === 'true')) return;
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/hubs/notifications")
+                .withAutomaticReconnect()
+                .build();
+
+            function showToast(title, message) {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+
+                const toastId = 'toast_' + Math.random().toString(36).substring(2);
+                const html = `
+                    <div id="${toastId}" class="toast align-items-center text-bg-primary border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+                      <div class="d-flex">
+                        <div class="toast-body">
+                          <strong>${title ?? 'Notification'}:</strong> ${message ?? ''}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                      </div>
+                    </div>`;
+
+                container.insertAdjacentHTML('beforeend', html);
+                const el = document.getElementById(toastId);
+                const toast = new bootstrap.Toast(el, { delay: 5000 });
+                toast.show();
+                el.addEventListener('hidden.bs.toast', () => el.remove());
+            }
+
+            connection.on("Notify", (payload) => {
+                showToast(payload?.title, payload?.message);
+                try { window.igbNavNotifications?.onNotify?.(payload); } catch { /* ignore */ }
+            });
+
+            connection.start().catch(() => { /* ignore */ });
+        })();
+    </script>
+    
+    <!-- Simple test -->
+    <script>
+        $(document).ready(function() {
+            console.log('Page loaded - logo switching should work');
+        });
+    </script>
+    <script type="text/javascript"  src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.js"></script>
+    <script type="text/javascript"  src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script type="text/javascript"  src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.0.20/tinymce.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+    
+    <div class="loadingOverlay" id="loader" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner-border m-5 text-center" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $(this).scrollTop(0);
+        
+        // Global offcanvas dark overlay functionality
+        $(document).on('show.bs.offcanvas', function(e) {
+            $('body').addClass('offcanvas-open');
+        });
+        
+        $(document).on('hidden.bs.offcanvas', function(e) {
+            $('body').removeClass('offcanvas-open');
+        });
+        
+        // Also handle backdrop clicks
+        $(document).on('click', '.offcanvas-backdrop', function() {
+            $('body').removeClass('offcanvas-open');
+        });
+    });
+
+    $(document)
+        .ajaxStart(function () {
+            $("#loader").show();
+        })
+        .ajaxStop(function () {
+            $('#loader').hide();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+2025-12-19 18:31:10.981 +05:00 [INF] Starting IGB Web Application
+2025-12-19 18:31:12.145 +05:00 [INF] Users already exist and PasswordHash is populated. Skipping seed.
+2025-12-19 18:31:12.147 +05:00 [INF] Database initialized and seeded successfully
+2025-12-19 18:31:12.317 +05:00 [ERR] Hosting failed to start
+System.IO.IOException: Failed to bind to address http://127.0.0.1:5170: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+ ---> System.Net.Sockets.SocketException (10048): Only one usage of each socket address (protocol/network address/port) is normally permitted.
+   at System.Net.Sockets.Socket.UpdateStatusAfterSocketErrorAndThrowException(SocketError error, Boolean disconnectOnFailure, String callerName)
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindAsync(ListenOptions[] listenOptions, AddressBindContext context, Func`2 useHttps, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__15_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+2025-12-19 18:31:12.351 +05:00 [FTL] Application start-up failed
+System.IO.IOException: Failed to bind to address http://127.0.0.1:5170: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+ ---> System.Net.Sockets.SocketException (10048): Only one usage of each socket address (protocol/network address/port) is normally permitted.
+   at System.Net.Sockets.Socket.UpdateStatusAfterSocketErrorAndThrowException(SocketError error, Boolean disconnectOnFailure, String callerName)
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindAsync(ListenOptions[] listenOptions, AddressBindContext context, Func`2 useHttps, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__15_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+   at Microsoft.Extensions.Hosting.Internal.Host.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.RunAsync(IHost host, CancellationToken token)
+   at Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions.RunAsync(IHost host, CancellationToken token)
+   at Program.<Main>$(String[] args) in D:\Projects\IGBApp\igb-new-version\IGB.Web\Program.cs:line 95
+2025-12-19 18:48:53.626 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-19 18:48:53.969 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-19 18:48:54.146 +05:00 [INF] Starting IGB Web Application
+2025-12-19 18:48:54.599 +05:00 [INF] Users already exist and PasswordHash is populated. Skipping seed.
+2025-12-19 18:48:54.600 +05:00 [INF] Database initialized and seeded successfully
+2025-12-19 18:48:54.630 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-19 18:48:54.630 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-19 18:48:54.630 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-19 18:48:54.646 +05:00 [INF] Server desktop-jmka7tq:42936:f530b9df successfully announced in 9.9764 ms
+2025-12-19 18:48:54.647 +05:00 [INF] Server desktop-jmka7tq:42936:f530b9df is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-19 18:48:54.653 +05:00 [INF] Server desktop-jmka7tq:42936:f530b9df all the dispatchers started
+2025-12-19 18:49:09.807 +05:00 [INF] Hangfire heartbeat at "2025-12-19T13:49:09.8071086Z"
+2025-12-19 18:49:48.536 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-19 18:49:49.006 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-19 18:49:49.164 +05:00 [INF] Starting IGB Web Application
+2025-12-19 18:49:49.824 +05:00 [INF] Users already exist and PasswordHash is populated. Skipping seed.
+2025-12-19 18:49:49.824 +05:00 [INF] Database initialized and seeded successfully
+2025-12-19 18:49:49.875 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-19 18:49:49.875 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-19 18:49:49.875 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-19 18:49:49.891 +05:00 [INF] Server desktop-jmka7tq:17968:44c90b5c successfully announced in 7.1728 ms
+2025-12-19 18:49:49.893 +05:00 [INF] Server desktop-jmka7tq:17968:44c90b5c is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-19 18:49:49.898 +05:00 [INF] Server desktop-jmka7tq:17968:44c90b5c all the dispatchers started
+2025-12-19 18:50:05.048 +05:00 [INF] Hangfire heartbeat at "2025-12-19T13:50:05.0478204Z"
+2025-12-19 18:51:05.080 +05:00 [INF] Hangfire heartbeat at "2025-12-19T13:51:05.0802440Z"
+2025-12-19 18:52:05.162 +05:00 [INF] Hangfire heartbeat at "2025-12-19T13:52:05.1622760Z"
+2025-12-19 18:53:05.249 +05:00 [INF] Hangfire heartbeat at "2025-12-19T13:53:05.2497260Z"
+2025-12-19 18:54:05.312 +05:00 [INF] Hangfire heartbeat at "2025-12-19T13:54:05.3123548Z"
+2025-12-19 18:54:49.963 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-19 19:38:22.245 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-19 19:38:22.872 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-19 19:38:23.077 +05:00 [INF] Starting IGB Web Application
+2025-12-19 19:38:24.077 +05:00 [INF] Users already exist and PasswordHash is populated. Skipping seed.
+2025-12-19 19:38:24.444 +05:00 [INF] Seeded sample curriculum/grade/course/topics.
+2025-12-19 19:38:24.444 +05:00 [INF] Database initialized and seeded successfully
+2025-12-19 19:38:24.507 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-19 19:38:24.507 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-19 19:38:24.507 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-19 19:38:24.530 +05:00 [INF] Server desktop-jmka7tq:17148:40f746a1 successfully announced in 10.7171 ms
+2025-12-19 19:38:24.535 +05:00 [INF] Server desktop-jmka7tq:17148:40f746a1 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-19 19:38:24.541 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-19 19:38:24.541 +05:00 [INF] Server desktop-jmka7tq:17148:40f746a1 all the dispatchers started
+2025-12-19 19:38:24.719 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:38:24.7190430Z"
+2025-12-19 19:39:09.723 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:39:09.7234586Z"
+2025-12-19 19:40:09.820 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:40:09.8204684Z"
+2025-12-19 19:47:50.400 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-19 19:47:50.780 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-19 19:47:50.995 +05:00 [INF] Starting IGB Web Application
+2025-12-19 19:47:51.729 +05:00 [INF] Users already exist and PasswordHash is populated. Skipping seed.
+2025-12-19 19:47:51.734 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-19 19:47:51.735 +05:00 [INF] Database initialized and seeded successfully
+2025-12-19 19:47:51.935 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-19 19:47:51.936 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-19 19:47:51.937 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-19 19:47:51.959 +05:00 [INF] Server desktop-jmka7tq:44420:03b923e1 successfully announced in 8.4874 ms
+2025-12-19 19:47:51.963 +05:00 [INF] Server desktop-jmka7tq:44420:03b923e1 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-19 19:47:51.985 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-19 19:47:52.068 +05:00 [INF] Server desktop-jmka7tq:44420:03b923e1 all the dispatchers started
+2025-12-19 19:47:52.237 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:47:52.2371033Z"
+2025-12-19 19:47:52.781 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:47:52.788 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:48:07.194 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:48:07.1949118Z"
+2025-12-19 19:48:27.184 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:48:27.188 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:48:51.318 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:48:51.319 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:49:07.311 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:49:07.3113320Z"
+2025-12-19 19:50:07.391 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:50:07.3917773Z"
+2025-12-19 19:51:07.737 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:51:07.7372291Z"
+2025-12-19 19:52:16.729 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-19 19:52:17.311 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-19 19:52:17.567 +05:00 [INF] Starting IGB Web Application
+2025-12-19 19:52:18.507 +05:00 [INF] Backfilled PasswordHash for 0 users and auto-confirmed email for 9 users.
+2025-12-19 19:52:18.514 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-19 19:52:18.515 +05:00 [INF] Database initialized and seeded successfully
+2025-12-19 19:52:18.674 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-19 19:52:18.675 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-19 19:52:18.675 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-19 19:52:18.698 +05:00 [INF] Server desktop-jmka7tq:30312:336ff2ee successfully announced in 8.1969 ms
+2025-12-19 19:52:18.702 +05:00 [INF] Server desktop-jmka7tq:30312:336ff2ee is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-19 19:52:18.781 +05:00 [INF] Server desktop-jmka7tq:30312:336ff2ee all the dispatchers started
+2025-12-19 19:52:19.096 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:52:19.0952681Z"
+2025-12-19 19:52:19.502 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:52:19.511 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:52:35.725 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:52:35.728 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:52:40.791 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:52:40.794 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:52:46.807 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:52:46.812 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:53:04.017 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:53:04.0176739Z"
+2025-12-19 19:54:04.105 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:54:04.1052593Z"
+2025-12-19 19:55:11.114 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-19 19:55:11.503 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-19 19:55:11.754 +05:00 [INF] Starting IGB Web Application
+2025-12-19 19:55:12.817 +05:00 [INF] Backfilled PasswordHash for 0 users, auto-confirmed email for 0 users, and auto-approved 9 seeded users.
+2025-12-19 19:55:12.827 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-19 19:55:12.828 +05:00 [INF] Database initialized and seeded successfully
+2025-12-19 19:55:13.150 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-19 19:55:13.151 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-19 19:55:13.151 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-19 19:55:13.185 +05:00 [INF] Server desktop-jmka7tq:45276:886c043b successfully announced in 18.5821 ms
+2025-12-19 19:55:13.188 +05:00 [INF] Server desktop-jmka7tq:45276:886c043b is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-19 19:55:13.291 +05:00 [INF] Server desktop-jmka7tq:45276:886c043b all the dispatchers started
+2025-12-19 19:55:13.448 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:55:13.4480558Z"
+2025-12-19 19:55:14.246 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:55:14.258 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:55:26.771 +05:00 [INF] User logged in successfully: superadmin@igb.com
+2025-12-19 19:55:26.780 +05:00 [INF] User superadmin@igb.com logged in successfully
+2025-12-19 19:55:27.018 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:55:27.021 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:55:52.704 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:55:52.718 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:55:56.465 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:55:56.469 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:55:58.807 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:55:58.810 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:00.794 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:00.797 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:03.698 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:03.700 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:05.391 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:05.393 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:06.438 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:06.439 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:08.557 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:08.561 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:09.118 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:09.120 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:10.354 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:10.356 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:12.254 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:12.257 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:13.537 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:56:13.5374066Z"
+2025-12-19 19:56:15.138 +05:00 [INF] User logged out
+2025-12-19 19:56:15.152 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:15.154 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:17.502 +05:00 [INF] User logged in successfully: superadmin@igb.com
+2025-12-19 19:56:17.503 +05:00 [INF] User superadmin@igb.com logged in successfully
+2025-12-19 19:56:17.513 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:17.515 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:26.503 +05:00 [INF] User logged out
+2025-12-19 19:56:26.522 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:26.527 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:37.630 +05:00 [INF] User logged in successfully: teacher1@igb.com
+2025-12-19 19:56:37.634 +05:00 [INF] User teacher1@igb.com logged in successfully
+2025-12-19 19:56:37.643 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:37.647 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:51.829 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:51.833 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:54.068 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:54.072 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:54.941 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:54.943 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:55.822 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:55.823 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:56.298 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:56.300 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:56.791 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:56.792 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:57.479 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:57.481 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:58.932 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:56:58.935 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-19 19:57:13.630 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:57:13.6309327Z"
+2025-12-19 19:58:13.714 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:58:13.7140819Z"
+2025-12-19 19:59:13.869 +05:00 [INF] Hangfire heartbeat at "2025-12-19T14:59:13.8689687Z"
+2025-12-19 20:00:13.279 +05:00 [INF] 2 servers were removed due to timeout
+2025-12-19 20:00:13.909 +05:00 [INF] Hangfire heartbeat at "2025-12-19T15:00:13.9094114Z"

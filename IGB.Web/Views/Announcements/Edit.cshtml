@@ -1,0 +1,106 @@
+@model IGB.Web.ViewModels.AnnouncementEditViewModel
+@using IGB.Domain.Enums
+@{
+    ViewData["Title"] = Model.Id == null ? "Create Announcement" : "Edit Announcement";
+    var students = ViewBag.StudentUsers as IEnumerable<dynamic> ?? Array.Empty<dynamic>();
+    var tutors = ViewBag.TutorUsers as IEnumerable<dynamic> ?? Array.Empty<dynamic>();
+    var guardians = ViewBag.GuardianUsers as IEnumerable<dynamic> ?? Array.Empty<dynamic>();
+}
+
+<div class="breadcrumb-header">
+    <h1 class="breadcrumb-title">@ViewData["Title"]</h1>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                @if (Model.Id != null)
+                {
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                }
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Title</label>
+                        <input class="form-control" asp-for="Title" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Audience</label>
+                        <select class="form-select" asp-for="Audience" asp-items="Html.GetEnumSelectList<AnnouncementAudience>()"></select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Body</label>
+                        <textarea class="form-control" asp-for="Body" rows="6"></textarea>
+                        <span asp-validation-for="Body" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Publish at (UTC)</label>
+                        <input class="form-control" asp-for="PublishAtUtc" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Expires at (UTC)</label>
+                        <input class="form-control" asp-for="ExpiresAtUtc" />
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" asp-for="IsPublished" />
+                            <label class="form-check-label" asp-for="IsPublished">Published</label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+                <h6>Optional: target a specific user</h6>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Target Student</label>
+                        <select class="form-select" asp-for="TargetStudentUserId">
+                            <option value="">(None)</option>
+                            @foreach (var u in students)
+                            {
+                                <option value="@u.Id">@u.Email</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Target Tutor</label>
+                        <select class="form-select" asp-for="TargetTutorUserId">
+                            <option value="">(None)</option>
+                            @foreach (var u in tutors)
+                            {
+                                <option value="@u.Id">@u.Email</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Target Guardian</label>
+                        <select class="form-select" asp-for="TargetGuardianUserId">
+                            <option value="">(None)</option>
+                            @foreach (var u in guardians)
+                            {
+                                <option value="@u.Id">@u.Email</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <small class="text-muted">If you select a target user, the announcement will only show to that user (and system-wide announcements still show to everyone).</small>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a asp-action="Manage" class="btn btn-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

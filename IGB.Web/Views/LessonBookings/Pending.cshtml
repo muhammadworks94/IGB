@@ -1,0 +1,56 @@
+@model List<IGB.Domain.Entities.LessonBooking>
+@{
+    ViewData["Title"] = "Pending Lesson Requests";
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Lesson Requests</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">Pending Lesson Requests</h1>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Status</th>
+                        <th>Options</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var l in Model)
+                    {
+                        <tr>
+                            <td>@(l.StudentUser?.FullName ?? l.StudentUser?.Email ?? l.StudentUserId.ToString())</td>
+                            <td>@l.Course?.Name</td>
+                            <td><span class="badge bg-warning">@l.Status</span></td>
+                            <td class="small text-muted">
+                                1) @l.Option1.ToString("yyyy-MM-dd HH:mm")<br/>
+                                2) @l.Option2.ToString("yyyy-MM-dd HH:mm")<br/>
+                                3) @l.Option3.ToString("yyyy-MM-dd HH:mm")
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Schedule" asp-route-id="@l.Id" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-calendar-check me-1"></i>Schedule
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

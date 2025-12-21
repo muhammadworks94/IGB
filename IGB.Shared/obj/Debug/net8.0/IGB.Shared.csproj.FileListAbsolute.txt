@@ -1,0 +1,17 @@
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\bin\Debug\net8.0\IGB.Shared.deps.json
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\bin\Debug\net8.0\IGB.Shared.dll
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\bin\Debug\net8.0\IGB.Shared.pdb
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\obj\Debug\net8.0\IGB.Shared.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\obj\Debug\net8.0\IGB.Shared.AssemblyInfoInputs.cache
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\obj\Debug\net8.0\IGB.Shared.AssemblyInfo.cs
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\obj\Debug\net8.0\IGB.Shared.csproj.CoreCompileInputs.cache
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\obj\Debug\net8.0\IGB.Shared.dll
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\obj\Debug\net8.0\refint\IGB.Shared.dll
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\obj\Debug\net8.0\IGB.Shared.pdb
+D:\Projects\IGBApp\igb-new-version\IGB.Shared\obj\Debug\net8.0\ref\IGB.Shared.dll
+D:\Projects\IGBApp\igb-new-version\_build_tmp\IGB.Web\IGB.Shared.deps.json
+D:\Projects\IGBApp\igb-new-version\_build_tmp\IGB.Web\IGB.Shared.dll
+D:\Projects\IGBApp\igb-new-version\_build_tmp\IGB.Web\IGB.Shared.pdb
+D:\Projects\IGBApp\igb-new-version\_build_tmp\solution\IGB.Shared.deps.json
+D:\Projects\IGBApp\igb-new-version\_build_tmp\solution\IGB.Shared.dll
+D:\Projects\IGBApp\igb-new-version\_build_tmp\solution\IGB.Shared.pdb

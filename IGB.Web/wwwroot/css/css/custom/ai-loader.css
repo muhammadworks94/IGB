@@ -1,0 +1,280 @@
+/**
+ * Justinian Loader and Document Checklist Styles
+ * Uses the system's existing color scheme for consistency
+ */
+
+/* Justinian Loader Animation */
+.justinian-loader {
+    position: relative;
+    display: inline-block;
+    margin: 20px 0;
+}
+
+.justinian-brain {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    margin: 0 auto;
+}
+
+.brain-lobe {
+    position: absolute;
+    width: 35px;
+    height: 45px;
+    background: linear-gradient(45deg, var(--bs-info), var(--bs-success));
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.brain-lobe.left {
+    left: 0;
+    animation-delay: 0s;
+}
+
+.brain-lobe.right {
+    right: 0;
+    animation-delay: 1s;
+}
+
+.brain-stem {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 20px;
+    background: var(--bs-secondary);
+    border-radius: 0 0 4px 4px;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 0.8; 
+    }
+    50% { 
+        transform: scale(1.1); 
+        opacity: 1; 
+    }
+}
+
+.justinian-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--bs-info);
+    border-radius: 50%;
+    animation: float 3s ease-in-out infinite;
+}
+
+.particle:nth-child(1) {
+    top: 10px;
+    left: 20px;
+    animation-delay: 0s;
+}
+
+.particle:nth-child(2) {
+    top: 20px;
+    right: 15px;
+    animation-delay: 0.5s;
+}
+
+.particle:nth-child(3) {
+    bottom: 15px;
+    left: 30px;
+    animation-delay: 1s;
+}
+
+.particle:nth-child(4) {
+    bottom: 25px;
+    right: 25px;
+    animation-delay: 1.5s;
+}
+
+.particle:nth-child(5) {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: 2s;
+}
+
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0px) scale(1); 
+        opacity: 0.7; 
+    }
+    50% { 
+        transform: translateY(-10px) scale(1.2); 
+        opacity: 1; 
+    }
+}
+
+/* Document Checklist Styles */
+.document-checklist {
+    margin-bottom: 20px;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bs-light);
+    transition: all 0.3s ease;
+}
+
+.checklist-item:hover {
+    background-color: rgba(var(--bs-light-rgb), 0.5);
+    padding-left: 10px;
+    border-radius: 5px;
+}
+
+.checklist-item:last-child {
+    border-bottom: none;
+}
+
+.checklist-item i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.checklist-item span {
+    font-size: 14px;
+    color: var(--bs-body-color);
+}
+
+/* Progress bar enhancement */
+.progress {
+    background-color: var(--bs-light);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+/* Justinian Generation Status Messages */
+.justinian-status-message {
+    font-size: 14px;
+    color: var(--bs-secondary);
+    margin-top: 10px;
+}
+
+.justinian-status-message.processing {
+    color: var(--bs-info);
+}
+
+.justinian-status-message.success {
+    color: var(--bs-success);
+}
+
+.justinian-status-message.error {
+    color: var(--bs-danger);
+}
+
+/* Document Checklist Categories */
+.checklist-category {
+    margin-bottom: 15px;
+}
+
+.checklist-category h6 {
+    color: var(--bs-primary);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* Checklist item icons with system colors */
+.checklist-item .fa-file-pdf {
+    color: var(--bs-danger);
+}
+
+.checklist-item .fa-file-alt {
+    color: var(--bs-primary);
+}
+
+.checklist-item .fa-chart-line {
+    color: var(--bs-success);
+}
+
+.checklist-item .fa-users {
+    color: var(--bs-info);
+}
+
+.checklist-item .fa-shield-alt {
+    color: var(--bs-warning);
+}
+
+.checklist-item .fa-calendar-alt {
+    color: var(--bs-secondary);
+}
+
+.checklist-item .fa-cogs {
+    color: var(--bs-dark);
+}
+
+.checklist-item .fa-handshake {
+    color: var(--bs-success);
+}
+
+.checklist-item .fa-balance-scale {
+    color: var(--bs-warning);
+}
+
+.checklist-item .fa-database {
+    color: var(--bs-info);
+}
+
+/* Tips section styling */
+.tips-section {
+    background-color: rgba(var(--bs-light-rgb), 0.3);
+    border-left: 4px solid var(--bs-success);
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.tips-section h6 {
+    color: var(--bs-success);
+    margin-bottom: 10px;
+}
+
+.tips-section ul {
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+
+.tips-section li {
+    color: var(--bs-body-color);
+    margin-bottom: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .justinian-brain {
+        width: 60px;
+        height: 45px;
+    }
+    
+    .brain-lobe {
+        width: 25px;
+        height: 35px;
+    }
+    
+    .checklist-item {
+        padding: 6px 0;
+    }
+    
+    .checklist-item:hover {
+        padding-left: 8px;
+    }
+}

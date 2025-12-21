@@ -1,0 +1,44 @@
+@model List<IGB.Web.ViewModels.AnnouncementListItemViewModel>
+@using IGB.Domain.Enums
+@{
+    ViewData["Title"] = "Announcements";
+}
+
+<div class="breadcrumb-header">
+    <h1 class="breadcrumb-title">Announcements</h1>
+    <p class="breadcrumb-subtitle">Latest updates relevant to you.</p>
+</div>
+
+<div class="container-fluid">
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-secondary">No announcements yet.</div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var a in Model)
+            {
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start justify-content-between">
+                                <div>
+                                    <h5 class="mb-1">@a.Title</h5>
+                                    <div class="text-muted small">
+                                        @a.PublishAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                        <span class="ms-2 badge bg-light text-dark">@a.Audience</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div style="white-space: pre-wrap;">@a.Body</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+

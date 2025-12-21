@@ -1,0 +1,257 @@
+/* ===================================
+   SUMMARY CARDS WITH RISK CAPCOM THEME
+   =================================== */
+
+/* Summary Card Base Styles */
+.summary-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    border: none;
+    box-shadow: 0 4px 20px var(--shadow-light);
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px var(--shadow-medium);
+}
+
+.summary-card:hover::before {
+    opacity: 1;
+}
+
+/* Summary Icon Styles */
+.summary-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.summary-card:hover .summary-icon {
+    transform: scale(1.1);
+    background: rgba(255,255,255,0.3);
+}
+
+/* Typography */
+.summary-card .display-6 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 0;
+}
+
+.summary-card .text-white-75 {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Progress Bar Styles */
+.summary-card .progress {
+    border-radius: 10px;
+    overflow: hidden;
+    height: 6px;
+    background: rgba(255,255,255,0.2);
+}
+
+.summary-card .progress-bar {
+    transition: width 1s ease-in-out;
+    background: var(--white);
+}
+
+/* Card-specific themes using Risk Capcom colors */
+
+/* Total Assignments Card - Primary Navy */
+.total-card {
+    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-blue) 100%);
+    color: var(--white);
+    animation: slideInLeft 0.6s ease-out;
+}
+
+/* Completed Assignments Card - Success Green */
+.completed-card {
+    background: linear-gradient(135deg, var(--success-green) 0%, var(--success-green-dark) 100%);
+    color: var(--white);
+    animation: slideInUp 0.6s ease-out 0.1s both;
+}
+
+/* In Progress Card - Warning Yellow */
+.progress-card {
+    background: linear-gradient(135deg, var(--warning-yellow) 0%, var(--warning-yellow-dark) 100%);
+    color: var(--charcoal);
+    animation: slideInUp 0.6s ease-out 0.2s both;
+}
+
+.progress-card .text-white-75 {
+    color: rgba(0, 0, 0, 0.75) !important;
+}
+
+.progress-card .progress {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.progress-card .progress-bar {
+    background: var(--charcoal);
+}
+
+/* Overdue Card - Error Red */
+.overdue-card {
+    background: linear-gradient(135deg, var(--error-red) 0%, #c82333 100%);
+    color: var(--white);
+    animation: slideInRight 0.6s ease-out 0.3s both;
+}
+
+/* Risk Areas Dashboard Cards */
+
+/* Total Risk Areas Card - Primary Navy */
+.total-risk-card {
+    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-blue) 100%);
+    color: var(--white);
+    animation: slideInLeft 0.6s ease-out;
+}
+
+/* High Risk Areas Card - Error Red */
+.high-risk-card {
+    background: linear-gradient(135deg, var(--error-red) 0%, #c82333 100%);
+    color: var(--white);
+    animation: slideInUp 0.6s ease-out 0.1s both;
+}
+
+/* Medium Risk Areas Card - Warning Yellow */
+.medium-risk-card {
+    background: linear-gradient(135deg, var(--warning-yellow) 0%, var(--warning-yellow-dark) 100%);
+    color: var(--charcoal);
+    animation: slideInUp 0.6s ease-out 0.2s both;
+}
+
+.medium-risk-card .text-white-75 {
+    color: rgba(0, 0, 0, 0.75) !important;
+}
+
+.medium-risk-card .progress {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.medium-risk-card .progress-bar {
+    background: var(--charcoal);
+}
+
+/* Low Risk Areas Card - Success Green */
+.low-risk-card {
+    background: linear-gradient(135deg, var(--success-green) 0%, var(--success-green-dark) 100%);
+    color: var(--white);
+    animation: slideInRight 0.6s ease-out 0.3s both;
+}
+
+/* Animations */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .summary-card .display-6 {
+        font-size: 2rem;
+    }
+    
+    .summary-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .summary-icon i {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* Card content spacing */
+.summary-card .card-body {
+    padding: 1.5rem;
+}
+
+.summary-card .d-flex.align-items-center {
+    gap: 1rem;
+}
+
+/* Hover effects for better UX */
+.summary-card:hover .display-6 {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+/* Focus states for accessibility */
+.summary-card:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+}
+
+/* Loading state */
+.summary-card.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.summary-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: 2px solid var(--white);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

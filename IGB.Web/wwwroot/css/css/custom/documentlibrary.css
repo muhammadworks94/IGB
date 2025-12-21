@@ -1,0 +1,136 @@
+﻿
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.btn-group .btn {
+    margin-right: 2px;
+}
+
+.card-header {
+    border-bottom: 3px solid rgba(0, 0, 0, 0.125);
+}
+
+.pagination .page-link {
+    color: #003366;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #003366;
+    border-color: #003366;
+    color: #fff;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.text-muted {
+    font-size: 0.875em;
+}
+
+/* Filter section styling */
+.row.align-items-end .form-label {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.row.align-items-end .form-select,
+.row.align-items-end .form-control {
+    font-size: 0.9rem;
+}
+
+#clearFilters,
+.btn-success {
+    white-space: nowrap;
+}
+
+#apply {
+    background-color: #003366;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+    .row.align-items-end .col-md-2 {
+        flex: 0 0 auto;
+        width: 16.66%;
+    }
+
+    .row.align-items-end .col-md-1 {
+        flex: 0 0 auto;
+        width: 11%;
+    }
+}
+
+/* Version History Modal Styling */
+.modal-xl {
+    max-width: 1200px;
+}
+
+/* Document History Modal */
+#documentHistoryModal .card {
+    border: 1px solid #e0e0e0;
+}
+
+#documentHistoryModal .card-body {
+    padding: 1.5rem;
+}
+
+#documentHistoryModal .list-group-item {
+    transition: all 0.2s ease;
+    border-left: none;
+    border-right: none;
+}
+
+    #documentHistoryModal .list-group-item:first-child {
+        border-top: none;
+    }
+
+    #documentHistoryModal .list-group-item:last-child {
+        border-bottom: none;
+    }
+
+    #documentHistoryModal .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+
+#documentHistoryModal .badge {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.65rem;
+}
+
+#documentHistoryModal .text-muted small {
+    font-size: 0.875rem;
+}
+
+/* Question number link styling */
+.question-number-link {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .question-number-link:hover {
+        text-decoration: underline !important;
+        opacity: 0.8;
+    }
+
+    .question-number-link strong {
+        font-size: 0.95rem;
+    }
+
+/* Tooltip styling for question text */
+.tooltip {
+    max-width: 400px;
+}
+
+.tooltip-inner {
+    text-align: left;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}

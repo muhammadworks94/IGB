@@ -1,0 +1,61 @@
+@model List<IGB.Domain.Entities.Course>
+@{
+    var grade = (IGB.Domain.Entities.Grade)ViewBag.Grade;
+    ViewData["Title"] = "Courses";
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-controller="Curricula" asp-action="Index">Curricula</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Grades" asp-action="Index" asp-route-curriculumId="@grade.CurriculumId">Grades</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Courses</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">Courses - @grade.Name</h1>
+    <p class="breadcrumb-subtitle">@grade.Curriculum?.Name</p>
+</div>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-end mb-3">
+        <a asp-action="Create" asp-route-gradeId="@grade.Id" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Course
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Credit Cost</th>
+                        <th>Status</th>
+                        <th class="text-end">Topics</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td>@c.Name</td>
+                            <td>@c.CreditCost</td>
+                            <td>
+                                <span class="badge @(c.IsActive ? "bg-success" : "bg-secondary")">@(c.IsActive ? "Active" : "Inactive")</span>
+                            </td>
+                            <td class="text-end">
+                                <a asp-controller="CourseTopics" asp-action="Index" asp-route-courseId="@c.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-list me-1"></i>Topics
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

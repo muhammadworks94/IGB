@@ -1,0 +1,159 @@
+@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var isSuperAdmin = User.IsInRole("SuperAdmin");
+    var isAdmin = isSuperAdmin || User.IsInRole("Admin");
+    var isTutor = User.IsInRole("Tutor");
+    var isStudent = User.IsInRole("Student");
+    var isStaff = isAdmin || isTutor;
+}
+
+<!-- Noble UI Sidebar -->
+<nav class="sidebar">
+    <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+            <!-- Full logo when expanded -->
+            <img src="img/icon.png" alt="IGB Logo" class="brand-logo-full" style="max-height: 40px; width: auto;">
+            <!-- Compact icon when collapsed -->
+            <img src="img/icon.png" alt="IGB Icon" class="brand-logo-compact" style="width: 30px; height: 30px;">
+        </a>
+    </div>
+    <div class="sidebar-body">
+        <ul class="nav">
+            <li class="nav-item nav-category">Main</li>
+            
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a asp-controller="Home" asp-action="Index" class="nav-link">
+                    <i class="link-icon fas fa-th"></i>
+                    <span class="link-title">Dashboard</span>
+                </a>
+            </li>
+
+            @* SuperAdmin only *@
+            @if (isAuthenticated && isSuperAdmin)
+            {
+                <!-- Users -->
+                <li class="nav-item">
+                    <a asp-controller="Users" asp-action="Index" class="nav-link">
+                        <i class="link-icon fas fa-users"></i>
+                        <span class="link-title">Users</span>
+                    </a>
+                </li>
+            }
+
+            @* Admin + SuperAdmin *@
+            @if (isAuthenticated && isAdmin)
+            {
+                <!-- Approvals -->
+                <li class="nav-item">
+                    <a asp-controller="Approvals" asp-action="Index" class="nav-link">
+                        <i class="link-icon fas fa-user-check"></i>
+                        <span class="link-title">Approvals</span>
+                    </a>
+                </li>
+            }
+
+            @* Admin + SuperAdmin *@
+            @if (isAuthenticated && isAdmin)
+            {
+                <!-- Curricula -->
+                <li class="nav-item">
+                    <a asp-controller="Curricula" asp-action="Index" class="nav-link">
+                        <i class="link-icon fas fa-layer-group"></i>
+                        <span class="link-title">Curricula</span>
+                    </a>
+                </li>
+            }
+
+            @* Admin + SuperAdmin *@
+            @if (isAuthenticated && isAdmin)
+            {
+                <!-- Course Bookings (Admin queue) -->
+                <li class="nav-item">
+                    <a asp-controller="CourseBookings" asp-action="Pending" class="nav-link">
+                        <i class="link-icon fas fa-clipboard-check"></i>
+                        <span class="link-title">Course Bookings</span>
+                    </a>
+                </li>
+            }
+
+            @* Staff (Tutor/Admin/SuperAdmin) *@
+            @if (isAuthenticated && isStaff)
+            {
+                <!-- Lesson Bookings (Staff queue) -->
+                <li class="nav-item">
+                    <a asp-controller="LessonBookings" asp-action="Pending" class="nav-link">
+                        <i class="link-icon fas fa-calendar-alt"></i>
+                        <span class="link-title">Lesson Requests</span>
+                    </a>
+                </li>
+            }
+
+            @* Students *@
+            @if (isAuthenticated && isStudent)
+            {
+                <!-- Browse Courses -->
+                <li class="nav-item">
+                    <a asp-controller="Courses" asp-action="Browse" class="nav-link">
+                        <i class="link-icon fas fa-book-open"></i>
+                        <span class="link-title">Browse Courses</span>
+                    </a>
+                </li>
+
+                <!-- My Course Bookings -->
+                <li class="nav-item">
+                    <a asp-controller="CourseBookings" asp-action="My" class="nav-link">
+                        <i class="link-icon fas fa-receipt"></i>
+                        <span class="link-title">My Course Bookings</span>
+                    </a>
+                </li>
+
+                <!-- Request Lesson -->
+                <li class="nav-item">
+                    <a asp-controller="LessonBookings" asp-action="Create" class="nav-link">
+                        <i class="link-icon fas fa-plus-circle"></i>
+                        <span class="link-title">Request Lesson</span>
+                    </a>
+                </li>
+
+                <!-- My Lessons -->
+                <li class="nav-item">
+                    <a asp-controller="LessonBookings" asp-action="My" class="nav-link">
+                        <i class="link-icon fas fa-user-clock"></i>
+                        <span class="link-title">My Lessons</span>
+                    </a>
+                </li>
+            }
+
+            <li class="nav-item nav-category">Account</li>
+            
+            <!-- Change Password -->
+            <li class="nav-item">
+                <a asp-controller="Account" asp-action="ChangePassword" class="nav-link">
+                    <i class="link-icon fas fa-key"></i>
+                    <span class="link-title">Change Password</span>
+                </a>
+            </li>
+
+            <!-- Profile -->
+            <li class="nav-item">
+                <a asp-controller="Profile" asp-action="Index" class="nav-link">
+                    <i class="link-icon fas fa-user"></i>
+                    <span class="link-title">Profile</span>
+                </a>
+            </li>
+
+            <!-- Logout Option -->
+            <li class="nav-item">
+                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline w-100">
+                    <button type="submit" class="nav-link border-0 bg-transparent w-100 text-start p-0">
+                        <i class="link-icon fas fa-sign-out-alt"></i>
+                        <span class="link-title">Logout</span>
+                    </button>
+                </form>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+

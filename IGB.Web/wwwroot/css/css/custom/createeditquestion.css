@@ -1,0 +1,112 @@
+﻿/* Form Labels Styling */
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.form-check-label {
+    font-weight: 500;
+    color: #495057;
+}
+h6 {
+    color: #495057;
+}
+/* Supporting Departments Dropdown Styling */
+#departmentDropdown {
+    background-color: white !important;
+    border: 1px solid #ced4da !important;
+    color: #495057 !important;
+}
+
+    #departmentDropdown:hover {
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
+
+    #departmentDropdown:focus {
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        outline: 0 !important;
+    }
+
+/* Ensure only one dropdown arrow is shown */
+#departmentDropdown::after {
+    display: none !important;
+}
+
+/* Remove any blue background from dropdown menu */
+.dropdown-menu {
+    background-color: white !important;
+    border: 1px solid #dee2e6 !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Department checkbox styling */
+.department-item:hover {
+    background-color: #f8f9fa !important;
+}
+
+.department-item:has(.department-checkbox:checked) {
+    background-color: #e3f2fd !important;
+    border-left: 3px solid #2196f3;
+}
+
+.department-checkbox:checked {
+    background-color: #2196f3 !important;
+    border-color: #2196f3 !important;
+}
+
+.department-checkbox:focus {
+    box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25) !important;
+}
+
+#selectAllDepartments:checked {
+    background-color: #2196f3 !important;
+    border-color: #2196f3 !important;
+}
+
+#selectAllDepartments:focus {
+    box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25) !important;
+}
+
+/* Fix for long department names */
+.department-item .form-check-label {
+    word-wrap: break-word !important;
+    white-space: normal !important;
+    line-height: 1.4 !important;
+    max-width: calc(100% - 40px) !important;
+    display: inline-block !important;
+}
+
+.department-item {
+    display: flex !important;
+    align-items: flex-start !important;
+    padding: 10px 16px !important;
+    border-radius: 6px !important;
+    transition: background-color 0.2s !important;
+    margin-left: 0 !important;
+}
+
+    .department-item .form-check-input {
+        margin-top: 2px !important;
+        flex-shrink: 0 !important;
+    }
+
+/* Custom scrollbar for department checkboxes */
+#departmentCheckboxes::-webkit-scrollbar {
+    width: 6px;
+}
+
+#departmentCheckboxes::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+#departmentCheckboxes::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+    #departmentCheckboxes::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }

@@ -1,0 +1,207 @@
+/* Custom Timeline Styling - Using NobleUI Defaults */
+/* Minimal customizations using existing theme colors */
+
+/* Timeline Container */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary-navy), var(--info-blue));
+}
+
+/* Timeline Items */
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-gray);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.timeline-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Timeline Markers */
+.timeline-marker {
+    position: absolute;
+    left: -22px;
+    top: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 3px solid var(--white);
+    z-index: 2;
+}
+
+/* Timeline Content */
+.timeline-content {
+    padding: 25px;
+    position: relative;
+}
+
+.timeline-content::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 25px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid var(--white);
+}
+
+.timeline-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-navy);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.timeline-text {
+    color: var(--medium-gray);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.timeline-content small {
+    color: var(--medium-gray);
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.timeline-content small::before {
+    content: '🕒';
+    margin-right: 6px;
+    font-size: 0.9rem;
+}
+
+/* Timeline Item Variants */
+.timeline-item.system {
+    border-left: 4px solid var(--primary-navy);
+}
+
+.timeline-item.system .timeline-marker {
+    background: var(--primary-navy);
+}
+
+.timeline-item.success {
+    border-left: 4px solid var(--success-green);
+}
+
+.timeline-item.success .timeline-marker {
+    background: var(--success-green);
+}
+
+.timeline-item.info {
+    border-left: 4px solid var(--info-blue);
+}
+
+.timeline-item.info .timeline-marker {
+    background: var(--info-blue);
+}
+
+.timeline-item.warning {
+    border-left: 4px solid var(--warning-yellow);
+}
+
+.timeline-item.warning .timeline-marker {
+    background: var(--warning-yellow);
+    color: var(--charcoal);
+}
+
+.timeline-item.danger {
+    border-left: 4px solid var(--error-red);
+}
+
+.timeline-item.danger .timeline-marker {
+    background: var(--error-red);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .timeline {
+        padding-left: 20px;
+    }
+    
+    .timeline::before {
+        left: 10px;
+    }
+    
+    .timeline-marker {
+        left: -15px;
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+    }
+    
+    .timeline-content {
+        padding: 20px;
+    }
+    
+    .timeline-title {
+        font-size: 1rem;
+    }
+    
+    .timeline-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .timeline {
+        padding-left: 15px;
+    }
+    
+    .timeline::before {
+        left: 7px;
+    }
+    
+    .timeline-marker {
+        left: -12px;
+        width: 25px;
+        height: 25px;
+        font-size: 0.8rem;
+    }
+    
+    .timeline-content {
+        padding: 15px;
+    }
+    
+    .timeline-title {
+        font-size: 0.95rem;
+    }
+    
+    .timeline-text {
+        font-size: 0.85rem;
+    }
+} 

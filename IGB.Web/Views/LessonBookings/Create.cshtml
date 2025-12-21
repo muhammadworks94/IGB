@@ -1,0 +1,98 @@
+@model IGB.Web.ViewModels.LessonRequestViewModel
+@{
+    ViewData["Title"] = "Request Lesson";
+    var bookings = ViewBag.ApprovedBookings as List<IGB.Domain.Entities.CourseBooking> ?? new();
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Request Lesson</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">Request Lesson</h1>
+    <p class="breadcrumb-subtitle">Pick a date range and provide 3 preferred time options.</p>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            @if (bookings.Count == 0)
+            {
+                <div class="alert alert-warning">
+                    You have no approved course bookings. Please book a course first.
+                </div>
+                <a asp-controller="Courses" asp-action="Browse" class="btn btn-primary">
+                    <i class="fas fa-book-open me-2"></i>Browse Courses
+                </a>
+            }
+            else
+            {
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label">Approved Course Booking</label>
+                        <select asp-for="CourseBookingId" class="form-select">
+                            <option value="">-- Select --</option>
+                            @foreach (var b in bookings)
+                            {
+                                <option value="@b.Id">
+                                    @(b.Course?.Grade?.Curriculum?.Name) / @(b.Course?.Grade?.Name) / @(b.Course?.Name)
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="CourseBookingId" class="text-danger"></span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Date From</label>
+                            <input asp-for="DateFrom" class="form-control" type="date" />
+                            <span asp-validation-for="DateFrom" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date To</label>
+                            <input asp-for="DateTo" class="form-control" type="date" />
+                            <span asp-validation-for="DateTo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Option 1</label>
+                            <input asp-for="Option1" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="Option1" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Option 2</label>
+                            <input asp-for="Option2" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="Option2" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Option 3</label>
+                            <input asp-for="Option3" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="Option3" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Duration (minutes)</label>
+                            <input asp-for="DurationMinutes" class="form-control" type="number" min="30" max="180" />
+                            <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-end gap-2">
+                        <a asp-action="My" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Request
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+
+

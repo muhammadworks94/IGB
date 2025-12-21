@@ -1,0 +1,65 @@
+/* Simple Custom Tabs Styling - Using NobleUI Defaults */
+/* Minimal customizations using existing theme colors */
+
+/* Simple Tabs - Based on NobleUI defaults */
+.custom-tabs {
+    border-bottom: 2px solid var(--border-gray);
+}
+
+.custom-tabs .nav-link {
+    border: none;
+    border-radius: 8px 8px 0 0;
+    margin-right: 4px;
+    padding: 12px 20px;
+    font-weight: 500;
+    color: var(--medium-gray);
+    background: var(--off-white);
+    transition: all 0.2s ease;
+}
+
+.custom-tabs .nav-link:hover {
+    background: var(--light-gray);
+    color: var(--primary-navy);
+    border-bottom: 2px solid var(--primary-navy);
+}
+
+.custom-tabs .nav-link.active {
+    background: var(--white);
+    color: var(--primary-navy);
+    border-bottom: 2px solid var(--primary-navy);
+    font-weight: 600;
+}
+
+/* Tab Content */
+.tab-content {
+    background: var(--white);
+    border: 1px solid var(--border-gray);
+    border-top: none;
+    padding: 25px;
+    border-radius: 0 0 8px 8px;
+}
+
+.tab-pane {
+    padding: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .custom-tabs .nav-link {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+        margin-right: 3px;
+    }
+    
+    .tab-content {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .custom-tabs .nav-link {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        margin-right: 2px;
+    }
+} 

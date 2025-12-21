@@ -1,0 +1,555 @@
+/* ========================================
+   MESSAGING WIDGET STYLES
+   Bottom-right floating chat widget
+   ======================================== */
+
+.messaging-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Toggle Button (Floating Chat Icon) */
+.messaging-toggle {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #0077b5, #005885);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 119, 181, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    margin-left: auto;
+}
+
+.messaging-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 119, 181, 0.4);
+}
+
+.messaging-toggle:active {
+    transform: scale(0.95);
+}
+
+.messaging-toggle i {
+    color: white;
+    font-size: 24px;
+}
+
+/* Unread Badge */
+.messaging-toggle .notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    padding: 0 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Messaging Popup Window */
+.messaging-window {
+    position: absolute;
+    bottom: 63px;
+    right: 0;
+    width: 380px;
+    max-height: 600px;
+    height: 537px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #e1e5e9;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.messaging-panel.expanded .messaging-window {
+    display: flex;
+}
+
+/* Header */
+.messaging-header {
+    background: linear-gradient(135deg, #0077b5, #005885);
+    color: white;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.messaging-title {
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.messaging-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.messaging-controls .btn {
+    padding: 4px 8px;
+    border: none;
+    background: none;
+    color: white;
+}
+
+.messaging-controls .btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* Quick Actions */
+.messaging-quick-actions {
+    padding: 12px;
+    border-bottom: 1px solid #e1e5e9;
+    background: #f8f9fa;
+    flex-shrink: 0;
+}
+
+/* Tabs */
+.messaging-tabs {
+    display: flex;
+    border-bottom: 1px solid #e1e5e9;
+    background: white;
+    flex-shrink: 0;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    position: relative;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.tab-button:hover {
+    background: #f8f9fa;
+    color: #0077b5;
+}
+
+.tab-button.active {
+    color: #0077b5;
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #0077b5;
+}
+
+.tab-button .badge {
+    font-size: 10px;
+    padding: 2px 6px;
+}
+
+/* Content Area */
+.messaging-content {
+    flex: 1;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+.messaging-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messaging-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.messaging-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.messaging-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Message List */
+.message-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.message-item {
+    padding: 12px 16px;
+/*    border-bottom: 1px solid #e1e5e9;*/
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.message-item:hover {
+    background: #f8f9fa;
+    border-left: 3px solid #0077b5;
+    padding-left: 13px;
+}
+
+.message-item.unread {
+    background: #e3f2fd;
+    border-left: 3px solid #0077b5;
+    padding-left: 13px;
+    font-weight: 500;
+}
+
+.message-item.unread:hover {
+    background: #d1e9f6;
+}
+
+.message-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.message-sender {
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.message-time {
+    font-size: 11px;
+    color: #999;
+}
+
+.message-subject {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+    font-weight: 500;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.message-preview {
+    font-size: 12px;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+/* New widget styles for updated layout */
+.avatar-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-container .avatar-img,
+.avatar-container .rounded-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.avatar-container .contact-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.avatar-container .contact-avatar.d-none {
+    display: none !important;
+}
+
+.message-avatar {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-avatar .avatar-container {
+    width: 40px;
+    height: 40px;
+}
+
+.message-avatar .avatar-container .contact-avatar {
+    font-size: 16px;
+}
+
+.message-avatar .status {
+    width: 10px;
+    height: 10px;
+    background: #28a745;
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+.message-content {
+    min-width: 0; /* Fix flex overflow */
+}
+
+.message-sender-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.unread-count-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+}
+
+.message-text-preview {
+    font-size: 13px;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;  /* Show 2 lines max */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.message-meta-small {
+    font-size: 11px;
+}
+
+.messaging-section-header {
+    padding: 10px 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e1e5e9;
+    font-weight: 500;
+}
+
+.message-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.message-meta .badge {
+    font-size: 10px;
+    padding: 2px 6px;
+}
+
+/* Priority Badges */
+.badge-sm {
+    font-size: 10px;
+    padding: 3px 6px;
+}
+
+.badge.badge-danger {
+    background-color: #dc3545;
+}
+
+.badge.badge-warning {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge.badge-info {
+    background-color: #17a2b8;
+}
+
+.badge.badge-success {
+    background-color: #28a745;
+}
+
+/* Empty State */
+.messaging-empty {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.messaging-empty i {
+    opacity: 0.3;
+}
+
+/* Footer */
+.messaging-footer {
+    padding: 10px;
+    border-top: 1px solid #e1e5e9;
+    background: white;
+    flex-shrink: 0;
+}
+
+.messaging-footer .btn-link {
+    color: #0077b5;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.messaging-footer .btn-link:hover {
+    color: #005885;
+    text-decoration: underline;
+}
+
+/* Loading Spinner */
+.messaging-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.messaging-loading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: #0077b5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .messaging-window {
+        width: 340px;
+        height: 500px;
+        max-height: calc(100vh - 100px);
+    }
+    
+    .messaging-panel {
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .messaging-toggle {
+        width: 56px;
+        height: 56px;
+    }
+
+    .messaging-toggle i {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .messaging-window {
+        width: calc(100vw - 20px);
+        right: -10px;
+        bottom: 70px;
+    }
+
+    .messaging-toggle {
+        width: 50px;
+        height: 50px;
+    }
+
+    .messaging-toggle i {
+        font-size: 20px;
+    }
+}
+
+/* Animation for new message arrival */
+@keyframes newMessagePulse {
+    0%, 100% {
+        background: #e3f2fd;
+    }
+    50% {
+        background: #bbdefb;
+    }
+}
+
+.message-item.new-arrival {
+    animation: newMessagePulse 1s ease 2;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.typing-indicator .dots {
+    display: inline-block;
+    animation: typingDots 1.4s infinite;
+}
+
+@keyframes typingDots {
+    0%, 20% {
+        content: '.';
+    }
+    40% {
+        content: '..';
+    }
+    60%, 100% {
+        content: '...';
+    }
+}
+

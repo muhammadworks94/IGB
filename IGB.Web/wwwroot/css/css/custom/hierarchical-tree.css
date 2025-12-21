@@ -1,0 +1,391 @@
+/* Hierarchical Tree View Styles - FORCED TREE LINES */
+.hierarchical-tree {
+    padding: 1rem;
+    background: #fff;
+    border-radius: 0.5rem;
+    width: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.tree-item {
+    position: relative;
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.tree-content {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    width: 100%;
+    min-height: 50px;
+    position: relative;
+    margin-left: 0;
+}
+
+.tree-content:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+.tree-icon {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+    min-width: 40px;
+}
+
+.tree-toggle {
+    margin-right: 0.5rem;
+    transition: transform 0.3s ease;
+    color: #6c757d;
+    font-size: 0.85rem;
+    width: 16px;
+    text-align: center;
+}
+
+.tree-info {
+    flex: 1;
+    min-width: 0;
+    margin-right: 1.5rem;
+}
+
+.tree-title {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.125rem;
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+
+.tree-description {
+    color: #6c757d;
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tree-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.tree-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+    flex-shrink: 0;
+    min-width: 120px;
+}
+
+/* FORCED TREE STRUCTURE WITH VISIBLE LINES */
+.hierarchical-tree .tree-children {
+    position: relative !important;
+    margin-left: 3rem !important;
+    padding-left: 2rem !important;
+    margin-top: 0.5rem !important;
+    width: calc(100% - 3rem) !important;
+}
+
+/* FORCED VERTICAL TREE LINE */
+.hierarchical-tree .tree-children::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: -0.5rem !important;
+    bottom: 0 !important;
+    width: 3px !important;
+    background: #007bff !important;
+    z-index: 1 !important;
+    display: block !important;
+}
+
+/* FORCED HORIZONTAL CONNECTOR LINES */
+.hierarchical-tree .tree-children .tree-item .tree-content::before {
+    content: '' !important;
+    position: absolute !important;
+    left: -2rem !important;
+    top: 50% !important;
+    width: 2rem !important;
+    height: 3px !important;
+    background: #007bff !important;
+    transform: translateY(-50%) !important;
+    z-index: 2 !important;
+    display: block !important;
+}
+
+/* Level-specific styling */
+.hierarchical-tree .tree-item[data-type="Category"] .tree-content {
+    background: #f8f9fa !important;
+    border-left: 4px solid #007bff !important;
+    border: 1px solid #dee2e6 !important;
+    margin-left: 0 !important;
+}
+
+.hierarchical-tree .tree-item[data-type="SubCategory"] .tree-content {
+    background: #fff !important;
+    border-left: 4px solid #28a745 !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+.hierarchical-tree .tree-item[data-type="Module"] .tree-content {
+    background: #fff !important;
+    border-left: 4px solid #17a2b8 !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+.hierarchical-tree .tree-item[data-type="QuestionGroup"] .tree-content {
+    background: #fff !important;
+    border-left: 4px solid #ffc107 !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+.hierarchical-tree .tree-item[data-type="Question"] .tree-content {
+    background: #fff !important;
+    border-left: 4px solid #6c757d !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+/* Progress bars */
+.progress {
+    height: 6px;
+    border-radius: 3px;
+    background-color: #e9ecef;
+    min-width: 80px;
+    max-width: 100px;
+}
+
+.progress-bar {
+    border-radius: 3px;
+    font-size: 0.65rem;
+    line-height: 6px;
+    color: #fff;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Badges */
+.badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.2rem;
+    font-weight: 500;
+}
+
+/* Search highlighting */
+mark.bg-warning {
+    background-color: #fff3cd !important;
+    color: #856404 !important;
+    padding: 0.15rem 0.3rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+}
+
+/* Required items highlighting */
+.tree-item.required-highlight {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+    border-left: 5px solid #dc3545 !important;
+}
+
+.tree-item.required-highlight .tree-content {
+    background-color: rgba(220, 53, 69, 0.08) !important;
+}
+
+/* Animation for expand/collapse */
+.tree-children {
+    transition: all 0.3s ease;
+}
+
+.tree-toggle {
+    transition: transform 0.3s ease;
+}
+
+/* Custom scrollbar for long content */
+.hierarchical-tree {
+    max-height: 70vh;
+    overflow-y: auto;
+    min-height: 200px;
+}
+
+/* Loading state */
+.hierarchical-tree.loading {
+    position: relative;
+    min-height: 200px;
+}
+
+.hierarchical-tree.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hierarchical-tree::-webkit-scrollbar {
+    width: 10px;
+}
+
+.hierarchical-tree::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+.hierarchical-tree::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 5px;
+}
+
+.hierarchical-tree::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Card improvements */
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 0.75rem;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+    padding: 1rem 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Button improvements */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Form controls */
+.form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .tree-content {
+        padding: 1rem;
+    }
+    
+    .tree-icon {
+        margin-right: 1rem;
+        min-width: 40px;
+    }
+    
+    .hierarchical-tree .tree-children {
+        margin-left: 2.5rem !important;
+        padding-left: 1.5rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .hierarchical-tree {
+        padding: 1rem;
+    }
+    
+    .tree-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .tree-actions {
+        margin-left: 0;
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .hierarchical-tree .tree-children {
+        margin-left: 2rem !important;
+        padding-left: 1.5rem !important;
+        width: calc(100% - 2rem) !important;
+    }
+    
+    .tree-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .progress {
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 576px) {
+    .tree-title {
+        font-size: 1rem;
+    }
+    
+    .tree-description {
+        font-size: 0.85rem;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .tree-actions,
+    .btn-group {
+        display: none !important;
+    }
+    
+    .tree-children {
+        display: block !important;
+        margin-left: 1rem;
+        border-left: 1px solid #ccc;
+        padding-left: 0.5rem;
+    }
+    
+    .tree-item {
+        break-inside: avoid;
+    }
+}

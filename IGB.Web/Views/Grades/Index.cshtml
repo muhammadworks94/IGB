@@ -1,0 +1,61 @@
+@model List<IGB.Domain.Entities.Grade>
+@{
+    var curriculum = (IGB.Domain.Entities.Curriculum)ViewBag.Curriculum;
+    ViewData["Title"] = "Grades";
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-controller="Curricula" asp-action="Index">Curricula</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@curriculum.Name - Grades</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">Grades - @curriculum.Name</h1>
+</div>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-end mb-3">
+        <a asp-action="Create" asp-route-curriculumId="@curriculum.Id" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Grade
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Level</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var g in Model)
+                    {
+                        <tr>
+                            <td>@g.Name</td>
+                            <td>@(g.Level?.ToString() ?? "-")</td>
+                            <td>
+                                <span class="badge @(g.IsActive ? "bg-success" : "bg-secondary")">
+                                    @(g.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a asp-controller="Courses" asp-action="Index" asp-route-gradeId="@g.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-book me-1"></i>Courses
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

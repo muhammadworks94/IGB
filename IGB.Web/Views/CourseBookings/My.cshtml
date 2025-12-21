@@ -1,0 +1,56 @@
+@model List<IGB.Domain.Entities.CourseBooking>
+@{
+    ViewData["Title"] = "My Course Bookings";
+}
+
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Courses" asp-action="Browse">Browse Courses</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Bookings</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">My Course Bookings</h1>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Grade</th>
+                        <th>Curriculum</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var b in Model)
+                    {
+                        var badge = b.Status switch
+                        {
+                            IGB.Domain.Enums.BookingStatus.Approved => "bg-success",
+                            IGB.Domain.Enums.BookingStatus.Rejected => "bg-danger",
+                            IGB.Domain.Enums.BookingStatus.Cancelled => "bg-secondary",
+                            _ => "bg-warning"
+                        };
+                        <tr>
+                            <td>@b.Course?.Name</td>
+                            <td>@b.Course?.Grade?.Name</td>
+                            <td>@b.Course?.Grade?.Curriculum?.Name</td>
+                            <td><span class="badge @badge">@b.Status</span></td>
+                            <td>@b.RequestedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

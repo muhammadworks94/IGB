@@ -1,0 +1,874 @@
+/* ===================================
+   THEMED CARDS WITH RISK CAPCOM COLORS
+   =================================== */
+
+/* Theme Card Base Styles */
+.theme-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.theme-card .card-body {
+    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.theme-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Primary Navy Theme Card */
+.theme-card-primary {
+    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-blue) 100%);
+    color: var(--white);
+}
+
+.theme-card-primary .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-primary .card-title {
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-primary .card-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Accent Blue Theme Card */
+.theme-card-accent {
+    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-blue) 100%);
+    color: var(--white);
+}
+
+.theme-card-accent .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-accent .card-title {
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-accent .card-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Success Green Theme Card */
+.theme-card-success {
+    background: linear-gradient(135deg, var(--success-green) 0%, #1e7e34 100%);
+    color: var(--white);
+}
+
+.theme-card-success .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-success .card-title {
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-success .card-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Warning Theme Card */
+.theme-card-warning {
+    background: linear-gradient(135deg, var(--warning-yellow) 0%, #e0a800 100%);
+    color: var(--charcoal);
+}
+
+.theme-card-warning .card-header {
+    background: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    color: var(--charcoal);
+}
+
+.theme-card-warning .card-title {
+    color: var(--charcoal);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-warning .card-text {
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Info Theme Card */
+.theme-card-info {
+    background: linear-gradient(135deg, var(--info-blue) 0%, #138496 100%);
+    color: var(--white);
+}
+
+.theme-card-info .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-info .card-title {
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-info .card-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Danger Theme Card */
+.theme-card-danger {
+    background: linear-gradient(135deg, var(--error-red) 0%, #c82333 100%);
+    color: var(--white);
+}
+
+.theme-card-danger .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-danger .card-title {
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-danger .card-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Purple Theme Card */
+.theme-card-purple {
+    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+    color: var(--white);
+}
+
+.theme-card-purple .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-purple .card-title {
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-purple .card-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Teal Theme Card */
+.theme-card-teal {
+    background: linear-gradient(135deg, #20c997 0%, #1ba085 100%);
+    color: var(--white);
+}
+
+.theme-card-teal .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-teal .card-title {
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-teal .card-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Orange Theme Card */
+.theme-card-orange {
+    background: linear-gradient(135deg, #fd7e14 0%, #e55a00 100%);
+    color: var(--white);
+}
+
+.theme-card-orange .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-orange .card-title {
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-orange .card-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Light Theme Card */
+.theme-card-light {
+    background: linear-gradient(135deg, var(--light-gray) 0%, var(--off-white) 100%);
+    color: var(--charcoal);
+    border: 1px solid var(--border-gray);
+}
+
+.theme-card-light .card-header {
+    background: rgba(0, 51, 102, 0.05);
+    border-bottom: 1px solid var(--border-gray);
+    color: var(--primary-navy);
+}
+
+.theme-card-light .card-title {
+    color: var(--primary-navy);
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+}
+
+.theme-card-light .card-text {
+    color: var(--dark-gray);
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+/* Card Icon Styles */
+.theme-card .card-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.theme-card-light .card-icon {
+    background: var(--primary-navy);
+    color: var(--white);
+}
+
+.theme-card-warning .card-icon {
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--charcoal);
+}
+
+.theme-card-purple .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.theme-card-teal .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.theme-card-orange .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* Card Button Styles */
+.theme-card .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 0.375rem 1rem;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 0.875rem;
+}
+
+.theme-card .btn-primary {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    backdrop-filter: blur(10px);
+}
+
+.theme-card .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.theme-card-light .btn-primary {
+    background: var(--primary-navy);
+    color: var(--white);
+}
+
+.theme-card-light .btn-primary:hover {
+    background: var(--primary-blue);
+    transform: translateY(-2px);
+}
+
+/* Reduce button spacing */
+.theme-card .btn {
+    margin-top: 0.375rem !important;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+}
+
+.theme-card-warning .btn-primary {
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--charcoal);
+}
+
+.theme-card-warning .btn-primary:hover {
+    background: rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.theme-card-purple .btn-primary {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    backdrop-filter: blur(10px);
+}
+
+.theme-card-purple .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.theme-card-teal .btn-primary {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    backdrop-filter: blur(10px);
+}
+
+.theme-card-teal .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.theme-card-orange .btn-primary {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    backdrop-filter: blur(10px);
+}
+
+.theme-card-orange .btn-primary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Card Stats */
+.theme-card .card-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.theme-card-light .card-stats {
+    border-top: 1px solid var(--border-gray);
+}
+
+.theme-card-warning .card-stats {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.theme-card-purple .card-stats {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-card-teal .card-stats {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-card-orange .card-stats {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-card .stat-item {
+    text-align: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.theme-card .stat-number {
+    font-size: 1rem;
+    font-weight: 700;
+    display: block;
+    line-height: 1.2;
+}
+
+.theme-card .stat-label {
+    font-size: 0.65rem;
+    opacity: 0.8;
+    line-height: 1.1;
+    word-wrap: break-word;
+}
+
+/* Card Badge */
+.theme-card .card-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+
+.theme-card-light .card-badge {
+    background: var(--primary-navy);
+    color: var(--white);
+}
+
+.theme-card-warning .card-badge {
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--charcoal);
+}
+
+.theme-card-purple .card-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-teal .card-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+.theme-card-orange .card-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+}
+
+/* Card Progress Bar */
+.theme-card .progress {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    margin-top: 0.5rem;
+}
+
+.theme-card .progress-bar {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 3px;
+}
+
+.theme-card-light .progress {
+    background: var(--border-gray);
+}
+
+.theme-card-light .progress-bar {
+    background: var(--primary-navy);
+}
+
+.theme-card-warning .progress {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.theme-card-warning .progress-bar {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.theme-card-purple .progress {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.theme-card-purple .progress-bar {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.theme-card-teal .progress {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.theme-card-teal .progress-bar {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.theme-card-orange .progress {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.theme-card-orange .progress-bar {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+/* Card Content Distribution */
+.theme-card .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.theme-card .card-actions {
+    margin-top: auto;
+}
+
+/* Card Animation */
+@keyframes cardPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.theme-card.animated {
+    animation: cardPulse 2s infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .theme-card {
+        margin-bottom: 1rem;
+    }
+    
+    .theme-card .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .theme-card .stat-number {
+        font-size: 1.25rem;
+    }
+}
+
+/* ===================================
+   QUICK ACTION BUTTON CARDS
+   =================================== */
+
+/* Quick Action Button Card Styles */
+.quick-action-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border: 1px solid var(--border-gray);
+}
+
+.quick-action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.quick-action-card .card-body {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.quick-action-card .card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+    color: var(--white);
+    transition: all 0.3s ease;
+}
+
+.quick-action-card .card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+    color: var(--charcoal);
+}
+
+/* Quick Action Button Color Themes */
+.quick-action-card.btn-primary {
+    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-blue) 100%);
+    border-color: var(--primary-navy);
+}
+
+.quick-action-card.btn-primary .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.quick-action-card.btn-primary .card-title {
+    color: var(--white);
+}
+
+.quick-action-card.btn-success {
+    background: linear-gradient(135deg, var(--success-green) 0%, #1e7e34 100%);
+    border-color: var(--success-green);
+}
+
+.quick-action-card.btn-success .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.quick-action-card.btn-success .card-title {
+    color: var(--white);
+}
+
+.quick-action-card.btn-warning {
+    background: linear-gradient(135deg, var(--warning-yellow) 0%, #e0a800 100%);
+    border-color: var(--warning-yellow);
+}
+
+.quick-action-card.btn-warning .card-icon {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.quick-action-card.btn-warning .card-title {
+    color: var(--charcoal);
+}
+
+.quick-action-card.btn-info {
+    background: linear-gradient(135deg, var(--info-blue) 0%, #138496 100%);
+    border-color: var(--info-blue);
+}
+
+.quick-action-card.btn-info .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.quick-action-card.btn-info .card-title {
+    color: var(--white);
+}
+
+.quick-action-card.btn-secondary {
+    background: linear-gradient(135deg, var(--medium-gray) 0%, var(--dark-gray) 100%);
+    border-color: var(--medium-gray);
+}
+
+.quick-action-card.btn-secondary .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.quick-action-card.btn-secondary .card-title {
+    color: var(--white);
+}
+
+.quick-action-card.btn-danger {
+    background: linear-gradient(135deg, var(--error-red) 0%, #c82333 100%);
+    border-color: var(--error-red);
+}
+
+.quick-action-card.btn-danger .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.quick-action-card.btn-danger .card-title {
+    color: var(--white);
+}
+
+/* Hover Effects */
+.quick-action-card:hover .card-icon {
+    transform: scale(1.1);
+}
+
+.quick-action-card:hover .card-title {
+    transform: translateY(-1px);
+}
+
+/* Equal Height for Quick Action Cards */
+.quick-action-card {
+    min-height: 120px;
+    text-decoration: none;
+    display: block;
+}
+
+/* ===================================
+   PAGE HEADER STYLES
+   =================================== */
+
+/* Page Header Container */
+.page-header {
+    background: #f8f9fa;
+    color: #333;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Breadcrumb Styles */
+.page-header .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.page-header .breadcrumb-item {
+    font-size: 0.875rem;
+}
+
+.page-header .breadcrumb-item a {
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.page-header .breadcrumb-item a:hover {
+    color: #495057;
+}
+
+.page-header .breadcrumb-item.active {
+    color: #495057;
+    font-weight: 500;
+}
+
+.page-header .breadcrumb-item + .breadcrumb-item::before {
+    color: #6c757d;
+    content: "›";
+    font-weight: bold;
+}
+
+/* Page Title Section */
+.page-title-section {
+    margin-top: 0.5rem;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+    color: #212529;
+    line-height: 1.2;
+}
+
+.page-description {
+    font-size: 1rem;
+    color: #6c757d;
+    margin: 0.5rem 0 0 0;
+    line-height: 1.5;
+    max-width: 600px;
+}
+
+/* Action Button in Header */
+.page-header .btn-primary {
+    background: #007bff;
+    border: 1px solid #007bff;
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.page-header .btn-primary:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1rem 0;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .page-description {
+        font-size: 0.9rem;
+    }
+    
+    .page-title-section .col-md-4 {
+        margin-top: 1rem;
+        text-align: left !important;
+    }
+    
+    /* Card Stats Responsive */
+    .theme-card .card-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .theme-card .stat-item {
+        flex: none;
+        width: 100%;
+    }
+    
+    .theme-card .stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .theme-card .stat-label {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .theme-card .card-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    
+    .theme-card .stat-item {
+        flex: 1;
+        min-width: 45%;
+    }
+} 

@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Student Portal";
+}
+
+<div class="breadcrumb-header">
+    <h1 class="breadcrumb-title">Student Portal</h1>
+    <p class="breadcrumb-subtitle">Browse courses, manage bookings, and track lessons.</p>
+</div>
+
+<div class="container-fluid">
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-4">
+            <a class="btn btn-outline-primary w-100" asp-controller="Courses" asp-action="Browse">Browse Courses</a>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <a class="btn btn-outline-primary w-100" asp-controller="CourseBookings" asp-action="My">My Course Bookings</a>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <a class="btn btn-outline-primary w-100" asp-controller="LessonBookings" asp-action="My">My Lessons</a>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <a class="btn btn-outline-primary w-100" asp-controller="Profile" asp-action="Index">My Profile</a>
+        </div>
+    </div>
+</div>
+
+

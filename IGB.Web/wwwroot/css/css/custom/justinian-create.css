@@ -1,0 +1,94 @@
+/**
+ * Justinian Create View Styles
+ * Uses the system's existing color scheme for consistency
+ */
+
+/* Form validation styles */
+.is-invalid {
+    border-color: var(--bs-danger) !important;
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-danger-rgb), 0.25) !important;
+}
+
+.is-valid {
+    border-color: var(--bs-success) !important;
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-success-rgb), 0.25) !important;
+}
+
+.required-field {
+    border-color: var(--bs-warning) !important;
+}
+
+.text-danger {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Method selection cards */
+#uploadCard, #textCard {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+#uploadCard:hover, #textCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#uploadCard.selected-method {
+    border-color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+#textCard.selected-method {
+    border-color: var(--bs-success);
+    background-color: rgba(var(--bs-success-rgb), 0.05);
+}
+
+/* Welcome section styling */
+.alert-info {
+    border-left: 4px solid var(--bs-info);
+}
+
+.alert-info ul {
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+
+.alert-info li {
+    margin-bottom: 5px;
+}
+
+/* File preview styling */
+#filePreview .alert {
+    border-radius: 8px;
+}
+
+/* Method selection message */
+.method-selection-message {
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Justinian analysis preview */
+#justinianPreviewSection {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #uploadCard, #textCard {
+        margin-bottom: 1rem;
+    }
+}

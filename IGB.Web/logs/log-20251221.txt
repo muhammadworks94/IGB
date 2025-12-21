@@ -1,0 +1,804 @@
+2025-12-21 12:26:29.013 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-21 12:26:29.669 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-21 12:26:30.131 +05:00 [INF] Starting IGB Web Application
+2025-12-21 12:26:31.053 +05:00 [INF] Users already exist and are up-to-date. Skipping seed/backfill.
+2025-12-21 12:26:31.061 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-21 12:26:31.063 +05:00 [INF] Database initialized and seeded successfully
+2025-12-21 12:26:31.223 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-21 12:26:31.225 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-21 12:26:31.225 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-21 12:26:31.250 +05:00 [INF] Server desktop-jmka7tq:20856:e16a2e05 successfully announced in 9.6625 ms
+2025-12-21 12:26:31.255 +05:00 [INF] Server desktop-jmka7tq:20856:e16a2e05 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-21 12:26:31.277 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-21 12:26:31.355 +05:00 [INF] Server desktop-jmka7tq:20856:e16a2e05 all the dispatchers started
+2025-12-21 12:26:31.622 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:26:31.6219816Z"
+2025-12-21 12:26:32.154 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:26:32.178 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:27:01.576 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:27:01.5760317Z"
+2025-12-21 12:28:01.641 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:28:01.6416982Z"
+2025-12-21 12:28:21.803 +05:00 [INF] User logged in successfully: superadmin@igb.com
+2025-12-21 12:28:21.810 +05:00 [INF] User superadmin@igb.com logged in successfully
+2025-12-21 12:28:22.025 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:28:22.043 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:28:32.062 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:28:32.064 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:28:34.387 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:28:34.390 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:29:01.691 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:29:01.6916282Z"
+2025-12-21 12:30:01.751 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:30:01.7516050Z"
+2025-12-21 12:31:01.835 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:31:01.8356583Z"
+2025-12-21 12:32:01.899 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:32:01.8990612Z"
+2025-12-21 12:33:02.000 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:33:02.0002159Z"
+2025-12-21 12:33:33.343 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-21 12:33:33.692 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-21 12:33:33.905 +05:00 [INF] Starting IGB Web Application
+2025-12-21 12:33:34.781 +05:00 [INF] Users already exist and are up-to-date. Skipping seed/backfill.
+2025-12-21 12:33:34.787 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-21 12:33:34.787 +05:00 [INF] Database initialized and seeded successfully
+2025-12-21 12:33:34.958 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-21 12:33:34.959 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-21 12:33:34.960 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-21 12:33:34.988 +05:00 [INF] Server desktop-jmka7tq:2340:3743a2b4 successfully announced in 9.389 ms
+2025-12-21 12:33:34.994 +05:00 [INF] Server desktop-jmka7tq:2340:3743a2b4 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-21 12:33:35.228 +05:00 [INF] Server desktop-jmka7tq:2340:3743a2b4 all the dispatchers started
+2025-12-21 12:33:35.798 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:33:35.808 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:34:05.528 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:34:05.5279412Z"
+2025-12-21 12:35:05.498 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:35:05.4986605Z"
+2025-12-21 12:36:05.667 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:36:05.6678467Z"
+2025-12-21 12:37:05.742 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:37:05.7424288Z"
+2025-12-21 12:38:05.824 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:38:05.8246015Z"
+2025-12-21 12:38:35.015 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-21 12:39:05.950 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:39:05.9509633Z"
+2025-12-21 12:40:06.032 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:40:06.0320205Z"
+2025-12-21 12:41:06.128 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:41:06.1287809Z"
+2025-12-21 12:42:06.199 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:42:06.1991154Z"
+2025-12-21 12:42:12.525 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:42:12.532 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:43:06.293 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:43:06.2932696Z"
+2025-12-21 12:44:06.358 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:44:06.3582008Z"
+2025-12-21 12:45:06.444 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:45:06.4447016Z"
+2025-12-21 12:46:06.593 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:46:06.5939333Z"
+2025-12-21 12:47:06.695 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:47:06.6953645Z"
+2025-12-21 12:48:06.807 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:48:06.8073516Z"
+2025-12-21 12:49:06.867 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:49:06.8674885Z"
+2025-12-21 12:50:06.959 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:50:06.9596390Z"
+2025-12-21 12:51:07.035 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:51:07.0356073Z"
+2025-12-21 12:52:07.133 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:52:07.1339221Z"
+2025-12-21 12:53:07.223 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:53:07.2230780Z"
+2025-12-21 12:53:29.300 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-21 12:53:29.621 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-21 12:53:29.839 +05:00 [INF] Starting IGB Web Application
+2025-12-21 12:53:30.611 +05:00 [INF] Users already exist and are up-to-date. Skipping seed/backfill.
+2025-12-21 12:53:30.617 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-21 12:53:30.617 +05:00 [INF] Database initialized and seeded successfully
+2025-12-21 12:53:30.765 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-21 12:53:30.766 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-21 12:53:30.766 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-21 12:53:30.786 +05:00 [INF] Server desktop-jmka7tq:10720:7063c174 successfully announced in 7.0907 ms
+2025-12-21 12:53:30.791 +05:00 [INF] Server desktop-jmka7tq:10720:7063c174 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-21 12:53:30.878 +05:00 [INF] Server desktop-jmka7tq:10720:7063c174 all the dispatchers started
+2025-12-21 12:53:31.654 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:53:31.678 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:54:01.121 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:54:01.1208467Z"
+2025-12-21 12:55:01.128 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:55:01.1288837Z"
+2025-12-21 12:56:01.212 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:56:01.2123941Z"
+2025-12-21 12:57:01.306 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:57:01.3066223Z"
+2025-12-21 12:57:26.250 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:57:26.264 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 12:58:01.385 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:58:01.3853932Z"
+2025-12-21 12:58:30.820 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-21 12:59:01.448 +05:00 [INF] Hangfire heartbeat at "2025-12-21T07:59:01.4483727Z"
+2025-12-21 13:00:01.533 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:00:01.5331568Z"
+2025-12-21 13:01:01.604 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:01:01.6046936Z"
+2025-12-21 13:01:26.480 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:01:26.491 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:02:01.704 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:02:01.7041903Z"
+2025-12-21 13:03:01.771 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:03:01.7715321Z"
+2025-12-21 13:04:01.849 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:04:01.8493737Z"
+2025-12-21 13:05:01.930 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:05:01.9307871Z"
+2025-12-21 13:06:02.026 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:06:02.0264639Z"
+2025-12-21 13:07:02.077 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:07:02.0779009Z"
+2025-12-21 13:08:02.174 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:08:02.1748753Z"
+2025-12-21 13:09:02.251 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:09:02.2515918Z"
+2025-12-21 13:10:02.333 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:10:02.3338367Z"
+2025-12-21 13:10:05.366 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:10:05.374 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:10:21.271 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-21 13:10:21.717 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-21 13:10:21.919 +05:00 [INF] Starting IGB Web Application
+2025-12-21 13:10:22.729 +05:00 [INF] Users already exist and are up-to-date. Skipping seed/backfill.
+2025-12-21 13:10:22.734 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-21 13:10:22.735 +05:00 [INF] Database initialized and seeded successfully
+2025-12-21 13:10:22.876 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-21 13:10:22.878 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-21 13:10:22.879 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-21 13:10:22.902 +05:00 [INF] Server desktop-jmka7tq:32132:47a3b3a4 successfully announced in 7.2966 ms
+2025-12-21 13:10:22.907 +05:00 [INF] Server desktop-jmka7tq:32132:47a3b3a4 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-21 13:10:22.975 +05:00 [INF] Server desktop-jmka7tq:32132:47a3b3a4 all the dispatchers started
+2025-12-21 13:10:24.111 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:10:24.133 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:11:08.272 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:11:08.2721785Z"
+2025-12-21 13:12:08.257 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:12:08.2579487Z"
+2025-12-21 13:13:08.323 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:13:08.3235454Z"
+2025-12-21 13:14:08.429 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:14:08.4297838Z"
+2025-12-21 13:15:08.513 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:15:08.5135317Z"
+2025-12-21 13:15:22.930 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-21 13:16:08.573 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:16:08.5733190Z"
+2025-12-21 13:17:08.627 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:17:08.6277321Z"
+2025-12-21 13:18:08.719 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:18:08.7190930Z"
+2025-12-21 13:19:08.814 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:19:08.8147878Z"
+2025-12-21 13:20:08.891 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:20:08.8910290Z"
+2025-12-21 13:20:10.276 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:20:10.278 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:20:14.976 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:20:14.978 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:21:55.083 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-21 13:21:55.474 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-21 13:21:55.684 +05:00 [INF] Starting IGB Web Application
+2025-12-21 13:21:56.418 +05:00 [INF] Users already exist and are up-to-date. Skipping seed/backfill.
+2025-12-21 13:21:56.423 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-21 13:21:56.424 +05:00 [INF] Database initialized and seeded successfully
+2025-12-21 13:21:56.582 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-21 13:21:56.588 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-21 13:21:56.588 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-21 13:21:56.616 +05:00 [INF] Server desktop-jmka7tq:3516:24486722 successfully announced in 9.8619 ms
+2025-12-21 13:21:56.622 +05:00 [INF] Server desktop-jmka7tq:3516:24486722 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-21 13:21:56.708 +05:00 [INF] Server desktop-jmka7tq:3516:24486722 all the dispatchers started
+2025-12-21 13:21:57.019 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:21:57.0130978Z"
+2025-12-21 13:21:57.288 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:21:57.297 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:22:11.938 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:22:11.9382737Z"
+2025-12-21 13:23:12.049 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:23:12.0492295Z"
+2025-12-21 13:23:54.566 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:23:54.568 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:23:58.186 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:23:58.189 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:00.738 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:00.743 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:01.617 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:01.619 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:03.529 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:03.533 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:04.276 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:04.281 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:12.149 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:24:12.1495447Z"
+2025-12-21 13:24:14.432 +05:00 [INF] Getting user 1
+2025-12-21 13:24:14.475 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:14.479 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:16.668 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:16.670 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:19.323 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:19.327 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:20.420 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:20.424 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:21.418 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:21.422 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:23.117 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:23.119 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:24.074 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:24.078 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:25.422 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:25.425 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:26.436 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:26.438 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:27.141 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:27.145 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:28.089 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:28.092 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:29.862 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:29.865 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:31.018 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:31.019 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:32.252 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:32.254 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:33.036 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:33.040 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:37.539 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:37.545 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:38.851 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:38.852 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:40.802 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:40.806 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:41.218 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:41.220 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:54.965 +05:00 [INF] User logged out
+2025-12-21 13:24:55.020 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:24:55.024 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:25:12.256 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:25:12.2560268Z"
+2025-12-21 13:26:12.354 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:26:12.3546288Z"
+2025-12-21 13:26:56.647 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-21 13:27:12.426 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:27:12.4269424Z"
+2025-12-21 13:27:36.187 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-21 13:27:36.526 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-21 13:27:36.752 +05:00 [INF] Starting IGB Web Application
+2025-12-21 13:27:37.628 +05:00 [INF] Users already exist and are up-to-date. Skipping seed/backfill.
+2025-12-21 13:27:37.635 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-21 13:27:37.636 +05:00 [INF] Database initialized and seeded successfully
+2025-12-21 13:27:37.808 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-21 13:27:37.809 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-21 13:27:37.810 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-21 13:27:37.835 +05:00 [INF] Server desktop-jmka7tq:21548:5f7450ed successfully announced in 9.3588 ms
+2025-12-21 13:27:37.840 +05:00 [INF] Server desktop-jmka7tq:21548:5f7450ed is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-21 13:27:37.995 +05:00 [INF] Server desktop-jmka7tq:21548:5f7450ed all the dispatchers started
+2025-12-21 13:27:38.488 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:27:38.497 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:27:40.494 +05:00 [INF] User logged in successfully: superadmin@igb.com
+2025-12-21 13:27:40.500 +05:00 [INF] User superadmin@igb.com logged in successfully
+2025-12-21 13:27:40.654 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:27:40.656 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:28:08.261 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:28:08.2612744Z"
+2025-12-21 13:29:08.288 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:29:08.2887726Z"
+2025-12-21 13:29:08.362 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:29:08.367 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:29:13.456 +05:00 [INF] Getting user 1
+2025-12-21 13:29:13.502 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:29:13.506 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:29:15.674 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:29:15.676 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-21 13:30:08.383 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:30:08.3835986Z"
+2025-12-21 13:31:08.488 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:31:08.4888040Z"
+2025-12-21 13:32:08.572 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:32:08.5723319Z"
+2025-12-21 13:32:37.879 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-21 13:33:08.666 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:33:08.6669734Z"
+2025-12-21 13:34:08.734 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:34:08.7347627Z"
+2025-12-21 13:35:08.836 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:35:08.8366056Z"
+2025-12-21 13:36:08.920 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:36:08.9204313Z"
+2025-12-21 13:37:08.984 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:37:08.9844386Z"
+2025-12-21 13:38:09.068 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:38:09.0681495Z"
+2025-12-21 13:39:09.137 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:39:09.1376681Z"
+2025-12-21 13:40:09.211 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:40:09.2118838Z"
+2025-12-21 13:41:09.316 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:41:09.3166053Z"
+2025-12-21 13:42:09.410 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:42:09.4104305Z"
+2025-12-21 13:43:09.536 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:43:09.5362396Z"
+2025-12-21 13:44:09.637 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:44:09.6374687Z"
+2025-12-21 13:45:09.733 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:45:09.7332620Z"
+2025-12-21 13:46:09.832 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:46:09.8322365Z"
+2025-12-21 13:47:09.907 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:47:09.9078007Z"
+2025-12-21 13:48:09.995 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:48:09.9953885Z"
+2025-12-21 13:49:10.052 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:49:10.0527971Z"
+2025-12-21 13:50:10.174 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:50:10.1743705Z"
+2025-12-21 13:51:10.259 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:51:10.2595394Z"
+2025-12-21 13:52:10.335 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:52:10.3355512Z"
+2025-12-21 13:53:10.432 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:53:10.4328708Z"
+2025-12-21 13:54:10.533 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:54:10.5337311Z"
+2025-12-21 13:55:10.614 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:55:10.6144061Z"
+2025-12-21 13:56:10.672 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:56:10.6725626Z"
+2025-12-21 13:57:10.757 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:57:10.7576803Z"
+2025-12-21 13:58:10.845 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:58:10.8455787Z"
+2025-12-21 13:59:10.947 +05:00 [INF] Hangfire heartbeat at "2025-12-21T08:59:10.9478551Z"
+2025-12-21 14:00:11.010 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:00:11.0105168Z"
+2025-12-21 14:01:11.065 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:01:11.0653652Z"
+2025-12-21 14:02:11.163 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:02:11.1631263Z"
+2025-12-21 14:03:11.239 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:03:11.2393228Z"
+2025-12-21 14:04:11.322 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:04:11.3222386Z"
+2025-12-21 14:05:11.407 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:05:11.4070210Z"
+2025-12-21 14:06:11.463 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:06:11.4639029Z"
+2025-12-21 14:07:11.567 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:07:11.5675260Z"
+2025-12-21 14:08:11.647 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:08:11.6477715Z"
+2025-12-21 14:09:11.731 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:09:11.7313421Z"
+2025-12-21 14:10:11.822 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:10:11.8220903Z"
+2025-12-21 14:11:11.946 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:11:11.9464621Z"
+2025-12-21 14:12:12.023 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:12:12.0232380Z"
+2025-12-21 14:13:12.104 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:13:12.1049424Z"
+2025-12-21 14:14:12.177 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:14:12.1769120Z"
+2025-12-21 14:15:12.239 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:15:12.2393325Z"
+2025-12-21 14:16:12.338 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:16:12.3389427Z"
+2025-12-21 14:17:12.440 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:17:12.4404482Z"
+2025-12-21 14:18:12.537 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:18:12.5377175Z"
+2025-12-21 14:19:12.641 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:19:12.6416421Z"
+2025-12-21 14:20:12.738 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:20:12.7386322Z"
+2025-12-21 14:21:12.835 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:21:12.8350554Z"
+2025-12-21 14:22:12.932 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:22:12.9318895Z"
+2025-12-21 14:23:13.014 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:23:13.0141668Z"
+2025-12-21 14:24:13.105 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:24:13.1055376Z"
+2025-12-21 14:25:13.174 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:25:13.1739951Z"
+2025-12-21 14:26:13.261 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:26:13.2612383Z"
+2025-12-21 14:27:13.357 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:27:13.3573488Z"
+2025-12-21 14:28:13.448 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:28:13.4489233Z"
+2025-12-21 14:29:13.567 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:29:13.5676753Z"
+2025-12-21 14:30:13.642 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:30:13.6429736Z"
+2025-12-21 14:31:13.736 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:31:13.7362057Z"
+2025-12-21 14:32:13.809 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:32:13.8098271Z"
+2025-12-21 14:33:13.884 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:33:13.8847115Z"
+2025-12-21 14:34:13.970 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:34:13.9708842Z"
+2025-12-21 14:35:14.067 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:35:14.0670005Z"
+2025-12-21 14:36:14.159 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:36:14.1595823Z"
+2025-12-21 14:37:14.210 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:37:14.2107544Z"
+2025-12-21 14:38:14.307 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:38:14.3070340Z"
+2025-12-21 14:39:14.368 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:39:14.3681373Z"
+2025-12-21 14:40:14.439 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:40:14.4391819Z"
+2025-12-21 14:41:14.535 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:41:14.5354488Z"
+2025-12-21 14:42:14.646 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:42:14.6464523Z"
+2025-12-21 14:43:14.737 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:43:14.7375498Z"
+2025-12-21 14:44:14.819 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:44:14.8191536Z"
+2025-12-21 14:45:14.925 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:45:14.9251369Z"
+2025-12-21 14:46:14.997 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:46:14.9974828Z"
+2025-12-21 14:47:00.035 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:47:00.0357138Z"
+2025-12-21 14:48:00.115 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:48:00.1157235Z"
+2025-12-21 14:49:00.215 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:49:00.2153745Z"
+2025-12-21 14:50:00.267 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:50:00.2674487Z"
+2025-12-21 14:51:00.360 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:51:00.3608227Z"
+2025-12-21 14:52:00.431 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:52:00.4311238Z"
+2025-12-21 14:53:00.525 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:53:00.5255097Z"
+2025-12-21 14:54:00.592 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:54:00.5919993Z"
+2025-12-21 14:55:00.665 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:55:00.6650787Z"
+2025-12-21 14:56:00.776 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:56:00.7761108Z"
+2025-12-21 14:57:00.886 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:57:00.8867959Z"
+2025-12-21 14:58:00.992 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:58:00.9926099Z"
+2025-12-21 14:59:01.116 +05:00 [INF] Hangfire heartbeat at "2025-12-21T09:59:01.1165522Z"
+2025-12-21 15:00:01.214 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:00:01.2142074Z"
+2025-12-21 15:01:01.298 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:01:01.2988978Z"
+2025-12-21 15:02:01.405 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:02:01.4050659Z"
+2025-12-21 15:03:01.504 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:03:01.5047618Z"
+2025-12-21 15:04:01.638 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:04:01.6381452Z"
+2025-12-21 15:05:01.720 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:05:01.7204123Z"
+2025-12-21 15:06:01.823 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:06:01.8232618Z"
+2025-12-21 15:07:01.894 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:07:01.8942712Z"
+2025-12-21 15:08:01.987 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:08:01.9875253Z"
+2025-12-21 15:09:02.078 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:09:02.0781603Z"
+2025-12-21 15:10:02.138 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:10:02.1385416Z"
+2025-12-21 15:11:02.232 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:11:02.2329805Z"
+2025-12-21 15:12:02.345 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:12:02.3455759Z"
+2025-12-21 15:13:02.437 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:13:02.4377754Z"
+2025-12-21 15:14:02.531 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:14:02.5310827Z"
+2025-12-21 15:15:02.608 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:15:02.6087577Z"
+2025-12-21 15:16:02.686 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:16:02.6863126Z"
+2025-12-21 15:17:02.815 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:17:02.8151122Z"
+2025-12-21 15:18:02.913 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:18:02.9134571Z"
+2025-12-21 15:19:02.981 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:19:02.9817678Z"
+2025-12-21 15:20:03.052 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:20:03.0521071Z"
+2025-12-21 15:21:03.142 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:21:03.1423835Z"
+2025-12-21 15:22:03.237 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:22:03.2374774Z"
+2025-12-21 15:23:03.331 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:23:03.3316049Z"
+2025-12-21 15:24:03.420 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:24:03.4201092Z"
+2025-12-21 15:25:03.511 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:25:03.5110822Z"
+2025-12-21 15:26:03.599 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:26:03.5994550Z"
+2025-12-21 15:27:03.713 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:27:03.7138867Z"
+2025-12-21 15:28:03.836 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:28:03.8367549Z"
+2025-12-21 15:29:03.937 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:29:03.9372279Z"
+2025-12-21 15:30:04.009 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:30:04.0092471Z"
+2025-12-21 15:31:04.085 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:31:04.0855712Z"
+2025-12-21 15:32:04.187 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:32:04.1872812Z"
+2025-12-21 15:33:04.280 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:33:04.2807520Z"
+2025-12-21 15:34:04.371 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:34:04.3713324Z"
+2025-12-21 15:35:04.448 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:35:04.4480861Z"
+2025-12-21 15:36:04.524 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:36:04.5249738Z"
+2025-12-21 15:37:04.627 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:37:04.6274114Z"
+2025-12-21 15:38:04.711 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:38:04.7114420Z"
+2025-12-21 15:39:04.824 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:39:04.8243562Z"
+2025-12-21 15:40:04.947 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:40:04.9470309Z"
+2025-12-21 15:41:05.027 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:41:05.0276211Z"
+2025-12-21 15:42:05.103 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:42:05.1035212Z"
+2025-12-21 15:43:05.197 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:43:05.1971053Z"
+2025-12-21 15:44:05.309 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:44:05.3093908Z"
+2025-12-21 15:45:05.379 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:45:05.3790953Z"
+2025-12-21 15:46:05.479 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:46:05.4794567Z"
+2025-12-21 15:47:05.575 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:47:05.5755306Z"
+2025-12-21 15:48:05.663 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:48:05.6630713Z"
+2025-12-21 15:49:05.820 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:49:05.8204960Z"
+2025-12-21 15:50:05.902 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:50:05.9028395Z"
+2025-12-21 15:51:06.016 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:51:06.0168389Z"
+2025-12-21 15:52:06.088 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:52:06.0887671Z"
+2025-12-21 15:53:06.156 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:53:06.1560259Z"
+2025-12-21 15:54:06.275 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:54:06.2758391Z"
+2025-12-21 15:55:06.361 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:55:06.3612451Z"
+2025-12-21 15:56:06.452 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:56:06.4521881Z"
+2025-12-21 15:57:06.525 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:57:06.5259228Z"
+2025-12-21 15:58:06.579 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:58:06.5794783Z"
+2025-12-21 15:59:06.652 +05:00 [INF] Hangfire heartbeat at "2025-12-21T10:59:06.6521603Z"
+2025-12-21 16:00:06.739 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:00:06.7390928Z"
+2025-12-21 16:01:06.826 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:01:06.8261603Z"
+2025-12-21 16:02:06.889 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:02:06.8898695Z"
+2025-12-21 16:03:06.951 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:03:06.9519888Z"
+2025-12-21 16:04:07.049 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:04:07.0499233Z"
+2025-12-21 16:05:07.107 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:05:07.1075917Z"
+2025-12-21 16:06:07.175 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:06:07.1751816Z"
+2025-12-21 16:07:07.228 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:07:07.2288079Z"
+2025-12-21 16:08:07.295 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:08:07.2956155Z"
+2025-12-21 16:09:07.379 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:09:07.3793974Z"
+2025-12-21 16:10:07.428 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:10:07.4280693Z"
+2025-12-21 16:11:07.548 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:11:07.5487647Z"
+2025-12-21 16:12:07.671 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:12:07.6719883Z"
+2025-12-21 16:13:07.762 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:13:07.7621573Z"
+2025-12-21 16:14:07.876 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:14:07.8760803Z"
+2025-12-21 16:15:07.936 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:15:07.9361983Z"
+2025-12-21 16:16:08.029 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:16:08.0295900Z"
+2025-12-21 16:17:08.124 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:17:08.1244841Z"
+2025-12-21 16:18:08.263 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:18:08.2636646Z"
+2025-12-21 16:19:08.333 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:19:08.3335038Z"
+2025-12-21 16:20:08.414 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:20:08.4148555Z"
+2025-12-21 16:21:08.530 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:21:08.5300471Z"
+2025-12-21 16:22:08.663 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:22:08.6638248Z"
+2025-12-21 16:23:08.736 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:23:08.7361120Z"
+2025-12-21 16:24:08.815 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:24:08.8156619Z"
+2025-12-21 16:25:08.898 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:25:08.8983669Z"
+2025-12-21 16:26:09.013 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:26:09.0130322Z"
+2025-12-21 16:27:09.132 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:27:09.1326662Z"
+2025-12-21 16:28:09.233 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:28:09.2330628Z"
+2025-12-21 16:29:09.337 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:29:09.3370639Z"
+2025-12-21 16:30:09.404 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:30:09.4040577Z"
+2025-12-21 16:31:09.502 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:31:09.5020600Z"
+2025-12-21 16:32:09.594 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:32:09.5947796Z"
+2025-12-21 16:33:09.728 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:33:09.7288164Z"
+2025-12-21 16:34:09.804 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:34:09.8040087Z"
+2025-12-21 16:35:09.928 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:35:09.9283929Z"
+2025-12-21 16:36:10.055 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:36:10.0557865Z"
+2025-12-21 16:37:10.152 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:37:10.1523062Z"
+2025-12-21 16:38:10.265 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:38:10.2650613Z"
+2025-12-21 16:39:10.355 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:39:10.3554144Z"
+2025-12-21 16:40:10.433 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:40:10.4337686Z"
+2025-12-21 16:41:10.566 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:41:10.5661762Z"
+2025-12-21 16:42:10.690 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:42:10.6909066Z"
+2025-12-21 16:43:10.769 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:43:10.7691314Z"
+2025-12-21 16:44:10.864 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:44:10.8648368Z"
+2025-12-21 16:45:10.968 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:45:10.9680453Z"
+2025-12-21 16:46:11.092 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:46:11.0926214Z"
+2025-12-21 16:47:11.189 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:47:11.1890655Z"
+2025-12-21 16:48:11.270 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:48:11.2700916Z"
+2025-12-21 16:49:11.343 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:49:11.3436089Z"
+2025-12-21 16:50:11.436 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:50:11.4364880Z"
+2025-12-21 16:51:11.542 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:51:11.5426373Z"
+2025-12-21 16:52:11.653 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:52:11.6538511Z"
+2025-12-21 16:53:11.744 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:53:11.7445533Z"
+2025-12-21 16:54:11.823 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:54:11.8233862Z"
+2025-12-21 16:55:11.905 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:55:11.9057486Z"
+2025-12-21 16:56:12.002 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:56:12.0025582Z"
+2025-12-21 16:57:12.114 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:57:12.1149727Z"
+2025-12-21 16:58:12.185 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:58:12.1855098Z"
+2025-12-21 16:59:12.285 +05:00 [INF] Hangfire heartbeat at "2025-12-21T11:59:12.2858097Z"
+2025-12-21 17:00:12.391 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:00:12.3914964Z"
+2025-12-21 17:01:12.454 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:01:12.4547177Z"
+2025-12-21 17:02:12.558 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:02:12.5583673Z"
+2025-12-21 17:03:12.651 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:03:12.6513181Z"
+2025-12-21 17:04:12.730 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:04:12.7302604Z"
+2025-12-21 17:05:12.810 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:05:12.8107870Z"
+2025-12-21 17:06:12.953 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:06:12.9536141Z"
+2025-12-21 17:07:13.072 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:07:13.0726182Z"
+2025-12-21 17:08:13.165 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:08:13.1650336Z"
+2025-12-21 17:09:13.315 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:09:13.3155600Z"
+2025-12-21 17:10:13.405 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:10:13.4052553Z"
+2025-12-21 17:11:13.490 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:11:13.4900110Z"
+2025-12-21 17:12:13.556 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:12:13.5560436Z"
+2025-12-21 17:13:13.642 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:13:13.6429335Z"
+2025-12-21 17:14:13.799 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:14:13.7994132Z"
+2025-12-21 17:15:13.948 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:15:13.9483182Z"
+2025-12-21 17:16:13.988 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:16:13.9882043Z"
+2025-12-21 17:17:14.094 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:17:14.0945613Z"
+2025-12-21 17:18:14.156 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:18:14.1565356Z"
+2025-12-21 17:19:14.224 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:19:14.2243797Z"
+2025-12-21 17:20:14.312 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:20:14.3121582Z"
+2025-12-21 17:21:14.434 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:21:14.4348477Z"
+2025-12-21 17:22:14.487 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:22:14.4874622Z"
+2025-12-21 17:23:14.566 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:23:14.5668258Z"
+2025-12-21 17:24:14.687 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:24:14.6871529Z"
+2025-12-21 17:25:14.799 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:25:14.7991470Z"
+2025-12-21 17:26:14.916 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:26:14.9160745Z"
+2025-12-21 17:27:14.973 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:27:14.9732486Z"
+2025-12-21 17:28:15.014 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:28:15.0146360Z"
+2025-12-21 17:29:00.099 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:29:00.0999297Z"
+2025-12-21 17:30:00.187 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:30:00.1873962Z"
+2025-12-21 17:31:00.306 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:31:00.3061424Z"
+2025-12-21 17:32:00.354 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:32:00.3548157Z"
+2025-12-21 17:33:00.434 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:33:00.4341325Z"
+2025-12-21 17:34:00.533 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:34:00.5331927Z"
+2025-12-21 17:35:00.635 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:35:00.6352364Z"
+2025-12-21 17:36:00.735 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:36:00.7357076Z"
+2025-12-21 17:37:00.832 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:37:00.8326110Z"
+2025-12-21 17:38:00.894 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:38:00.8944005Z"
+2025-12-21 17:39:00.991 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:39:00.9917016Z"
+2025-12-21 17:40:01.086 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:40:01.0867888Z"
+2025-12-21 17:41:01.179 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:41:01.1799974Z"
+2025-12-21 17:42:01.254 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:42:01.2540762Z"
+2025-12-21 17:43:01.365 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:43:01.3651670Z"
+2025-12-21 17:44:01.457 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:44:01.4579346Z"
+2025-12-21 17:45:01.532 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:45:01.5323113Z"
+2025-12-21 17:46:01.596 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:46:01.5961145Z"
+2025-12-21 17:47:01.708 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:47:01.7083832Z"
+2025-12-21 17:48:01.814 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:48:01.8148878Z"
+2025-12-21 17:49:01.894 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:49:01.8947700Z"
+2025-12-21 17:50:01.979 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:50:01.9790003Z"
+2025-12-21 17:51:02.033 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:51:02.0335118Z"
+2025-12-21 17:52:02.135 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:52:02.1353191Z"
+2025-12-21 17:53:02.193 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:53:02.1936907Z"
+2025-12-21 17:54:02.244 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:54:02.2448185Z"
+2025-12-21 17:55:02.347 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:55:02.3474054Z"
+2025-12-21 17:56:02.426 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:56:02.4260826Z"
+2025-12-21 17:57:02.518 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:57:02.5189659Z"
+2025-12-21 17:58:02.626 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:58:02.6265600Z"
+2025-12-21 17:59:02.732 +05:00 [INF] Hangfire heartbeat at "2025-12-21T12:59:02.7321537Z"
+2025-12-21 18:00:02.812 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:00:02.8120053Z"
+2025-12-21 18:01:02.888 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:01:02.8883823Z"
+2025-12-21 18:02:02.985 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:02:02.9858729Z"
+2025-12-21 18:03:03.098 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:03:03.0983486Z"
+2025-12-21 18:04:03.190 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:04:03.1906226Z"
+2025-12-21 18:05:03.229 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:05:03.2295564Z"
+2025-12-21 18:06:03.327 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:06:03.3277640Z"
+2025-12-21 18:07:03.481 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:07:03.4815006Z"
+2025-12-21 18:08:03.593 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:08:03.5931237Z"
+2025-12-21 18:09:03.706 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:09:03.7061872Z"
+2025-12-21 18:10:03.824 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:10:03.8245026Z"
+2025-12-21 18:11:03.900 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:11:03.9004251Z"
+2025-12-21 18:12:03.980 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:12:03.9809908Z"
+2025-12-21 18:13:04.081 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:13:04.0813515Z"
+2025-12-21 18:14:04.161 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:14:04.1613643Z"
+2025-12-21 18:15:04.243 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:15:04.2431931Z"
+2025-12-21 18:16:04.320 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:16:04.3208892Z"
+2025-12-21 18:17:04.450 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:17:04.4508101Z"
+2025-12-21 18:18:04.577 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:18:04.5774269Z"
+2025-12-21 18:19:04.677 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:19:04.6778429Z"
+2025-12-21 18:20:04.786 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:20:04.7865690Z"
+2025-12-21 18:21:04.861 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:21:04.8619336Z"
+2025-12-21 18:22:04.937 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:22:04.9373091Z"
+2025-12-21 18:23:05.049 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:23:05.0499643Z"
+2025-12-21 18:24:05.121 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:24:05.1215209Z"
+2025-12-21 18:25:05.183 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:25:05.1833312Z"
+2025-12-21 18:26:05.281 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:26:05.2812450Z"
+2025-12-21 18:27:05.330 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:27:05.3309891Z"
+2025-12-21 18:28:05.445 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:28:05.4453513Z"
+2025-12-21 18:29:05.559 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:29:05.5591313Z"
+2025-12-21 18:30:05.700 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:30:05.7008730Z"
+2025-12-21 18:31:05.833 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:31:05.8335625Z"
+2025-12-21 18:32:05.926 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:32:05.9269807Z"
+2025-12-21 18:33:06.053 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:33:06.0534143Z"
+2025-12-21 18:34:06.138 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:34:06.1384930Z"
+2025-12-21 18:35:06.233 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:35:06.2336688Z"
+2025-12-21 18:36:06.334 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:36:06.3345002Z"
+2025-12-21 18:37:06.436 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:37:06.4366765Z"
+2025-12-21 18:38:06.518 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:38:06.5185721Z"
+2025-12-21 18:39:06.622 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:39:06.6227110Z"
+2025-12-21 18:40:06.715 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:40:06.7159598Z"
+2025-12-21 18:41:06.840 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:41:06.8403809Z"
+2025-12-21 18:42:06.979 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:42:06.9798500Z"
+2025-12-21 18:43:07.083 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:43:07.0833868Z"
+2025-12-21 18:44:07.222 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:44:07.2222087Z"
+2025-12-21 18:45:07.282 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:45:07.2829457Z"
+2025-12-21 18:46:07.367 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:46:07.3669834Z"
+2025-12-21 18:47:07.477 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:47:07.4772206Z"
+2025-12-21 18:48:07.553 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:48:07.5539812Z"
+2025-12-21 18:49:07.624 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:49:07.6243342Z"
+2025-12-21 18:50:07.697 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:50:07.6979081Z"
+2025-12-21 18:51:07.803 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:51:07.8031813Z"
+2025-12-21 18:52:07.891 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:52:07.8910143Z"
+2025-12-21 18:53:07.980 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:53:07.9807179Z"
+2025-12-21 18:54:08.065 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:54:08.0650619Z"
+2025-12-21 18:55:08.152 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:55:08.1524750Z"
+2025-12-21 18:56:08.269 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:56:08.2699929Z"
+2025-12-21 18:57:08.392 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:57:08.3925856Z"
+2025-12-21 18:58:08.501 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:58:08.5019102Z"
+2025-12-21 18:59:08.596 +05:00 [INF] Hangfire heartbeat at "2025-12-21T13:59:08.5969331Z"
+2025-12-21 19:00:08.687 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:00:08.6873220Z"
+2025-12-21 19:01:08.740 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:01:08.7403618Z"
+2025-12-21 19:02:08.879 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:02:08.8791340Z"
+2025-12-21 19:03:09.011 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:03:09.0115297Z"
+2025-12-21 19:04:09.111 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:04:09.1114896Z"
+2025-12-21 19:05:09.173 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:05:09.1737362Z"
+2025-12-21 19:06:09.311 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:06:09.3112352Z"
+2025-12-21 19:07:09.420 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:07:09.4207514Z"
+2025-12-21 19:08:09.516 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:08:09.5167190Z"
+2025-12-21 19:09:09.626 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:09:09.6266108Z"
+2025-12-21 19:10:09.714 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:10:09.7145205Z"
+2025-12-21 19:11:09.880 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:11:09.8806554Z"
+2025-12-21 19:12:09.962 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:12:09.9625657Z"
+2025-12-21 19:13:10.064 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:13:10.0647407Z"
+2025-12-21 19:14:10.180 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:14:10.1806182Z"
+2025-12-21 19:15:10.259 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:15:10.2597399Z"
+2025-12-21 19:16:10.366 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:16:10.3669119Z"
+2025-12-21 19:17:10.470 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:17:10.4701215Z"
+2025-12-21 19:18:10.589 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:18:10.5896218Z"
+2025-12-21 19:19:10.686 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:19:10.6868645Z"
+2025-12-21 19:20:10.774 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:20:10.7741029Z"
+2025-12-21 19:21:10.875 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:21:10.8754371Z"
+2025-12-21 19:22:10.990 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:22:10.9907249Z"
+2025-12-21 19:23:11.113 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:23:11.1133719Z"
+2025-12-21 19:24:11.189 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:24:11.1895335Z"
+2025-12-21 19:25:11.285 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:25:11.2858862Z"
+2025-12-21 19:26:11.439 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:26:11.4394814Z"
+2025-12-21 19:27:11.499 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:27:11.4995210Z"
+2025-12-21 19:28:11.569 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:28:11.5693980Z"
+2025-12-21 19:29:11.672 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:29:11.6721815Z"
+2025-12-21 19:30:11.766 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:30:11.7667316Z"
+2025-12-21 19:31:11.841 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:31:11.8418927Z"
+2025-12-21 19:32:11.918 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:32:11.9183033Z"
+2025-12-21 19:33:12.005 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:33:12.0051022Z"
+2025-12-21 19:34:12.071 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:34:12.0714048Z"
+2025-12-21 19:35:12.174 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:35:12.1746704Z"
+2025-12-21 19:36:12.293 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:36:12.2930650Z"
+2025-12-21 19:37:12.440 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:37:12.4407801Z"
+2025-12-21 19:38:12.538 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:38:12.5380246Z"
+2025-12-21 19:39:12.647 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:39:12.6472654Z"
+2025-12-21 19:40:12.736 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:40:12.7364959Z"
+2025-12-21 19:41:12.871 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:41:12.8715220Z"
+2025-12-21 19:42:12.974 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:42:12.9743735Z"
+2025-12-21 19:43:13.103 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:43:13.1032556Z"
+2025-12-21 19:44:13.251 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:44:13.2510815Z"
+2025-12-21 19:45:13.324 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:45:13.3241275Z"
+2025-12-21 19:46:13.429 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:46:13.4294874Z"
+2025-12-21 19:47:13.509 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:47:13.5090536Z"
+2025-12-21 19:48:13.578 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:48:13.5789928Z"
+2025-12-21 19:49:13.683 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:49:13.6831363Z"
+2025-12-21 19:50:13.805 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:50:13.8056096Z"
+2025-12-21 19:51:13.953 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:51:13.9532482Z"
+2025-12-21 19:52:14.055 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:52:14.0554239Z"
+2025-12-21 19:53:14.177 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:53:14.1770207Z"
+2025-12-21 19:54:14.306 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:54:14.3062672Z"
+2025-12-21 19:55:14.409 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:55:14.4090819Z"
+2025-12-21 19:56:14.525 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:56:14.5251833Z"
+2025-12-21 19:57:14.609 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:57:14.6094450Z"
+2025-12-21 19:58:14.690 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:58:14.6908664Z"
+2025-12-21 19:59:14.800 +05:00 [INF] Hangfire heartbeat at "2025-12-21T14:59:14.8007543Z"
+2025-12-21 20:00:14.857 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:00:14.8575271Z"
+2025-12-21 20:01:14.993 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:01:14.9939561Z"
+2025-12-21 20:02:00.099 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:02:00.0992396Z"
+2025-12-21 20:03:00.201 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:03:00.2016203Z"
+2025-12-21 20:04:00.317 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:04:00.3179796Z"
+2025-12-21 20:05:00.371 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:05:00.3717072Z"
+2025-12-21 20:06:00.481 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:06:00.4813697Z"
+2025-12-21 20:07:00.602 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:07:00.6027048Z"
+2025-12-21 20:08:00.681 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:08:00.6810627Z"
+2025-12-21 20:09:00.786 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:09:00.7861274Z"
+2025-12-21 20:10:00.882 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:10:00.8826204Z"
+2025-12-21 20:11:00.992 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:11:00.9926292Z"
+2025-12-21 20:12:01.125 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:12:01.1258599Z"
+2025-12-21 20:13:01.259 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:13:01.2594805Z"
+2025-12-21 20:14:01.352 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:14:01.3520925Z"
+2025-12-21 20:15:01.425 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:15:01.4250127Z"
+2025-12-21 20:16:01.527 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:16:01.5271553Z"
+2025-12-21 20:17:01.588 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:17:01.5888602Z"
+2025-12-21 20:18:01.667 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:18:01.6673697Z"
+2025-12-21 20:19:01.782 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:19:01.7826663Z"
+2025-12-21 20:20:01.870 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:20:01.8709807Z"
+2025-12-21 20:21:01.990 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:21:01.9900413Z"
+2025-12-21 20:22:02.116 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:22:02.1164967Z"
+2025-12-21 20:23:02.197 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:23:02.1975395Z"
+2025-12-21 20:24:02.309 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:24:02.3095517Z"
+2025-12-21 20:25:02.462 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:25:02.4626354Z"
+2025-12-21 20:26:02.566 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:26:02.5667181Z"
+2025-12-21 20:27:02.671 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:27:02.6718892Z"
+2025-12-21 20:28:02.759 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:28:02.7592104Z"
+2025-12-21 20:29:02.849 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:29:02.8497499Z"
+2025-12-21 20:30:02.921 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:30:02.9215070Z"
+2025-12-21 20:31:03.022 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:31:03.0226326Z"
+2025-12-21 20:32:03.146 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:32:03.1463289Z"
+2025-12-21 20:33:03.284 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:33:03.2843793Z"
+2025-12-21 20:34:03.420 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:34:03.4202478Z"
+2025-12-21 20:35:03.523 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:35:03.5236510Z"
+2025-12-21 20:36:03.629 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:36:03.6296367Z"
+2025-12-21 20:37:03.716 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:37:03.7160838Z"
+2025-12-21 20:38:03.781 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:38:03.7816276Z"
+2025-12-21 20:39:03.885 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:39:03.8851751Z"
+2025-12-21 20:40:03.956 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:40:03.9569236Z"
+2025-12-21 20:41:04.032 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:41:04.0325426Z"
+2025-12-21 20:42:04.152 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:42:04.1523759Z"
+2025-12-21 20:43:04.242 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:43:04.2426138Z"
+2025-12-21 20:44:04.368 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:44:04.3680809Z"
+2025-12-21 20:45:04.502 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:45:04.5022811Z"
+2025-12-21 20:46:04.589 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:46:04.5895554Z"
+2025-12-21 20:47:04.679 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:47:04.6794514Z"
+2025-12-21 20:48:04.790 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:48:04.7904406Z"
+2025-12-21 20:49:04.850 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:49:04.8507816Z"
+2025-12-21 20:50:04.953 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:50:04.9539256Z"
+2025-12-21 20:51:05.038 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:51:05.0381037Z"
+2025-12-21 20:52:05.116 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:52:05.1167878Z"
+2025-12-21 20:53:05.199 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:53:05.1996458Z"
+2025-12-21 20:54:05.272 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:54:05.2727837Z"
+2025-12-21 20:55:05.357 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:55:05.3577829Z"
+2025-12-21 20:56:05.430 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:56:05.4303565Z"
+2025-12-21 20:57:05.533 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:57:05.5332129Z"
+2025-12-21 20:58:05.590 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:58:05.5904132Z"
+2025-12-21 20:59:05.731 +05:00 [INF] Hangfire heartbeat at "2025-12-21T15:59:05.7311232Z"
+2025-12-21 21:00:05.787 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:00:05.7878383Z"
+2025-12-21 21:01:05.877 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:01:05.8770397Z"
+2025-12-21 21:02:05.961 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:02:05.9618821Z"
+2025-12-21 21:03:06.056 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:03:06.0563520Z"
+2025-12-21 21:04:06.117 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:04:06.1170905Z"
+2025-12-21 21:05:06.212 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:05:06.2128681Z"
+2025-12-21 21:06:06.303 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:06:06.3036994Z"
+2025-12-21 21:07:06.402 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:07:06.4028871Z"
+2025-12-21 21:08:06.502 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:08:06.5025603Z"
+2025-12-21 21:09:06.607 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:09:06.6073396Z"
+2025-12-21 21:10:06.698 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:10:06.6984096Z"
+2025-12-21 21:11:06.789 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:11:06.7894270Z"
+2025-12-21 21:12:06.872 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:12:06.8722279Z"
+2025-12-21 21:13:06.942 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:13:06.9427205Z"
+2025-12-21 21:14:07.035 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:14:07.0351519Z"
+2025-12-21 21:15:07.120 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:15:07.1200748Z"
+2025-12-21 21:16:07.207 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:16:07.2076644Z"
+2025-12-21 21:17:07.289 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:17:07.2891501Z"
+2025-12-21 21:18:07.360 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:18:07.3607398Z"
+2025-12-21 21:19:07.433 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:19:07.4333450Z"
+2025-12-21 21:20:07.501 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:20:07.5017913Z"
+2025-12-21 21:21:07.618 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:21:07.6184500Z"
+2025-12-21 21:22:07.724 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:22:07.7245578Z"
+2025-12-21 21:23:07.807 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:23:07.8076773Z"
+2025-12-21 21:24:07.913 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:24:07.9130150Z"
+2025-12-21 21:25:08.010 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:25:08.0104905Z"
+2025-12-21 21:26:08.091 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:26:08.0911779Z"
+2025-12-21 21:27:08.172 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:27:08.1722976Z"
+2025-12-21 21:28:08.238 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:28:08.2389304Z"
+2025-12-21 21:29:08.341 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:29:08.3417651Z"
+2025-12-21 21:30:08.439 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:30:08.4391706Z"
+2025-12-21 21:31:08.544 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:31:08.5447266Z"
+2025-12-21 21:32:08.658 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:32:08.6583976Z"
+2025-12-21 21:33:08.766 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:33:08.7662926Z"
+2025-12-21 21:34:08.848 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:34:08.8480609Z"
+2025-12-21 21:35:08.939 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:35:08.9399104Z"
+2025-12-21 21:36:09.046 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:36:09.0467008Z"
+2025-12-21 21:37:09.134 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:37:09.1340876Z"
+2025-12-21 21:38:09.236 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:38:09.2361083Z"
+2025-12-21 21:39:09.330 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:39:09.3305625Z"
+2025-12-21 21:40:09.453 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:40:09.4533358Z"
+2025-12-21 21:41:09.538 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:41:09.5388690Z"
+2025-12-21 21:42:09.631 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:42:09.6313656Z"
+2025-12-21 21:43:09.743 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:43:09.7439777Z"
+2025-12-21 21:44:09.812 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:44:09.8128130Z"
+2025-12-21 21:45:09.906 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:45:09.9069817Z"
+2025-12-21 21:46:10.002 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:46:10.0024753Z"
+2025-12-21 21:47:10.093 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:47:10.0929304Z"
+2025-12-21 21:48:10.195 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:48:10.1951344Z"
+2025-12-21 21:49:10.281 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:49:10.2810634Z"
+2025-12-21 21:50:10.379 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:50:10.3797693Z"
+2025-12-21 21:51:10.484 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:51:10.4847151Z"
+2025-12-21 21:52:10.553 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:52:10.5538921Z"
+2025-12-21 21:53:10.651 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:53:10.6517966Z"
+2025-12-21 21:54:10.736 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:54:10.7368266Z"
+2025-12-21 21:55:10.837 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:55:10.8376809Z"
+2025-12-21 21:56:10.966 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:56:10.9661599Z"
+2025-12-21 21:57:11.097 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:57:11.0972007Z"
+2025-12-21 21:58:11.177 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:58:11.1776105Z"
+2025-12-21 21:59:11.260 +05:00 [INF] Hangfire heartbeat at "2025-12-21T16:59:11.2605408Z"
+2025-12-21 22:00:11.355 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:00:11.3554670Z"
+2025-12-21 22:01:11.429 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:01:11.4297879Z"
+2025-12-21 22:02:11.515 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:02:11.5155878Z"
+2025-12-21 22:03:11.598 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:03:11.5983082Z"
+2025-12-21 22:04:11.678 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:04:11.6789440Z"
+2025-12-21 22:05:11.742 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:05:11.7428201Z"
+2025-12-21 22:06:11.841 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:06:11.8417533Z"
+2025-12-21 22:07:11.930 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:07:11.9307170Z"
+2025-12-21 22:08:11.993 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:08:11.9936526Z"
+2025-12-21 22:09:12.069 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:09:12.0695548Z"
+2025-12-21 22:10:12.182 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:10:12.1823555Z"
+2025-12-21 22:11:12.268 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:11:12.2680946Z"
+2025-12-21 22:12:12.352 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:12:12.3525297Z"
+2025-12-21 22:13:12.428 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:13:12.4289422Z"
+2025-12-21 22:14:12.512 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:14:12.5127054Z"
+2025-12-21 22:15:12.614 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:15:12.6149942Z"
+2025-12-21 22:16:12.690 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:16:12.6909125Z"
+2025-12-21 22:17:12.817 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:17:12.8179738Z"
+2025-12-21 22:18:12.913 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:18:12.9137952Z"
+2025-12-21 22:19:13.007 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:19:13.0075648Z"
+2025-12-21 22:20:13.114 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:20:13.1140543Z"
+2025-12-21 22:21:13.218 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:21:13.2180435Z"
+2025-12-21 22:22:13.280 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:22:13.2805242Z"
+2025-12-21 22:23:13.349 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:23:13.3497130Z"
+2025-12-21 22:24:13.418 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:24:13.4188789Z"
+2025-12-21 22:25:13.572 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:25:13.5729528Z"
+2025-12-21 22:26:13.668 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:26:13.6685967Z"
+2025-12-21 22:27:13.764 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:27:13.7641418Z"
+2025-12-21 22:28:13.859 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:28:13.8599287Z"
+2025-12-21 22:29:13.954 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:29:13.9545095Z"
+2025-12-21 22:30:14.058 +05:00 [INF] Hangfire heartbeat at "2025-12-21T17:30:14.0586430Z"

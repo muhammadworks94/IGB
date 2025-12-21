@@ -1,0 +1,716 @@
+﻿@model IGB.Application.DTOs.DashboardSummaryDto
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Dashboard";
+    var isSuperAdmin = User.IsInRole("SuperAdmin");
+    var activeUsersApprox = Model.ActiveStudents + Model.ActiveTutors; // admins not tracked as active/inactive in DTO
+    var inactiveUsersApprox = Math.Max(Model.TotalUsers - activeUsersApprox, 0);
+}
+
+<!-- Breadcrumb Header -->
+<div class="breadcrumb-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item active" aria-current="page">Home</li>
+        </ol>
+    </nav>
+    <h1 class="breadcrumb-title">Dashboard</h1>
+    <p class="breadcrumb-subtitle">Welcome to your IGB System Dashboard - Manage your educational platform efficiently</p>
+
+    @if (User.IsInRole("SuperAdmin"))
+    {
+        <form asp-action="SendTestNotification" method="post" class="mt-2">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-bell me-2"></i>Send Test Notification (SignalR)
+            </button>
+        </form>
+    }
+</div>
+
+<div class="container-fluid @(isSuperAdmin ? "admin-dashboard-container" : "")">
+    
+    <!-- Flash Messages Section -->
+    <div id="divFlashMessage">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+
+    @if (isSuperAdmin)
+    {
+        <!-- SuperAdmin KPI Cards -->
+        <div class="overview-stats-section">
+            <div class="row g-3">
+                <div class="col-xl-3 col-md-6">
+                    <div class="kpi-tile kpi-tile-blue">
+                        <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value">@Model.TotalUsers</div>
+                            <div class="kpi-label">Total Users</div>
+                            <div class="kpi-sub">Approx. active: <strong>@activeUsersApprox</strong></div>
+                            <div class="kpi-accent"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="kpi-tile kpi-tile-green">
+                        <div class="kpi-icon"><i class="fas fa-user-graduate"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value">@Model.StudentsCount</div>
+                            <div class="kpi-label">Students</div>
+                            <div class="kpi-sub">Active: <strong>@Model.ActiveStudents</strong></div>
+                            <div class="kpi-accent"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="kpi-tile kpi-tile-amber">
+                        <div class="kpi-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value">@Model.TutorsCount</div>
+                            <div class="kpi-label">Teachers</div>
+                            <div class="kpi-sub">Active: <strong>@Model.ActiveTutors</strong></div>
+                            <div class="kpi-accent"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="kpi-tile kpi-tile-red">
+                        <div class="kpi-icon"><i class="fas fa-book"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value">@Model.TotalCourses</div>
+                            <div class="kpi-label">Total Courses</div>
+                            <div class="kpi-sub">Updated: <strong>@Model.GeneratedAtUtc.ToLocalTime().ToString("HH:mm")</strong></div>
+                            <div class="kpi-accent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Non-SuperAdmin Overview (keep simple) -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-light py-2">
+                        <h6 class="mb-0">
+                            <i class="fas fa-tachometer-alt me-2"></i>System Overview
+                        </h6>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row text-center">
+                            <div class="col-md-3 col-6">
+                                <div class="summary-item">
+                                    <div class="summary-number text-primary">@Model.TotalUsers</div>
+                                    <div class="summary-label">Total Users</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="summary-item">
+                                    <div class="summary-number text-success">@Model.ActiveStudents</div>
+                                    <div class="summary-label">Active Students</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="summary-item">
+                                    <div class="summary-number text-warning">@Model.ActiveTutors</div>
+                                    <div class="summary-label">Active Teachers</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="summary-item">
+                                    <div class="summary-number text-info">@Model.TotalCourses</div>
+                                    <div class="summary-label">Total Courses</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!isSuperAdmin)
+    {
+        <!-- Main Dashboard Modules -->
+        <div class="row g-3">
+            <!-- Users Management Module -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card dashboard-module-compact h-100" onclick="location.href='@Url.Action("Index", "Users")'" style="cursor: pointer;">
+                    <div class="card-header text-white text-center" style="background: linear-gradient(135deg, #0066cc 0%, #004499 100%);">
+                        <div class="module-icon-compact">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4 class="card-title text-white mb-0" style="color: white !important;">Users Management</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="stats-row-compact">
+                            <div class="stat-item-compact">
+                                <div class="stat-label-compact">Total Users</div>
+                                <div class="stat-value-compact">@Model.TotalUsers</div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <div class="stat-label-compact">Active Users</div>
+                                <div class="stat-value-compact">@(Model.ActiveStudents + Model.ActiveTutors)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Courses Module -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card dashboard-module-compact h-100" onclick="location.href='#'" style="cursor: pointer;">
+                    <div class="card-header text-white text-center" style="background: linear-gradient(135deg, #001a33 0%, #002d5a 100%);">
+                        <div class="module-icon-compact">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h4 class="card-title text-white mb-0" style="color: white !important;">Courses</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="stats-row-compact">
+                            <div class="stat-item-compact">
+                                <div class="stat-label-compact">Total Courses</div>
+                                <div class="stat-value-compact">0</div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <div class="stat-label-compact">Active Courses</div>
+                                <div class="stat-value-compact">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Module -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card dashboard-module-compact h-100" onclick="location.href='#'" style="cursor: pointer;">
+                    <div class="card-header text-white text-center" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%);">
+                        <div class="module-icon-compact">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4 class="card-title text-white mb-0" style="color: white !important;">Reports</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="stats-row-compact">
+                            <div class="stat-item-compact">
+                                <div class="stat-label-compact">This Month</div>
+                                <div class="stat-value-compact">0</div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <div class="stat-label-compact">Total Reports</div>
+                                <div class="stat-value-compact">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (isSuperAdmin)
+    {
+        <div class="row mt-4 g-3">
+            <!-- Main content -->
+            <div class="col-lg-9">
+                <!-- Analytics (Charts + Tables) -->
+                <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h5 class="dashboard-card-title"><i class="fas fa-chart-line me-2"></i>Analytics</h5>
+                    <div class="dashboard-card-actions">
+                        <span class="badge bg-light text-dark">Last updated: @Model.GeneratedAtUtc.ToLocalTime().ToString("HH:mm")</span>
+                    </div>
+                </div>
+                <div class="dashboard-card-body">
+                    <ul class="nav nav-pills mb-3" id="analyticsTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="analytics-charts-tab" data-bs-toggle="pill" data-bs-target="#analytics-charts" type="button" role="tab">
+                                Charts
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="analytics-tables-tab" data-bs-toggle="pill" data-bs-target="#analytics-tables" type="button" role="tab">
+                                Tables
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="analyticsTabContent">
+                        <div class="tab-pane fade show active" id="analytics-charts" role="tabpanel">
+                            <div class="row g-3">
+                                <div class="col-lg-8">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="fw-semibold">User growth</div>
+                                        <div class="btn-group btn-group-sm" role="group" aria-label="Chart type">
+                                            <button type="button" class="btn btn-outline-primary" id="btnGrowthLine">Line</button>
+                                            <button type="button" class="btn btn-outline-primary" id="btnGrowthBar">Bar</button>
+                                        </div>
+                                    </div>
+                                    <div class="igb-chart-wrap igb-chart-line">
+                                        <canvas id="userGrowthChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="d-flex flex-column gap-3">
+                                        <div>
+                                            <div class="fw-semibold mb-2">User distribution</div>
+                                            <div class="igb-chart-wrap igb-chart-donut">
+                                                <canvas id="userRoleChart"></canvas>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold mb-2">Active vs inactive (approx.)</div>
+                                            <div class="igb-chart-wrap igb-chart-donut">
+                                                <canvas id="userActiveChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="analytics-tables" role="tabpanel">
+                            <div class="row g-3">
+                                <div class="col-lg-8">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Month</th>
+                                                    <th class="text-end">New users</th>
+                                                    <th class="text-end">Cumulative</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    var running = 0;
+                                                    for (var i = 0; i < Model.UserGrowthLabels.Count; i++)
+                                                    {
+                                                        var label = Model.UserGrowthLabels[i];
+                                                        var count = (i < Model.UserGrowthCounts.Count) ? Model.UserGrowthCounts[i] : 0;
+                                                        running += count;
+                                                        <tr>
+                                                            <td>@label</td>
+                                                            <td class="text-end">@count</td>
+                                                            <td class="text-end">@running</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Role</th>
+                                                    <th class="text-end">Count</th>
+                                                    <th class="text-end">%</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    var total = Math.Max(Model.StudentsCount + Model.TutorsCount + Model.AdminsCount, 1);
+                                                    <tr>
+                                                        <td>Students</td>
+                                                        <td class="text-end">@Model.StudentsCount</td>
+                                                        <td class="text-end">@((Model.StudentsCount * 100.0 / total).ToString("0.0"))</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Teachers</td>
+                                                        <td class="text-end">@Model.TutorsCount</td>
+                                                        <td class="text-end">@((Model.TutorsCount * 100.0 / total).ToString("0.0"))</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Admins</td>
+                                                        <td class="text-end">@Model.AdminsCount</td>
+                                                        <td class="text-end">@((Model.AdminsCount * 100.0 / total).ToString("0.0"))</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right rail -->
+            <div class="col-lg-3">
+                <div class="dashboard-right-rail">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                        </div>
+                        <div class="dashboard-card-body">
+                            <div class="quick-actions-grid quick-actions-grid-rail">
+                                <a class="quick-action-btn quick-action-tile" asp-controller="Users" asp-action="Index">
+                                    <i class="fas fa-users-cog"></i><span>Manage Users</span>
+                                </a>
+                                <a class="quick-action-btn quick-action-tile" asp-controller="Approvals" asp-action="Index">
+                                    <i class="fas fa-user-check"></i><span>Pending Approvals</span>
+                                </a>
+                                <a class="quick-action-btn quick-action-tile" asp-controller="Courses" asp-action="Index">
+                                    <i class="fas fa-book-open"></i><span>Manage Courses</span>
+                                </a>
+                                <a class="quick-action-btn quick-action-tile" asp-controller="Grades" asp-action="Index">
+                                    <i class="fas fa-layer-group"></i><span>Grades & Levels</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card mt-3">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title"><i class="fas fa-info-circle me-2"></i>At a Glance</h5>
+                        </div>
+                        <div class="dashboard-card-body">
+                            <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                                <span class="text-muted">Admins</span>
+                                <span class="badge bg-primary">@Model.AdminsCount</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                                <span class="text-muted">Approx. inactive users</span>
+                                <span class="badge bg-secondary">@inactiveUsersApprox</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between py-2">
+                                <span class="text-muted">Growth window</span>
+                                <span class="badge bg-info">Last 6 months</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Analytics (Charts + Tables) -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h5 class="dashboard-card-title"><i class="fas fa-chart-line me-2"></i>Analytics</h5>
+                        <div class="dashboard-card-actions">
+                            <span class="badge bg-light text-dark">Last updated: @Model.GeneratedAtUtc.ToLocalTime().ToString("HH:mm")</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card-body">
+                        <ul class="nav nav-pills mb-3" id="analyticsTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="analytics-charts-tab" data-bs-toggle="pill" data-bs-target="#analytics-charts" type="button" role="tab">
+                                    Charts
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="analytics-tables-tab" data-bs-toggle="pill" data-bs-target="#analytics-tables" type="button" role="tab">
+                                    Tables
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="analyticsTabContent">
+                            <div class="tab-pane fade show active" id="analytics-charts" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-lg-8">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div class="fw-semibold">User growth</div>
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Chart type">
+                                                <button type="button" class="btn btn-outline-primary" id="btnGrowthLine">Line</button>
+                                                <button type="button" class="btn btn-outline-primary" id="btnGrowthBar">Bar</button>
+                                            </div>
+                                        </div>
+                                        <div class="igb-chart-wrap igb-chart-line">
+                                            <canvas id="userGrowthChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="d-flex flex-column gap-3">
+                                            <div>
+                                                <div class="fw-semibold mb-2">User distribution</div>
+                                                <div class="igb-chart-wrap igb-chart-donut">
+                                                    <canvas id="userRoleChart"></canvas>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold mb-2">Active vs inactive (approx.)</div>
+                                                <div class="igb-chart-wrap igb-chart-donut">
+                                                    <canvas id="userActiveChart"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="analytics-tables" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-lg-8">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm align-middle">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Month</th>
+                                                        <th class="text-end">New users</th>
+                                                        <th class="text-end">Cumulative</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{
+                                                        var running = 0;
+                                                        for (var i = 0; i < Model.UserGrowthLabels.Count; i++)
+                                                        {
+                                                            var label = Model.UserGrowthLabels[i];
+                                                            var count = (i < Model.UserGrowthCounts.Count) ? Model.UserGrowthCounts[i] : 0;
+                                                            running += count;
+                                                            <tr>
+                                                                <td>@label</td>
+                                                                <td class="text-end">@count</td>
+                                                                <td class="text-end">@running</td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm align-middle">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Role</th>
+                                                        <th class="text-end">Count</th>
+                                                        <th class="text-end">%</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{
+                                                        var total = Math.Max(Model.StudentsCount + Model.TutorsCount + Model.AdminsCount, 1);
+                                                        <tr>
+                                                            <td>Students</td>
+                                                            <td class="text-end">@Model.StudentsCount</td>
+                                                            <td class="text-end">@((Model.StudentsCount * 100.0 / total).ToString("0.0"))</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Teachers</td>
+                                                            <td class="text-end">@Model.TutorsCount</td>
+                                                            <td class="text-end">@((Model.TutorsCount * 100.0 / total).ToString("0.0"))</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Admins</td>
+                                                            <td class="text-end">@Model.AdminsCount</td>
+                                                            <td class="text-end">@((Model.AdminsCount * 100.0 / total).ToString("0.0"))</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Recent Activity Section -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-light py-2">
+                    <h6 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Recent Activity
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">System Initialized</h6>
+                                <small class="text-muted">Just now</small>
+                            </div>
+                            <p class="mb-1 text-muted">IGB System is ready for use</p>
+                            <small class="text-success"><i class="fas fa-check-circle me-1"></i>Active</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Global Chart.js defaults to match UI
+            Chart.defaults.font.family = 'Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif';
+            Chart.defaults.color = '#6c757d';
+            Chart.defaults.animation.duration = 450;
+            Chart.defaults.elements.line.capBezierPoints = true;
+
+            const growthLabels = @Html.Raw(JsonSerializer.Serialize(Model.UserGrowthLabels));
+            const growthCounts = @Html.Raw(JsonSerializer.Serialize(Model.UserGrowthCounts));
+            const studentsCount = @Model.StudentsCount;
+            const tutorsCount = @Model.TutorsCount;
+            const adminsCount = @Model.AdminsCount;
+            const totalUsers = @Model.TotalUsers;
+            const activeUsersApprox = @(Model.ActiveStudents + Model.ActiveTutors);
+            const inactiveUsersApprox = Math.max(totalUsers - activeUsersApprox, 0);
+
+            const commonPlugins = {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        padding: 10,
+                        color: '#6c757d',
+                        font: { size: 11, weight: '600' }
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            };
+
+            const commonScales = {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#6c757d', font: { size: 11 }, maxRotation: 0, autoSkip: true }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.06)' },
+                    ticks: { color: '#6c757d', font: { size: 11 }, precision: 0 }
+                }
+            };
+
+            // Growth chart (toggle line/bar)
+            let growthChart = null;
+            function renderGrowthChart(type) {
+                const canvas = document.getElementById('userGrowthChart');
+                if (!canvas) return;
+                if (growthChart) growthChart.destroy();
+
+                const isLine = type === 'line';
+                growthChart = new Chart(canvas, {
+                    type,
+                    data: {
+                        labels: growthLabels,
+                        datasets: [{
+                            label: 'New users',
+                            data: growthCounts,
+                            borderColor: '#14b8a6',
+                            backgroundColor: isLine ? 'rgba(20, 184, 166, 0.14)' : 'rgba(20, 184, 166, 0.55)',
+                            fill: isLine,
+                            tension: isLine ? 0.35 : 0,
+                            borderWidth: isLine ? 3 : 0,
+                            borderRadius: type === 'bar' ? 8 : 0,
+                            pointRadius: isLine ? 3 : 0,
+                            pointHoverRadius: isLine ? 5 : 0,
+                            pointBorderWidth: isLine ? 2 : 0,
+                            pointBorderColor: '#ffffff',
+                            pointBackgroundColor: '#14b8a6',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: { ...commonPlugins, legend: { ...commonPlugins.legend, position: 'top', align: 'end' } },
+                        scales: commonScales
+                    }
+                });
+            }
+
+            function setGrowthToggleActive(type) {
+                const isLine = type === 'line';
+                $('#btnGrowthLine').toggleClass('active', isLine);
+                $('#btnGrowthBar').toggleClass('active', !isLine);
+            }
+
+            $('#btnGrowthLine').on('click', function () { setGrowthToggleActive('line'); renderGrowthChart('line'); });
+            $('#btnGrowthBar').on('click', function () { setGrowthToggleActive('bar'); renderGrowthChart('bar'); });
+            setGrowthToggleActive('line');
+            renderGrowthChart('line');
+
+            // Role distribution (doughnut)
+            const roleCanvas = document.getElementById('userRoleChart');
+            if (roleCanvas) new Chart(roleCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Students', 'Teachers', 'Admins'],
+                    datasets: [{
+                        data: [studentsCount, tutorsCount, adminsCount],
+                        backgroundColor: ['rgba(59, 130, 246, 0.85)', 'rgba(245, 158, 11, 0.85)', 'rgba(239, 68, 68, 0.85)'],
+                        borderColor: ['rgba(59, 130, 246, 1)', 'rgba(245, 158, 11, 1)', 'rgba(239, 68, 68, 1)'],
+                        borderWidth: 2,
+                        hoverOffset: 6,
+                        spacing: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: { ...commonPlugins, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.formattedValue}` } } }
+                }
+            });
+
+            // Active vs inactive (approx) doughnut
+            const activeCanvas = document.getElementById('userActiveChart');
+            if (activeCanvas) new Chart(activeCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Active (approx.)', 'Inactive (approx.)'],
+                    datasets: [{
+                        data: [activeUsersApprox, inactiveUsersApprox],
+                        backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(107, 114, 128, 0.55)'],
+                        borderColor: ['rgba(16, 185, 129, 1)', 'rgba(107, 114, 128, 0.9)'],
+                        borderWidth: 2,
+                        hoverOffset: 6,
+                        spacing: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: { ...commonPlugins, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.formattedValue}` } } }
+                }
+            });
+        });
+    </script>
+}

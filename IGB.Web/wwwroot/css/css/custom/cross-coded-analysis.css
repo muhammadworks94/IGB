@@ -1,0 +1,179 @@
+/* Cross-Coded Question Analysis Styles */
+
+.cross-coded-analysis-container {
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.analysis-result-card {
+    transition: all 0.3s ease;
+}
+
+.analysis-result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.analysis-text {
+    background: #fff;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #007bff;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.admin-actions {
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+.admin-decision-section {
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+.progress {
+    height: 25px;
+    border-radius: 12px;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.analysis-result-card .card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.6em;
+    border-radius: 6px;
+}
+
+.list-unstyled li {
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.list-unstyled li:last-child {
+    border-bottom: none;
+}
+
+.list-unstyled li i {
+    width: 16px;
+}
+
+/* Loading state */
+#cross-coded-analysis-loading {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+}
+
+/* Empty state */
+.empty-analysis-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-analysis-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .analysis-result-card .card-body .row .col-md-6 {
+        margin-bottom: 15px;
+    }
+    
+    .admin-actions .btn {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+}
+
+/* Animation for new analysis results */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.analysis-result-card {
+    animation: slideInUp 0.5s ease-out;
+}
+
+/* Status indicators */
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.status-indicator.consistent {
+    background-color: #28a745;
+}
+
+.status-indicator.inconsistent {
+    background-color: #dc3545;
+}
+
+.status-indicator.uncertain {
+    background-color: #ffc107;
+}
+
+/* Severity indicators */
+.severity-high {
+    border-left-color: #dc3545 !important;
+}
+
+.severity-medium {
+    border-left-color: #ffc107 !important;
+}
+
+.severity-low {
+    border-left-color: #28a745 !important;
+}
+
+/* Recommendation styling */
+.recommendation-item {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border-left: 3px solid #007bff;
+}
+
+/* Admin decision styling */
+.decision-accepted {
+    border-left-color: #28a745 !important;
+}
+
+.decision-rejected {
+    border-left-color: #dc3545 !important;
+}
+
+.decision-review {
+    border-left-color: #ffc107 !important;
+}

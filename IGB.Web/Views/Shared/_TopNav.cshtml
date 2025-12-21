@@ -1,0 +1,210 @@
+<!-- Complete Noble UI Top Navigation -->
+@inject Microsoft.Extensions.Localization.IStringLocalizer<IGB.Web.Localization.SharedResource> L
+@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var isSuperAdmin = User.IsInRole("SuperAdmin");
+    var isAdmin = isSuperAdmin || User.IsInRole("Admin");
+    var isTutor = User.IsInRole("Tutor");
+    var isStudent = User.IsInRole("Student");
+    var isStaff = isAdmin || isTutor;
+
+    var currentCulture = System.Globalization.CultureInfo.CurrentUICulture?.Name ?? "en-US";
+    var supportedLanguages = new (string Culture, string Label, string Icon)[]
+    {
+        ("en-US", "English", "fas fa-language"),
+        ("ar-SA", "العربية", "fas fa-language")
+    };
+}
+
+<nav class="navbar">
+    <div class="navbar-content">
+        <a href="#" class="sidebar-toggler">
+            <i class="fas fa-bars"></i>
+        </a>
+        <form class="search-form">
+            <div class="input-group">
+                <div class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </div>
+                <input type="text" class="form-control" id="navbarForm" placeholder="@L["SearchHere"]">
+            </div>
+        </form>
+        <ul class="navbar-nav">
+            <!-- Apps Dropdown -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="appsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-th"></i>
+                </a>
+                <div class="dropdown-menu p-0" aria-labelledby="appsDropdown">
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
+                        <p class="mb-0 fw-bold">IGB Apps</p>
+                        <a href="javascript:;" class="text-muted">Quick Access</a>
+                    </div>
+                    <div class="row g-0 p-1">
+                        @if (isAuthenticated && isSuperAdmin)
+                        {
+                            <div class="col-3 text-center">
+                                <a asp-controller="Users" asp-action="Index" class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70">
+                                    <i class="fas fa-users icon-lg mb-1"></i>
+                                    <p class="tx-12">Users</p>
+                                </a>
+                            </div>
+                        }
+                        @if (isAuthenticated && isAdmin)
+                        {
+                            <div class="col-3 text-center">
+                                <a asp-controller="Approvals" asp-action="Index" class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70">
+                                    <i class="fas fa-user-check icon-lg mb-1"></i>
+                                    <p class="tx-12">Approvals</p>
+                                </a>
+                            </div>
+                            <div class="col-3 text-center">
+                                <a asp-controller="CourseBookings" asp-action="Pending" class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70">
+                                    <i class="fas fa-clipboard-check icon-lg mb-1"></i>
+                                    <p class="tx-12">Bookings</p>
+                                </a>
+                            </div>
+                        }
+                        @if (isAuthenticated && isStaff)
+                        {
+                            <div class="col-3 text-center">
+                                <a asp-controller="LessonBookings" asp-action="Pending" class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70">
+                                    <i class="fas fa-calendar-alt icon-lg mb-1"></i>
+                                    <p class="tx-12">Lessons</p>
+                                </a>
+                            </div>
+                        }
+                        @if (isAuthenticated && isStudent)
+                        {
+                            <div class="col-3 text-center">
+                                <a asp-controller="Courses" asp-action="Browse" class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70">
+                                    <i class="fas fa-book-open icon-lg mb-1"></i>
+                                    <p class="tx-12">Courses</p>
+                                </a>
+                            </div>
+                            <div class="col-3 text-center">
+                                <a asp-controller="LessonBookings" asp-action="My" class="dropdown-item d-flex flex-column align-items-center justify-content-center wd-70 ht-70">
+                                    <i class="fas fa-user-clock icon-lg mb-1"></i>
+                                    <p class="tx-12">My Lessons</p>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-center border-top">
+                        <a asp-controller="Home" asp-action="Index">View Dashboard</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Notifications Dropdown -->
+            @if (isAuthenticated)
+            {
+                <li class="nav-item dropdown position-relative">
+                    <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-indicator d-none" id="navNotificationIndicator">
+                            <span class="badge">0</span>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu p-0" aria-labelledby="notificationsDropdown" style="min-width: 320px;">
+                        <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
+                            <p class="mb-0 fw-bold">@L["Notifications"]</p>
+                            <button type="button" class="btn btn-link btn-sm text-muted p-0" id="navNotificationsClearBtn">@L["Clear"]</button>
+                        </div>
+                        <div class="p-2" id="navNotificationsList">
+                            <div class="text-muted small px-2 py-2">No notifications yet.</div>
+                        </div>
+                        <div class="px-3 py-2 d-flex align-items-center justify-content-center border-top">
+                            <a href="javascript:;" class="text-muted small" id="navNotificationsMarkReadBtn">@L["MarkAllRead"]</a>
+                        </div>
+                    </div>
+                </li>
+            }
+
+            <!-- Language Dropdown -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="@L["Language"]">
+                    <i class="fas fa-globe"></i>
+                </a>
+                <div class="dropdown-menu p-0" aria-labelledby="languageDropdown">
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
+                        <p class="mb-0 fw-bold">@L["Language"]</p>
+                        <span class="text-muted small">@currentCulture</span>
+                    </div>
+                    <ul class="list-unstyled p-1 mb-0">
+                        @foreach (var lang in supportedLanguages)
+                        {
+                            var isActive = string.Equals(currentCulture, lang.Culture, StringComparison.OrdinalIgnoreCase);
+                            <li class="dropdown-item py-2">
+                                <a class="text-body ms-0 d-flex align-items-center justify-content-between"
+                                   asp-controller="Localization"
+                                   asp-action="Set"
+                                   asp-route-culture="@lang.Culture"
+                                   asp-route-returnUrl="@(Context?.Request?.Path + Context?.Request?.QueryString)">
+                                    <span><i class="@lang.Icon me-2 icon-md"></i>@lang.Label</span>
+                                    @if (isActive)
+                                    {
+                                        <i class="fas fa-check text-success"></i>
+                                    }
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </li>
+
+            <!-- User Profile Dropdown -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img class="wd-30 ht-30 rounded-circle" src="img/avatar.png" alt="profile">
+                </a>
+                <div class="dropdown-menu p-0" aria-labelledby="profileDropdown">
+                    <div class="d-flex flex-column align-items-center border-bottom px-5 py-3">
+                        <div class="mb-3">
+                            <img class="wd-80 ht-80 rounded-circle" src="img/avatar.png" alt="User">
+                        </div>
+                        <div class="text-center">
+                            <p class="tx-16 fw-bolder">@(Context?.Session?.GetString("UserName") ?? "IGB User")</p>
+                            <p class="tx-12 text-muted">@(Context?.Session?.GetString("UserRole") ?? "System User")</p>
+                        </div>
+                    </div>
+                    <ul class="list-unstyled p-1">
+                        <li class="dropdown-item py-2">
+                            <a asp-controller="Profile" asp-action="Index" class="text-body ms-0">
+                                <i class="fas fa-user me-2 icon-md"></i>
+                                <span>Profile</span>
+                            </a>
+                        </li>
+                        <li class="dropdown-item py-2">
+                            <a asp-controller="Account" asp-action="ChangePassword" class="text-body ms-0">
+                                <i class="fas fa-key me-2 icon-md"></i>
+                                <span>Change Password</span>
+                            </a>
+                        </li>
+                        <li class="dropdown-item py-2">
+                            <a href="javascript:;" class="text-body ms-0">
+                                <i class="fas fa-cog me-2 icon-md"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="dropdown-item py-2">
+                            <a asp-controller="Home" asp-action="Index" class="text-body ms-0">
+                                <i class="fas fa-home me-2 icon-md"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="dropdown-item py-2">
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-link text-body ms-0 p-0 border-0 w-100 text-start">
+                                    <i class="fas fa-sign-out-alt me-2 icon-md"></i>
+                                    <span>Log Out</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+

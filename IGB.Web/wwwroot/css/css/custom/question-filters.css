@@ -1,0 +1,185 @@
+/* Question Type Filtering Styles */
+.filter-checkbox {
+    position: relative;
+    margin-bottom: 0;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid var(--bs-primary);
+    border-radius: 0.375rem;
+    background-color: transparent;
+    color: var(--bs-primary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.filter-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    width: 0;
+    height: 0;
+}
+
+.filter-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Checked state */
+.filter-checkbox.checked {
+    background-color: var(--bs-primary);
+    color: white;
+    font-weight: 600;
+}
+
+/* Unchecked state */
+.filter-checkbox.unchecked {
+    background-color: transparent;
+    color: var(--bs-primary);
+    font-weight: 400;
+}
+
+.filter-checkbox:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.filter-checkbox.unchecked:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.filter-checkbox .badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.5em;
+}
+
+/* Dropdown filter styles */
+.dropdown-item.filter-checkbox {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item.filter-checkbox:hover {
+    background-color: var(--bs-light);
+}
+
+.dropdown-item.filter-checkbox input[type="checkbox"] {
+    position: static;
+    opacity: 1;
+    cursor: pointer;
+    width: 1.1em;
+    height: 1.1em;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.dropdown-item.filter-checkbox .filter-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-grow: 1;
+    gap: 0.5rem;
+}
+
+.dropdown-item.filter-checkbox .filter-text {
+    font-size: 0.875rem;
+    color: var(--bs-dark);
+}
+
+.dropdown-item.filter-checkbox .badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.5em;
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.dropdown-item.filter-checkbox input[type="checkbox"]:checked + .filter-content .filter-text {
+    font-weight: 600;
+    color: var(--bs-primary);
+}
+
+.dropdown-item.filter-checkbox input[type="checkbox"]:checked + .filter-content .badge {
+    background-color: var(--bs-success);
+}
+
+/* Style the visible checkboxes */
+.dropdown-item.filter-checkbox input[type="checkbox"] {
+    accent-color: var(--bs-primary);
+}
+
+/* Question filtering container */
+.question-filters-container {
+    background: var(--bs-light);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.question-filters-container .card-title {
+    color: var(--bs-dark);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.question-filters-container .d-flex {
+    gap: 0.5rem;
+}
+
+/* Filter button states */
+.filter-checkbox.active {
+    background-color: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+
+.filter-checkbox.inactive {
+    background-color: transparent;
+    color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .question-filters-container .d-flex {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-checkbox {
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Animation for filter changes */
+.question-row {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.question-row.hidden {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+/* Filter count badges */
+.filter-count-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: inherit;
+    font-weight: 600;
+}
+
+.filter-checkbox input[type="checkbox"]:checked + span .filter-count-badge {
+    background-color: rgba(255, 255, 255, 0.3);
+}
