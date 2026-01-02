@@ -2,60 +2,68 @@
 @{
     ViewData["Title"] = Model.Title;
     var isTutor = string.Equals(Model.Role, "Tutor", StringComparison.OrdinalIgnoreCase);
+    
+    // Build breadcrumbs
+    var breadcrumbs = new List<IGB.Web.ViewModels.BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new(Model.Title)
+    };
+    
+    // Build action buttons
+    var actionButtons = new List<IGB.Web.ViewModels.PageHeaderActionButton>();
+    
+    if (isTutor && Model.PendingApprovals > 0)
+    {
+        actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+            Text: "Approvals",
+            Url: "/Approvals",
+            ButtonType: "outline-secondary",
+            BadgeText: Model.PendingApprovals.ToString(),
+            BadgeVariant: "warning"
+        ));
+    }
+    
+    if (isTutor)
+    {
+        actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+            Text: "Add Tutor",
+            Icon: "fas fa-plus me-2",
+            ButtonType: "outline-primary",
+            ModalTarget: "#addTutorModal"
+        ));
+    }
+    else
+    {
+        actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+            Text: "Add Student",
+            Icon: "fas fa-plus me-2",
+            ButtonType: "outline-primary",
+            ModalTarget: "#addStudentModal"
+        ));
+    }
+    
+    // Build search configuration
+    var search = new IGB.Web.ViewModels.PageHeaderSearch(
+        Placeholder: "Search by name or email...",
+        QueryParamName: "q",
+        CurrentValue: Model.Query,
+        FormAction: Url.Action(isTutor ? "Tutors" : "Students", "AdminUsers"),
+        ShowClearButton: true,
+        ClearButtonUrl: Url.Action(isTutor ? "Tutors" : "Students", "AdminUsers")
+    );
+    
+    // Build page header view model
+    var pageHeader = new IGB.Web.ViewModels.PageHeaderViewModel(
+        Title: Model.Title,
+        Breadcrumbs: breadcrumbs,
+        Subtitle: isTutor ? "Manage tutors, their courses, availability, and ratings" : "Manage students, their enrollments, and guardians",
+        Search: search,
+        ActionButtons: actionButtons
+    );
 }
 
-<div class="breadcrumb-header">
-    <!-- Breadcrumbs -->
-    <nav aria-label="breadcrumb" class="mb-2">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
-        </ol>
-    </nav>
-    
-    <!-- Title, Search, and Action Buttons in one row -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
-        <h1 class="breadcrumb-title mb-0">@Model.Title</h1>
-        
-        <div class="d-flex gap-2 align-items-center flex-wrap">
-            <!-- Search Form -->
-            <form method="get" class="d-flex gap-2 align-items-center">
-                <div style="width: 250px;">
-                    <input class="form-control form-control-sm" name="q" value="@Model.Query" placeholder="Search by name or email..." />
-                </div>
-                <button class="btn btn-primary btn-sm" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
-                <a class="btn btn-outline-secondary btn-sm" href="@Url.Action(isTutor ? "Tutors" : "Students", "AdminUsers")">
-                    <i class="fas fa-times"></i>
-                </a>
-            </form>
-            
-            <!-- Action Buttons -->
-            @if (isTutor && Model.PendingApprovals > 0)
-            {
-                <a class="btn btn-outline-secondary btn-sm position-relative" href="/Approvals">
-                    Approvals
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.7rem;">
-                        @Model.PendingApprovals
-                    </span>
-                </a>
-            }
-            @if (isTutor)
-            {
-                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addTutorModal">
-                    <i class="fas fa-plus me-2"></i>Add Tutor
-                </button>
-            }
-            else
-            {
-                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addStudentModal">
-                    <i class="fas fa-plus me-2"></i>Add Student
-                </button>
-            }
-        </div>
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="container-fluid">
     @if (TempData["Error"] != null)

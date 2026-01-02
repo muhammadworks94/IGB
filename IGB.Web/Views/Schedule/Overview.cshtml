@@ -15,35 +15,30 @@
     DateTime? to = (DateTime?)ViewBag.To;
     var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
     var dashUrl = User.IsInRole("Admin") ? Url.Action("Admin", "Portal") : Url.Action("SuperAdmin", "Portal");
+    
+    // Build action buttons
+    var actionButtons = new List<IGB.Web.ViewModels.PageHeaderActionButton>
+    {
+        new("Filter", ButtonType: "primary", Icon: "fas fa-filter me-1", OnClick: "document.getElementById('scheduleFilterForm').submit(); return false;"),
+        new("Reset", Url: Url.Action("Overview", "Schedule"), ButtonType: "outline-secondary", Icon: "fas fa-rotate-left me-1"),
+        new("PDF", Url: Url.Action("ExportPdf", "Schedule", new { scope = "admin", tutorId = tutorId, studentId = studentId, guardianId = guardianId, courseId = courseId, status = status, from = from?.ToString("yyyy-MM-dd"), to = to?.ToString("yyyy-MM-dd") }), ButtonType: "outline-secondary", Icon: "fas fa-file-pdf me-1")
+    };
+    
+    // Build page header
+    var pageHeader = new IGB.Web.ViewModels.PageHeaderViewModel(
+        Title: "Schedules Overview",
+        Breadcrumbs: new List<BreadcrumbItem>
+        {
+            new("Dashboard", dashUrl),
+            new("Schedules", Url.Action("Overview", "Schedule")),
+            new("Overview")
+        },
+        Subtitle: "Master calendar view of all lessons and schedules",
+        ActionButtons: actionButtons
+    );
 }
 
-<div class="breadcrumb-header">
-    <!-- Breadcrumbs -->
-    <nav aria-label="breadcrumb" class="mb-2">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="@dashUrl">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="@Url.Action("Overview", "Schedule")">Schedules</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Overview</li>
-        </ol>
-    </nav>
-    
-    <!-- Title and Action Buttons in one row -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
-        <h1 class="breadcrumb-title mb-0">Schedules Overview</h1>
-        
-        <div class="d-flex gap-2 align-items-center flex-wrap">
-            <button class="btn btn-primary btn-sm" type="button" onclick="document.getElementById('scheduleFilterForm').submit()">
-                <i class="fas fa-filter me-1"></i>Filter
-            </button>
-            <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Overview","Schedule")">
-                <i class="fas fa-rotate-left me-1"></i>Reset
-            </a>
-            <a class="btn btn-outline-secondary btn-sm" target="_blank" id="pdfExportLink" href="@Url.Action("ExportPdf","Schedule", new { scope="admin", tutorId = tutorId, studentId = studentId, guardianId = guardianId, courseId = courseId, status = status, from = from?.ToString("yyyy-MM-dd"), to = to?.ToString("yyyy-MM-dd") })">
-                <i class="fas fa-file-pdf me-1"></i>PDF
-            </a>
-        </div>
-    </div>
-</div>
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="container-fluid">
     <div class="card mb-3">
@@ -178,8 +173,9 @@
         const from = form.querySelector('[name="from"]')?.value || '';
         const to = form.querySelector('[name="to"]')?.value || '';
         
-        const pdfLink = document.getElementById('pdfExportLink');
-        if (pdfLink) {
+        // Update PDF link in page header action button
+        const pdfButtons = document.querySelectorAll('a[href*="ExportPdf"]');
+        pdfButtons.forEach(btn => {
           const baseUrl = '@Url.Action("ExportPdf","Schedule")';
           const params = new URLSearchParams({
             scope: 'admin',
@@ -191,8 +187,8 @@
             from: from,
             to: to
           });
-          pdfLink.href = baseUrl + '?' + params.toString();
-        }
+          btn.href = baseUrl + '?' + params.toString();
+        });
       }
       
       // Initialize on page load and attach event listeners
