@@ -1,0 +1,101 @@
+@model IGB.Web.ViewModels.Feedback.RateTutorViewModel
+@{
+    ViewData["Title"] = "Rate Tutor";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Rate Tutor",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Feedback", Url.Action("MyFeedback", "Feedback")),
+        new("Rate Tutor")
+    },
+    Subtitle: $"{Model.TutorName} • {Model.CourseName}"
+))
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="LessonId" />
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.Rating),
+                            Value: Model.Rating,
+                            Label: "Overall Rating"
+                        ))
+                        <span asp-validation-for="Rating" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.SubjectKnowledge),
+                            Value: Model.SubjectKnowledge,
+                            Label: "Subject Knowledge"
+                        ))
+                        <span asp-validation-for="SubjectKnowledge" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.Communication),
+                            Value: Model.Communication,
+                            Label: "Communication"
+                        ))
+                        <span asp-validation-for="Communication" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.Punctuality),
+                            Value: Model.Punctuality,
+                            Label: "Punctuality"
+                        ))
+                        <span asp-validation-for="Punctuality" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.TeachingMethod),
+                            Value: Model.TeachingMethod,
+                            Label: "Teaching Method"
+                        ))
+                        <span asp-validation-for="TeachingMethod" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.Friendliness),
+                            Value: Model.Friendliness,
+                            Label: "Friendliness"
+                        ))
+                        <span asp-validation-for="Friendliness" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Comments</label>
+                        <textarea class="form-control" asp-for="Comments" rows="4" placeholder="Share helpful feedback..."></textarea>
+                        <span asp-validation-for="Comments" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" asp-for="IsAnonymous" />
+                            <label class="form-check-label" asp-for="IsAnonymous">Submit anonymously</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a class="btn btn-secondary" href="@Url.Action("My","LessonBookings")">Back</a>
+                    <button class="btn btn-primary" type="submit">Submit Feedback</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

@@ -1,0 +1,249 @@
+@model IGB.Web.ViewModels.Tutor.TutorAvailabilityPageViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "Teacher Availability";
+    var tutorId = (long)(ViewBag.TutorId ?? 0L);
+    var tutorName = (string)(ViewBag.TutorName ?? "Tutor");
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Teacher Availability",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Teachers", Url.Action("Tutors", "AdminUsers")),
+        new(tutorName),
+        new("Availability")
+    },
+    Subtitle: $"Timezone: {Model.TutorTimeZoneId}"
+))
+
+<div class="container-fluid">
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Weekly Availability Rules</h5>
+                    <form method="post" asp-action="SaveRule" asp-route-tutorId="@tutorId" class="row g-2">
+                        @Html.AntiForgeryToken()
+                        <div class="col-md-3">
+                            <label class="form-label">Day</label>
+                            <select class="form-select" name="DayOfWeek">
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                                <option value="6">Saturday</option>
+                                <option value="0">Sunday</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Start</label>
+                            <input class="form-control" type="time" id="ruleStart" value="09:00" />
+                            <input type="hidden" name="StartMinutes" id="ruleStartMinutes" value="540" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">End</label>
+                            <input class="form-control" type="time" id="ruleEnd" value="17:00" />
+                            <input type="hidden" name="EndMinutes" id="ruleEndMinutes" value="1020" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Slot</label>
+                            <select class="form-select" name="SlotMinutes">
+                                <option value="30">30m</option>
+                                <option value="45">45m</option>
+                                <option value="60" selected>60m</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" type="submit">Add</button>
+                        </div>
+                    </form>
+
+                    <hr />
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Range</th>
+                                <th>Slot</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var r in Model.Rules)
+                            {
+                                string DayName(int d) => Enum.GetName(typeof(DayOfWeek), d) ?? d.ToString();
+                                string ToTime(int mins) => $"{mins / 60:00}:{mins % 60:00}";
+                                <tr>
+                                    <td>@DayName(r.DayOfWeek)</td>
+                                    <td>@ToTime(r.StartMinutes) - @ToTime(r.EndMinutes)</td>
+                                    <td>@r.SlotMinutes min</td>
+                                    <td>
+                                        <span class="badge @(r.IsActive ? "bg-success" : "bg-secondary")">@(r.IsActive ? "Active" : "Inactive")</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <form method="post" asp-action="DeleteRule" asp-route-tutorId="@tutorId" asp-route-id="@r.Id" class="d-inline" onsubmit="return confirm('Delete rule?');">
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="mb-3">Blocked Dates/Times</h5>
+                    <form method="post" asp-action="SaveBlock" asp-route-tutorId="@tutorId" class="row g-2">
+                        @Html.AntiForgeryToken()
+                        <div class="col-md-4">
+                            <label class="form-label">Start (local)</label>
+                            <input class="form-control" type="datetime-local" id="blockStartLocal" />
+                            <input type="hidden" name="StartUtc" id="blockStartUtc" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">End (local)</label>
+                            <input class="form-control" type="datetime-local" id="blockEndLocal" />
+                            <input type="hidden" name="EndUtc" id="blockEndUtc" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Reason</label>
+                            <input class="form-control" name="Reason" />
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" type="submit">Add</button>
+                        </div>
+                    </form>
+
+                    <hr />
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>Start (UTC)</th>
+                                <th>End (UTC)</th>
+                                <th>Reason</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var b in Model.Blocks)
+                            {
+                                <tr>
+                                    <td>@b.StartUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@b.EndUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@b.Reason</td>
+                                    <td class="text-end">
+                                        <form method="post" asp-action="DeleteBlock" asp-route-tutorId="@tutorId" asp-route-id="@b.Id" class="d-inline" onsubmit="return confirm('Delete block?');">
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Calendar</h5>
+                    <div id="availabilityCalendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/nobleui/vendors/fullcalendar/main.min.js"></script>
+<script>
+  function toMinutes(v) {
+    const [h,m] = String(v||"00:00").split(":").map(Number);
+    return (h*60) + (m||0);
+  }
+  function syncRuleTimes() {
+    document.getElementById("ruleStartMinutes").value = toMinutes(document.getElementById("ruleStart").value);
+    document.getElementById("ruleEndMinutes").value = toMinutes(document.getElementById("ruleEnd").value);
+  }
+  document.getElementById("ruleStart")?.addEventListener("change", syncRuleTimes);
+  document.getElementById("ruleEnd")?.addEventListener("change", syncRuleTimes);
+  syncRuleTimes();
+
+  function toUtcIso(localVal) {
+    if (!localVal) return "";
+    const d = new Date(localVal);
+    return d.toISOString();
+  }
+  function syncBlockTimes() {
+    document.getElementById("blockStartUtc").value = toUtcIso(document.getElementById("blockStartLocal").value);
+    document.getElementById("blockEndUtc").value = toUtcIso(document.getElementById("blockEndLocal").value);
+  }
+  document.getElementById("blockStartLocal")?.addEventListener("change", syncBlockTimes);
+  document.getElementById("blockEndLocal")?.addEventListener("change", syncBlockTimes);
+  syncBlockTimes();
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const rules = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Rules));
+    const blocks = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Blocks));
+    const calEl = document.getElementById("availabilityCalendar");
+    if (!calEl || typeof FullCalendar === "undefined") return;
+
+    const events = [];
+    rules.forEach(r => {
+      if (!r.isActive) return;
+      const start = `${String(Math.floor(r.startMinutes/60)).padStart(2,'0')}:${String(r.startMinutes%60).padStart(2,'0')}`;
+      const end = `${String(Math.floor(r.endMinutes/60)).padStart(2,'0')}:${String(r.endMinutes%60).padStart(2,'0')}`;
+      events.push({
+        title: `Available (${r.slotMinutes}m)`,
+        daysOfWeek: [r.dayOfWeek],
+        startTime: start,
+        endTime: end,
+        display: "background",
+        backgroundColor: "#d1e7dd"
+      });
+    });
+    blocks.forEach(b => {
+      events.push({
+        title: b.reason || "Blocked",
+        start: b.startUtc,
+        end: b.endUtc,
+        color: "#f8d7da"
+      });
+    });
+
+    const cal = new FullCalendar.Calendar(calEl, {
+      initialView: "timeGridWeek",
+      height: 650,
+      nowIndicator: true,
+      allDaySlot: false,
+      events
+    });
+    cal.render();
+  });
+</script>
+
+

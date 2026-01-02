@@ -2,10 +2,10 @@
     ViewData["Title"] = "SuperAdmin Portal";
 }
 
-<div class="breadcrumb-header">
-    <h1 class="breadcrumb-title">SuperAdmin Portal</h1>
-    <p class="breadcrumb-subtitle">Use the dashboard and quick actions to manage the whole system.</p>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "SuperAdmin Portal",
+    Subtitle: "Use the dashboard and quick actions to manage the whole system."
+))
 
 <div class="container-fluid">
     <div class="alert alert-info">

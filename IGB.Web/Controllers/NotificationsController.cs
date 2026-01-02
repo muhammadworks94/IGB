@@ -22,7 +22,8 @@ public sealed class NotificationsController : Controller
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-        var snapshot = await _store.GetSnapshotAsync(userId, cancellationToken);
+        var roles = User.FindAll(ClaimTypes.Role).Select(r => r.Value).ToArray();
+        var snapshot = await _store.GetSnapshotAsync(userId, roles, cancellationToken);
         return Ok(new { unreadCount = snapshot.UnreadCount, items = snapshot.Items });
     }
 

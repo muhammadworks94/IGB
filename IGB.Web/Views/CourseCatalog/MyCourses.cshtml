@@ -1,0 +1,44 @@
+@model IGB.Web.ViewModels.Student.MyCoursesViewModel
+@{
+    ViewData["Title"] = "My Courses";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Courses",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Courses")
+    }
+))
+
+<div class="container-fluid">
+    @{
+        var tabs = new TabsViewModel(
+            Id: "myCoursesTabs",
+            Tabs: new List<TabItem>
+            {
+                new("active","Active (" + Model.Active.Count + ")"),
+                new("pending","Pending (" + Model.Pending.Count + ")"),
+                new("completed","Completed (" + Model.Completed.Count + ")"),
+            },
+            ActiveId: "active"
+        );
+    }
+
+    <partial name="Components/_Tabs" model="tabs" />
+
+    <div class="tab-content mt-3">
+        <div class="tab-pane fade show active" id="active" role="tabpanel">
+            <partial name="CourseCatalog/_MyCoursesTable" model="Model.Active" />
+        </div>
+        <div class="tab-pane fade" id="pending" role="tabpanel">
+            <partial name="CourseCatalog/_MyCoursesTable" model="Model.Pending" />
+        </div>
+        <div class="tab-pane fade" id="completed" role="tabpanel">
+            <partial name="CourseCatalog/_MyCoursesTable" model="Model.Completed" />
+        </div>
+    </div>
+</div>
+
+

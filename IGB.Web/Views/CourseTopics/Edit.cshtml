@@ -1,0 +1,54 @@
+@model IGB.Domain.Entities.CourseTopic
+@{
+    var course = ViewBag.Course as IGB.Domain.Entities.Course;
+    ViewData["Title"] = "Edit Topic";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Edit Topic",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Courses"),
+        new("All Courses", Url.Action("All", "Courses")),
+        new(course?.Name ?? "Course"),
+        new("Topics", course != null ? Url.Action("Index", "CourseTopics", new { courseId = course.Id }) : null),
+        new("Edit")
+    }
+))
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CourseId" />
+                <input type="hidden" asp-for="ParentTopicId" />
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sort order</label>
+                            <input asp-for="SortOrder" class="form-control" type="number" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3 d-flex justify-content-end gap-2">
+                    <a class="btn btn-secondary" href="@Url.Action("Index","CourseTopics", new { courseId = Model.CourseId })">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+
+

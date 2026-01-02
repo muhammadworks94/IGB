@@ -1,0 +1,35 @@
+@model IGB.Web.ViewModels.PageHeaderViewModel
+
+<div class="breadcrumb-header @(Model.Centered ? "text-center" : "")">
+    @if (Model.Breadcrumbs != null && Model.Breadcrumbs.Count > 0)
+    {
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 @(Model.Centered ? "justify-content-center" : "")">
+                @for (var i = 0; i < Model.Breadcrumbs.Count; i++)
+                {
+                    var item = Model.Breadcrumbs[i];
+                    var isLast = i == Model.Breadcrumbs.Count - 1;
+                    var hasUrl = !string.IsNullOrWhiteSpace(item.Url);
+
+                    if (!isLast && hasUrl)
+                    {
+                        <li class="breadcrumb-item"><a href="@item.Url">@item.Text</a></li>
+                    }
+                    else
+                    {
+                        <li class="breadcrumb-item active" aria-current="page">@item.Text</li>
+                    }
+                }
+            </ol>
+        </nav>
+    }
+
+    <h1 class="breadcrumb-title">@Model.Title</h1>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+    {
+        <p class="breadcrumb-subtitle">@Model.Subtitle</p>
+    }
+</div>
+
+

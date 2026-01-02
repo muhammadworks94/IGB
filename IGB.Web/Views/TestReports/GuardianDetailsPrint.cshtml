@@ -1,0 +1,67 @@
+@model IGB.Domain.Entities.TestReport
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = $"{Model.TestName} (Ward PDF)";
+    var topicTitles = Model.Topics.Where(t => !t.IsDeleted && t.CourseTopic != null).Select(t => t.CourseTopic!.Title).ToList();
+}
+
+<style>
+  @@media print {
+    .no-print { display:none !important; }
+    body { background: #fff !important; }
+  }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center no-print my-3">
+        <div class="text-muted small">Use your browser print dialog and choose “Save as PDF”.</div>
+        <button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <h4 class="mb-2">@Model.TestName</h4>
+    <div class="text-muted small mb-3">
+        Student: @Model.StudentUser?.FullName • Course: @Model.Course?.Name • Tutor: @Model.TutorUser?.FullName • Date: @Model.TestDate.ToString("yyyy-MM-dd")
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div><strong>Grade:</strong> @Model.Grade</div>
+            <div><strong>Percentage:</strong> @Model.Percentage.ToString("F2")%</div>
+            <div><strong>Marks:</strong> @Model.ObtainedMarks / @Model.TotalMarks</div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="mb-3">Topics Covered</h5>
+            @if (topicTitles.Count == 0)
+            {
+                <div class="text-muted">—</div>
+            }
+            else
+            {
+                <ul class="mb-0">
+                    @foreach (var t in topicTitles)
+                    {
+                        <li>@t</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="mb-3">Tutor Notes</h5>
+            <div class="mb-2"><strong>Strengths:</strong> @(string.IsNullOrWhiteSpace(Model.Strengths) ? "—" : Model.Strengths)</div>
+            <div class="mb-2"><strong>Areas for Improvement:</strong> @(string.IsNullOrWhiteSpace(Model.AreasForImprovement) ? "—" : Model.AreasForImprovement)</div>
+            <div class="mb-0"><strong>Comments:</strong> @(string.IsNullOrWhiteSpace(Model.TutorComments) ? "—" : Model.TutorComments)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+  window.addEventListener('load', () => setTimeout(() => window.print(), 250));
+</script>
+
+

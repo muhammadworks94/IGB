@@ -1,0 +1,127 @@
+@model IGB.Web.ViewModels.People.AdminPeopleListViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var actionName = Model.Role == "Tutor" ? "AdminTutors" : Model.Role == "Guardian" ? "AdminGuardians" : "AdminStudents";
+}
+
+<div class="breadcrumb-header">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="#">People</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </nav>
+    
+    <!-- Title, Search, and Action Buttons in one row -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
+        <h1 class="breadcrumb-title mb-0">@Model.Title</h1>
+        
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <!-- Search Form -->
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <div style="width: 250px;">
+                    <input class="form-control form-control-sm" name="q" value="@Model.Query" placeholder="Search by name or email..." />
+                </div>
+                <button class="btn btn-primary btn-sm" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a class="btn btn-outline-secondary btn-sm" href="@Url.Action(actionName, "People")">
+                    <i class="fas fa-times"></i>
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    @{
+        string profilePath(long id) =>
+            Model.Role == "Tutor" ? $"/People/Tutor/{id}" :
+            Model.Role == "Guardian" ? $"/People/Guardian/{id}" :
+            $"/People/Student/{id}";
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>User</th>
+                        @if (Model.Role == "Guardian") { <th>Wards</th> }
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model.Items)
+                    {
+                        var initials = (r.Name ?? "U").Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        var init = initials.Length >= 2 ? $"{initials[0][0]}{initials[1][0]}" : initials[0][0].ToString();
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (!string.IsNullOrWhiteSpace(r.AvatarUrl))
+                                    {
+                                        <img src="@r.AvatarUrl" alt="@(r.Name ?? "User")" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-semibold" style="width: 40px; height: 40px; background-color: #6c757d; font-size: 14px;">
+                                            @init
+                                        </div>
+                                    }
+                                    <div>
+                                        <div class="fw-semibold">
+                                            <a class="text-decoration-none" href="@profilePath(r.Id)">@r.Name</a>
+                                        </div>
+                                        <div class="text-muted small">@r.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            @if (Model.Role == "Guardian")
+                            {
+                                <td class="text-muted">
+                                    <span class="fw-semibold">@r.WardCount</span>
+                                    @if (!string.IsNullOrWhiteSpace(r.WardNamesPreview))
+                                    {
+                                        <div class="small text-muted text-truncate" style="max-width:200px;" title="@r.WardNamesPreview">@r.WardNamesPreview</div>
+                                    }
+                                </td>
+                            }
+                            <td class="text-muted">@(r.Phone ?? "-")</td>
+                            <td>
+                                <span class="badge @(r.IsActive ? "bg-success" : "bg-secondary")">@(r.IsActive ? "Active" : "Inactive")</span>
+                            </td>
+                            <td class="text-muted">@r.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary" href="@profilePath(r.Id)">View</a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.Pagination != null)
+            {
+                <partial name="Components/_Pagination" model="Model.Pagination" />
+            }
+        </div>
+    </div>
+</div>
+
+

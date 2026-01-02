@@ -1,0 +1,32 @@
+@model IGB.Web.ViewModels.Components.TabsViewModel
+
+<ul class="nav nav-tabs @(Model.CssClass ?? "")" id="@Model.Id" role="tablist">
+    @foreach (var t in Model.Tabs)
+    {
+        var active = t.Id == Model.ActiveId;
+        <li class="nav-item" role="presentation">
+            @if (!string.IsNullOrWhiteSpace(t.Href))
+            {
+                <a class="nav-link @(active ? "active" : "") @(t.Disabled ? "disabled" : "")"
+                   href="@t.Href"
+                   role="tab"
+                   aria-selected="@(active ? "true" : "false")"
+                   aria-disabled="@(t.Disabled ? "true" : "false")">@t.Label</a>
+            }
+            else
+            {
+                <button class="nav-link @(active ? "active" : "")"
+                        id="@($"{Model.Id}_{t.Id}")"
+                        data-bs-toggle="tab"
+                        data-bs-target="@($"#{t.Id}")"
+                        type="button"
+                        role="tab"
+                        aria-controls="@t.Id"
+                        aria-selected="@(active ? "true" : "false")"
+                        @(t.Disabled ? "disabled" : null)>@t.Label</button>
+            }
+        </li>
+    }
+</ul>
+
+

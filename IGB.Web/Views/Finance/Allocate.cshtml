@@ -1,0 +1,171 @@
+@model IGB.Web.ViewModels.Finance.AllocateCreditsViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "Allocate Credits";
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Allocate Credits",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Finance"),
+        new("Allocate Credits")
+    }
+))
+
+<div class="container-fluid">
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Add Credits</h5>
+                    <form method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="StudentUserId" id="studentUserId" value="@(Model.StudentUserId?.ToString() ?? "")" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Student</label>
+                            <input class="form-control" id="studentSearch" placeholder="Type name or email..." value="@Model.StudentName" autocomplete="off" />
+                            <div class="form-text">Select a student from the suggestions.</div>
+                            <div id="studentResults" class="list-group mt-2 d-none"></div>
+                        </div>
+
+                        @if (Model.StudentUserId.HasValue)
+                        {
+                            <div class="mb-3">
+                                <div class="text-muted small">Current remaining credits</div>
+                                <div class="fs-4 fw-semibold">@Model.CurrentRemaining</div>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <input class="form-control" name="Amount" type="number" value="@Model.Amount" />
+                            <div class="form-text">Use negative values only for Adjustment.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Reason</label>
+                            <select class="form-select" name="ReasonType">
+                                <option value="Purchase">Purchase</option>
+                                <option value="Bonus">Bonus</option>
+                                <option value="Refund">Refund</option>
+                                <option value="Adjustment">Adjustment</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" name="Notes" rows="3">@Model.Notes</textarea>
+                        </div>
+
+                        <button class="btn btn-primary w-100" type="submit" @(Model.StudentUserId.HasValue ? null : "disabled")>Apply</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Transaction History</h5>
+                        @if (Model.StudentUserId.HasValue)
+                        {
+                            <a class="btn btn-sm btn-outline-secondary" href="@Url.Action("ExportCsv","Finance", new { studentUserId = Model.StudentUserId })">
+                                Export CSV
+                            </a>
+                        }
+                    </div>
+                    <hr />
+
+                    @if (!Model.StudentUserId.HasValue)
+                    {
+                        <div class="text-muted">Select a student to view history.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Balance</th>
+                                    <th>Reason</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var t in Model.RecentTransactions)
+                                {
+                                    <tr>
+                                        <td class="text-muted small">@t.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td>@t.Type</td>
+                                        <td class="fw-semibold">@t.Amount</td>
+                                        <td class="text-muted">@t.BalanceAfter</td>
+                                        <td class="text-muted">@t.Reason</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <partial name="Components/_Pagination" model="Model.Pagination" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  (function () {
+    const input = document.getElementById('studentSearch');
+    const results = document.getElementById('studentResults');
+    const hiddenId = document.getElementById('studentUserId');
+
+    async function search(q) {
+      const res = await fetch('@Url.Action("StudentLookup","Finance")?q=' + encodeURIComponent(q));
+      if (!res.ok) return [];
+      return await res.json();
+    }
+
+    function show(items) {
+      results.innerHTML = "";
+      if (!items.length) {
+        results.classList.add("d-none");
+        return;
+      }
+      items.forEach(u => {
+        const a = document.createElement("button");
+        a.type = "button";
+        a.className = "list-group-item list-group-item-action";
+        a.innerHTML = `<div class="fw-semibold">${u.name}</div><div class="text-muted small">${u.email}</div>`;
+        a.onclick = () => {
+          hiddenId.value = u.id;
+          window.location = '@Url.Action("Allocate","Finance")' + '?studentUserId=' + encodeURIComponent(u.id);
+        };
+        results.appendChild(a);
+      });
+      results.classList.remove("d-none");
+    }
+
+    let t = null;
+    input?.addEventListener("input", function () {
+      const q = this.value.trim();
+      clearTimeout(t);
+      if (q.length < 2) { results.classList.add("d-none"); return; }
+      t = setTimeout(async () => show(await search(q)), 250);
+    });
+  })();
+</script>
+
+

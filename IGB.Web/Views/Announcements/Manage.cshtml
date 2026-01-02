@@ -3,10 +3,10 @@
     ViewData["Title"] = "Manage Announcements";
 }
 
-<div class="breadcrumb-header">
-    <h1 class="breadcrumb-title">Manage Announcements</h1>
-    <p class="breadcrumb-subtitle">Create and publish announcements for users.</p>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Manage Announcements",
+    Subtitle: "Create and publish announcements for users."
+))
 
 <div class="container-fluid">
     @if (TempData["Success"] != null)

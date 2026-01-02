@@ -1,0 +1,330 @@
+@model IGB.Web.ViewModels.People.TutorProfileVm
+@{
+    ViewData["Title"] = "Tutor Profile";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Teacher / Tutor Profile",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Portal")),
+        new("Users", Url.Action("Index","Users")),
+        new("Tutor Profile")
+    },
+    Centered: true
+))
+
+<div class="container-fluid">
+    <partial name="_PersonHeader" model="Model.Header" />
+
+    @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+    {
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <a class="btn btn-outline-primary" href="@Url.Action("Overview","Schedule", new { tutorId = Model.Header.UserId })">
+                <i class="fas fa-calendar-alt me-1"></i>View Schedule
+            </a>
+            <a class="btn btn-outline-secondary" href="@Url.Action("Index","AdminTutorAvailability", new { tutorId = Model.Header.UserId })">
+                <i class="fas fa-clock me-1"></i>Availability
+            </a>
+        </div>
+    }
+
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Assigned Courses</div>
+                    <div class="h3 mb-0">@Model.AssignedCourses.Count</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Average Rating</div>
+                    <div class="h3 mb-0">@Model.Rating.Average.ToString("0.0") <span class="text-muted fs-6">/ 5</span></div>
+                    <div class="text-muted small">@Model.Rating.Reviews reviews</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Upcoming Lessons</div>
+                    <div class="h3 mb-0">@Model.Lessons.Upcoming</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Students</div>
+                    <div class="h3 mb-0">@Model.Students.Count</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs mb-3" id="tutorTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab" aria-controls="courses" aria-selected="true">Courses</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ratings-tab" data-bs-toggle="tab" data-bs-target="#ratings" type="button" role="tab" aria-controls="ratings" aria-selected="false">Ratings</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="classes-tab" data-bs-toggle="tab" data-bs-target="#classes" type="button" role="tab" aria-controls="classes" aria-selected="false">Current Classes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="false">Students</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="tutorTabsContent">
+        <div class="tab-pane fade show active" id="courses" role="tabpanel" aria-labelledby="courses-tab">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <h6 class="mb-0">Assigned Courses</h6>
+                            <div class="text-muted small">Courses currently assigned to this tutor.</div>
+                        </div>
+                        @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                        {
+                            <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#assignCourseModal">
+                                <i class="fas fa-plus me-1"></i>Assign Course
+                            </button>
+                        }
+                    </div>
+
+                    @if (Model.AssignedCourses.Count == 0)
+                    {
+                        <div class="text-muted">No assigned courses found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Curriculum</th>
+                                    <th>Grade</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var c in Model.AssignedCourses)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@c.CourseName</td>
+                                        <td class="text-muted">@((c.Curriculum ?? "-"))</td>
+                                        <td class="text-muted">@((c.Grade ?? "-"))</td>
+                                        <td><span class="badge @(c.IsActive ? "bg-success" : "bg-secondary")">@(c.IsActive ? "Active" : "Inactive")</span></td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="ratings" role="tabpanel" aria-labelledby="ratings-tab">
+            <div class="row g-3">
+                <div class="col-12 col-xl-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-2">Ratings Summary</h6>
+                            <div class="d-flex align-items-end gap-2">
+                                <div class="display-6 fw-bold mb-0">@Model.Rating.Average.ToString("0.0")</div>
+                                <div class="text-muted">/ 5</div>
+                            </div>
+                            <div class="text-muted small">@Model.Rating.Reviews reviews</div>
+                            <div class="mt-2">
+                                @for (var i = 0; i < Model.Rating.Stars.Count; i++)
+                                {
+                                    var star = Model.Rating.Stars[i];
+                                    var count = Model.Rating.Counts[i];
+                                    var total = Math.Max(Model.Rating.Reviews, 1);
+                                    var pct = (int)Math.Round((count * 100.0) / total);
+                                    <div class="d-flex align-items-center gap-2 small mb-1">
+                                        <div style="width:44px;">@star★</div>
+                                        <div class="progress flex-grow-1" style="height:8px;">
+                                            <div class="progress-bar bg-warning" style="width:@pct%"></div>
+                                        </div>
+                                        <div class="text-muted" style="width:64px;text-align:right;">@count</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Ratings</h6>
+                                <span class="text-muted small">Click a rating to view details</span>
+                            </div>
+                            @if (Model.RecentReviews.Count == 0)
+                            {
+                                <div class="text-muted">No reviews yet.</div>
+                            }
+                            else
+                            {
+                                <div class="list-group">
+                                    @foreach (var r in Model.RecentReviews)
+                                    {
+                                        <a class="list-group-item list-group-item-action" href="/Feedback/TutorReview/@r.LessonId">
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                <div class="fw-semibold">@r.CourseName</div>
+                                                <div class="text-muted small">@DateTimeOffset.Parse(r.WhenUtc).ToLocalTime().ToString("dd MMM yyyy")</div>
+                                            </div>
+                                            <div class="small text-muted">Student: @r.StudentDisplayName • Rating: <span class="fw-semibold">@r.Rating</span>/5</div>
+                                            @if (!string.IsNullOrWhiteSpace(r.Comment))
+                                            {
+                                                <div class="small mt-1">@r.Comment</div>
+                                            }
+                                        </a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="classes" role="tabpanel" aria-labelledby="classes-tab">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <h6 class="mb-0">Current / Upcoming Classes</h6>
+                            <div class="text-muted small">Next 7 days + running sessions (UTC)</div>
+                        </div>
+                        <span class="text-muted small">@Model.CurrentClasses.Count</span>
+                    </div>
+
+                    @if (Model.CurrentClasses.Count == 0)
+                    {
+                        <div class="text-muted">No upcoming classes found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>When (UTC)</th>
+                                    <th>Course</th>
+                                    <th>Student</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var l in Model.CurrentClasses)
+                                {
+                                    <tr>
+                                        <td class="text-muted">@l.StartUtc.ToString("yyyy-MM-dd HH:mm") - @l.EndUtc.ToString("HH:mm")</td>
+                                        <td class="fw-semibold">@l.CourseName</td>
+                                        <td><a class="text-decoration-none" href="/People/Student/@l.StudentId">@l.StudentName</a></td>
+                                        <td><span class="badge bg-light text-dark">@l.Status</span></td>
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-primary" href="/LessonBookings/Details?id=@l.LessonId">View</a>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Students Related to this Tutor</h6>
+                        <span class="text-muted small">@Model.Students.Count</span>
+                    </div>
+                    @if (Model.Students.Count == 0)
+                    {
+                        <div class="text-muted">No students found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var s in Model.Students)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@s.Name</td>
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-secondary" href="/People/Student/@s.StudentId">Open profile</a>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+    {
+        <div class="modal fade" id="assignCourseModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" action="/People/Tutor/@Model.Header.UserId/AssignCourse">
+                        @Html.AntiForgeryToken()
+                        <div class="modal-header">
+                            <h5 class="modal-title">Assign Course</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            @if (Model.AssignableCourses.Count == 0)
+                            {
+                                <div class="text-muted">No unassigned active courses available.</div>
+                            }
+                            else
+                            {
+                                <label class="form-label">Select a course</label>
+                                <select class="form-select" name="courseId" required>
+                                    <option value="">-- Select --</option>
+                                    @foreach (var c in Model.AssignableCourses)
+                                    {
+                                        <option value="@c.CourseId">@c.CourseName @((c.Grade != null ? $"• {c.Grade}" : "")) @((c.Curriculum != null ? $"• {c.Curriculum}" : ""))</option>
+                                    }
+                                </select>
+                                <div class="form-text">Only unassigned active courses are shown.</div>
+                            }
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" @(Model.AssignableCourses.Count == 0 ? "disabled" : null)>Assign</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+

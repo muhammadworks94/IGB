@@ -1,0 +1,119 @@
+@model IGB.Web.ViewModels.Admin.PendingEnrollmentsViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "Pending Enrollments";
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Pending Approvals",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Enrollments"),
+        new("Pending Approvals")
+    }
+))
+
+<div class="container-fluid">
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" name="q" value="@Model.Query" placeholder="Student or course name..." />
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @{
+        var tableVm = new TableShellViewModel(
+            Id: "pendingEnrollments",
+            Columns: new List<TableColumn>
+            {
+                new("Student"),
+                new("Course"),
+                new("Credits required"),
+                new("Remaining credits"),
+                new("Requested"),
+                new("Actions", CssClass: "text-end")
+            },
+            RenderRows: html =>
+            {
+                var sb = new System.Text.StringBuilder();
+                foreach (var r in Model.Items)
+                {
+                    var approveUrl = Url.Action("Approve", "Enrollments") ?? "#";
+                    var rejectUrl = Url.Action("Reject", "Enrollments") ?? "#";
+                    sb.AppendLine($@"
+<tr>
+  <td>{System.Net.WebUtility.HtmlEncode(r.StudentName)}</td>
+  <td>{System.Net.WebUtility.HtmlEncode(r.CourseName)}</td>
+  <td>{r.CreditCost}</td>
+  <td>{r.RemainingCredits}</td>
+  <td>{r.RequestedAtUtc:yyyy-MM-dd HH:mm}</td>
+  <td class='text-end'>
+    <form method='post' action='{approveUrl}' class='d-inline'>
+      <input name='__RequestVerificationToken' type='hidden' value='{csrf}' />
+      <input type='hidden' name='bookingId' value='{r.BookingId}' />
+      <button type='submit' class='btn btn-sm btn-success'>Approve</button>
+    </form>
+    <button type='button' class='btn btn-sm btn-outline-danger' onclick='openReject({r.BookingId})'>Reject</button>
+  </td>
+</tr>");
+                }
+                return new Microsoft.AspNetCore.Html.HtmlString(sb.ToString());
+            },
+            Pagination: Model.Pagination,
+            SearchQuery: Model.Query
+        );
+    }
+
+    @await Html.PartialAsync("Components/_TableShell", tableVm)
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="@Url.Action("Reject","Enrollments")">
+                <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                <input type="hidden" name="bookingId" id="rejectBookingId" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject Enrollment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Reason (optional)</label>
+                    <textarea class="form-control" name="reason" rows="3" placeholder="Reason for rejection..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+  function openReject(id) {
+    document.getElementById('rejectBookingId').value = id;
+    const modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+    modal.show();
+  }
+</script>
+
+

@@ -1,21 +1,1055 @@
 @{
-    ViewData["Title"] = "Tutor Portal";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="breadcrumb-header">
-    <h1 class="breadcrumb-title">Tutor Portal</h1>
-    <p class="breadcrumb-subtitle">Manage your lessons, schedule, and student interactions.</p>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Dashboard",
+    Breadcrumbs: new List<BreadcrumbItem> { new("Dashboard", Url.Action("Index", "Portal")) }
+))
 
 <div class="container-fluid">
-    <div class="row g-3">
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="LessonBookings" asp-action="Pending">Lesson Requests</a>
+    <style>
+        .skeleton {
+            background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%);
+            background-size: 400% 100%;
+            animation: shimmer 1.2s ease-in-out infinite;
+            border-radius: 10px;
+        }
+        @@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+        .stat-card { border: 0; }
+        .icon-circle {
+            width: 42px; height: 42px;
+            display:flex; align-items:center; justify-content:center;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.45);
+        }
+        .bg-grad-primary { background: linear-gradient(135deg, rgba(13,110,253,0.18), rgba(13,110,253,0.04)); }
+        .bg-grad-secondary { background: linear-gradient(135deg, rgba(108,117,125,0.18), rgba(108,117,125,0.04)); }
+        .bg-grad-info { background: linear-gradient(135deg, rgba(13,202,240,0.18), rgba(13,202,240,0.04)); }
+        .bg-grad-success { background: linear-gradient(135deg, rgba(25,135,84,0.18), rgba(25,135,84,0.04)); }
+        .bg-grad-warning { background: linear-gradient(135deg, rgba(255,193,7,0.22), rgba(255,193,7,0.04)); }
+        .pulse { animation: pulse 1.4s ease-in-out infinite; }
+        @@keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(25,135,84,0.25); }
+            70% { box-shadow: 0 0 0 10px rgba(25,135,84,0); }
+            100% { box-shadow: 0 0 0 0 rgba(25,135,84,0); }
+        }
+        .lesson-border-upcoming { border-left: 4px solid #0dcaf0; }
+        .lesson-border-ongoing { border-left: 4px solid #198754; }
+        .lesson-border-completed { border-left: 4px solid #6c757d; }
+        .lesson-border-cancelled { border-left: 4px solid #dc3545; }
+        .widget-handle { cursor: grab; }
+    </style>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h3 class="mb-1" id="greeting">—</h3>
+            <div class="text-muted small"><span id="tutorClock">—</span></div>
         </div>
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="Profile" asp-action="Index">My Profile</a>
+        <div class="d-flex gap-2 align-items-center">
+            <a class="btn btn-outline-secondary" href="/Profile/Index"><i class="fas fa-user-circle me-2"></i>Profile</a>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Settings</button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><button class="dropdown-item" type="button" id="resetLayout">Reset layout</button></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="errorBox" class="alert alert-danger d-none">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">Dashboard failed to load</div>
+                <div class="small text-muted">Retry to refresh tutor data.</div>
+            </div>
+            <button class="btn btn-sm btn-light" id="retryBtn">Retry</button>
+        </div>
+    </div>
+
+    <div id="profileBanner" class="alert alert-warning d-none">
+        <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+            <div>
+                <div class="fw-semibold"><i class="fas fa-exclamation-triangle me-2"></i>Profile status</div>
+                <div class="small text-muted">Your profile is <span class="fw-semibold" id="profilePct">0%</span> complete</div>
+                <div class="progress mt-2" style="height:8px;max-width:520px;">
+                    <div class="progress-bar bg-warning" id="profileBar" style="width:0%"></div>
+                </div>
+                <div class="small mt-2" id="profileChecklist"></div>
+            </div>
+            <div class="d-flex gap-2">
+                <a class="btn btn-sm btn-primary" href="/Profile/Index">Complete Profile</a>
+                <button class="btn btn-sm btn-outline-secondary" id="dismissProfile" type="button">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="widgets" class="row g-3">
+        <!-- Quote + Weather + Notes -->
+        <div class="col-12 col-xl-4" data-widget="quote">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Daily teaching quote</h6>
+                        <span class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></span>
+                    </div>
+                    <div class="text-muted" id="dailyQuote">—</div>
+                    <div class="text-muted small mt-1" id="dailyQuoteAuthor"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-4" data-widget="weather">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Weather</h6>
+                        <span class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></span>
+                    </div>
+                    <div id="weatherBox" class="text-muted small">
+                        <div id="weatherStatus">Location not set.</div>
+                        <div class="mt-2 d-flex gap-2 flex-wrap">
+                            <button class="btn btn-sm btn-outline-primary" type="button" id="enableWeather">Use my location</button>
+                            <button class="btn btn-sm btn-outline-secondary d-none" type="button" id="clearWeather">Clear</button>
+                        </div>
+                        <div class="mt-2 d-none" id="weatherData">
+                            <div class="fw-semibold" id="weatherTemp">—</div>
+                            <div class="text-muted" id="weatherDesc">—</div>
+                            <div class="text-muted small" id="weatherUpdated">—</div>
+                        </div>
+                    </div>
+                    <div class="text-muted small mt-2">
+                        Powered by Open‑Meteo (no API key).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-4" data-widget="notes">
+            <div class="card" style="background: linear-gradient(135deg, rgba(255,193,7,0.18), rgba(255,193,7,0.06)); border:0;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Quick Notes</h6>
+                        <span class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></span>
+                    </div>
+                    <textarea id="quickNotes" class="form-control" rows="6" placeholder="Write reminders… (autosaves)"></textarea>
+                    <div class="text-muted small mt-2" id="notesSaved">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats (5) -->
+        <div class="col-12" data-widget="stats">
+    <div class="row g-3">
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card stat-card bg-grad-primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon-circle"><i class="fas fa-users"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="statStudents">—</div>
+                            <div class="text-muted">My Students</div>
+                            <div class="small text-muted mt-1"><span id="statActiveThisMonth">0</span> active this month</div>
+                            <div class="badge bg-success mt-2" id="statNewStudents">+0 new students</div>
+                            <a class="stretched-link" href="/Progress/Students"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card stat-card bg-grad-secondary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon-circle"><i class="fas fa-book"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="statCourses">—</div>
+                            <div class="text-muted">Teaching Courses</div>
+                            <div class="small text-muted mt-1">Across <span id="statCurriculums">0</span> curriculums</div>
+                            <a class="stretched-link" href="/Courses/My"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card stat-card bg-grad-info">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon-circle"><i class="fas fa-calendar-alt"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="statWeekLessons">—</div>
+                            <div class="text-muted">Lessons This Week</div>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <span class="badge bg-success" id="weekCompleted">0 completed</span>
+                                <span class="badge bg-primary" id="weekUpcoming">0 upcoming</span>
+                                <span class="badge bg-danger" id="weekCancelled">0 cancelled</span>
+                            </div>
+                            <a class="stretched-link" href="/Schedule/Tutor"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card stat-card bg-grad-success">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon-circle"><i class="fas fa-coins"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="statEarningsTotal">—</div>
+                            <div class="text-muted">Total Earnings</div>
+                            <div class="small text-muted mt-1"><span id="statEarningsMonth">0</span> credits this month</div>
+                            <div class="small mt-1" id="earningsChange"></div>
+                            <div class="mt-2" style="height:50px;">
+                                <canvas id="earningsSpark"></canvas>
+                            </div>
+                            <a class="stretched-link" href="/Earnings/MyEarnings"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card stat-card bg-grad-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon-circle"><i class="fas fa-star"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="statRating">—</div>
+                            <div class="text-muted">Average Rating</div>
+                            <div class="small text-muted mt-1">Based on <span id="statReviews">0</span> reviews</div>
+                            <div class="small mt-1" id="ratingTrend"></div>
+                            <a class="stretched-link" href="/Feedback/MyFeedbackTutor"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's schedule -->
+        <div class="col-12" data-widget="today">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <div>
+                            <h6 class="mb-0" id="todayTitle">Today's Schedule</h6>
+                            <div class="text-muted small" id="todayBadges"></div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-outline-secondary active" id="timelineBtn" type="button">Timeline</button>
+                                <button class="btn btn-sm btn-outline-secondary" id="listBtn" type="button">List</button>
+                            </div>
+                            <a class="btn btn-sm btn-outline-secondary" href="/Schedule/Tutor">View Full Week</a>
+                        </div>
+                    </div>
+                    <div id="todayEmpty" class="text-center text-muted d-none py-4">
+                        <div class="fw-semibold mb-1">No classes scheduled for today!</div>
+                        <div class="small mb-3">You have time to prepare lessons or set your availability.</div>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <a class="btn btn-primary" href="/TutorAvailability/Index">Set Availability</a>
+                            <a class="btn btn-outline-secondary" href="/Schedule/Tutor">View Upcoming Lessons</a>
+                        </div>
+                    </div>
+                    <div id="todayTimeline"></div>
+                    <div id="todayList" class="d-none"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="col-12" data-widget="actions">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-2">Quick actions</h6>
+                    <div class="row g-2">
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Schedule/Tutor" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="d-flex justify-content-between">
+                                    <div class="icon-circle"><i class="fas fa-calendar-check"></i></div>
+                                    <span class="badge bg-danger d-none" id="availabilityBadge">Not set</span>
+                                </div>
+                                <div class="fw-semibold mt-2">Set Availability</div>
+                                <div class="text-muted small">Manage your weekly schedule</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Progress/Students" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="d-flex justify-content-between">
+                                    <div class="icon-circle"><i class="fas fa-users"></i></div>
+                                    <span class="badge bg-success" id="newStudentsBadge">+0 new</span>
+                                </div>
+                                <div class="fw-semibold mt-2">My Students</div>
+                                <div class="text-muted small"><span id="activeStudentsText">0</span> active students</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Feedback/MyFeedbackTutor" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="d-flex justify-content-between">
+                                    <div class="icon-circle"><i class="fas fa-star"></i></div>
+                                    <span class="badge bg-warning text-dark d-none" id="feedbackPendingBadge">0 pending</span>
+                                </div>
+                                <div class="fw-semibold mt-2">Add Feedback</div>
+                                <div class="text-muted small">Provide student feedback</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/TestReports/Index" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="icon-circle"><i class="fas fa-file-alt"></i></div>
+                                <div class="fw-semibold mt-2">Test Reports</div>
+                                <div class="text-muted small">Upload test results</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Earnings/MyEarnings" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="icon-circle"><i class="fas fa-coins"></i></div>
+                                <div class="fw-semibold mt-2">Earnings</div>
+                                <div class="text-muted small"><span id="monthEarningsText">0</span> credits this month</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/LessonBookings/RescheduleRequests" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="d-flex justify-content-between">
+                                    <div class="icon-circle"><i class="fas fa-exchange-alt"></i></div>
+                                    <span class="badge bg-danger d-none" id="rescheduleBadge">0</span>
+                                </div>
+                                <div class="fw-semibold mt-2">Reschedule Requests</div>
+                                <div class="text-muted small">Review student changes</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students overview -->
+        <div class="col-12 col-xl-8" data-widget="students">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <h6 class="mb-0">My Students</h6>
+                            <span class="badge bg-light text-dark" id="studentsTotalBadge">0</span>
+                        </div>
+                        <a class="small text-decoration-none" href="/Progress/Students">View All</a>
+                    </div>
+                    <div class="d-flex gap-3 overflow-auto pb-2" id="studentsScroller" style="scrollbar-width: thin;">
+                        <div class="card p-3" style="min-width:260px;"><div class="skeleton" style="height:120px;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending actions -->
+        <div class="col-12 col-xl-4" data-widget="pending">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Pending Actions <span class="badge bg-danger ms-1" id="pendingCount">0</span></h6>
+                    </div>
+                    <div id="pendingList"></div>
+                    <div class="text-muted d-none" id="pendingEmpty">All caught up!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings + feedback + insights -->
+        <div class="col-12 col-xl-6" data-widget="earnings">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <h6 class="mb-0">Earnings Summary</h6>
+                        <a class="btn btn-sm btn-outline-secondary" href="/Earnings/MyEarnings">View details</a>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6"><div class="p-2 border rounded"><div class="text-muted small">This month</div><div class="fw-semibold" id="earnThisMonth">—</div></div></div>
+                        <div class="col-6"><div class="p-2 border rounded"><div class="text-muted small">Last month</div><div class="fw-semibold" id="earnLastMonth">—</div></div></div>
+                        <div class="col-6"><div class="p-2 border rounded"><div class="text-muted small">Avg / lesson</div><div class="fw-semibold" id="earnAvg">—</div></div></div>
+                        <div class="col-6"><div class="p-2 border rounded"><div class="text-muted small">Pending payments</div><div class="fw-semibold" id="earnPending">—</div></div></div>
+                    </div>
+                    <div style="height:240px;"><canvas id="earningsTrend"></canvas></div>
+                    <div class="mt-3">
+                        <div class="fw-semibold mb-1">Earnings by course</div>
+                        <div id="earnByCourse"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6" data-widget="feedback">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <div>
+                            <h6 class="mb-0">Recent Feedback</h6>
+                            <div class="text-muted small">Average: <span class="fw-semibold" id="fbAvg">—</span> • <span id="fbCount">0</span> reviews</div>
+                        </div>
+                        <a class="small text-decoration-none" href="/Feedback/MyFeedbackTutor">View All Feedback</a>
+                    </div>
+                    <div id="fbRecent"></div>
+                    <div class="mt-3">
+                        <div class="fw-semibold mb-1">Rating Breakdown</div>
+                        <div id="fbBreakdown"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12" data-widget="insights">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Your Teaching Insights</h6>
+                        <span class="text-muted small" id="insightsPeriod">This Month</span>
+                    </div>
+                    <div class="row g-2" id="insightsGrid"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="/nobleui/vendors/sortablejs/Sortable.min.js"></script>
+    <script>
+      (function(){
+        const state = { data: null, view: 'timeline' };
+        const errorBox = document.getElementById('errorBox');
+        const retryBtn = document.getElementById('retryBtn');
+        const localPrefKey = 'igb:tutorDashboard:prefs:v1'; // fallback only
+        const prefApi = '/api/dashboard/tutor/preferences';
+
+        let prefsJson = {}; // server-synced prefs
+        function debounce(fn, ms){
+          let t = null;
+          return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+        }
+
+        function showError(on){ errorBox.classList.toggle('d-none', !on); }
+        function setText(id, v){ const el = document.getElementById(id); if (el) el.textContent = v; }
+        function escapeHtml(s){ return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+        function fmtTime(iso){ return new Date(iso).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }); }
+        function fmtLocal(iso){ return new Date(iso).toLocaleString([], { weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }); }
+        function minsTo(iso){ return Math.round((new Date(iso).getTime() - Date.now())/60000); }
+        function relStart(iso){
+          const m = minsTo(iso);
+          if (m < 0) return 'Started';
+          if (m === 0) return 'Starting now!';
+          if (m < 60) return `Starts in ${m} mins`;
+          return `Starts in ${Math.floor(m/60)} hrs`;
+        }
+        function statusBadge(status, canJoin){
+          if (canJoin) return '<span class="badge bg-success pulse"><i class="fas fa-play me-1"></i>In Progress</span>';
+          if (status === 'Completed') return '<span class="badge bg-secondary"><i class="fas fa-check me-1"></i>Completed</span>';
+          if (status === 'Cancelled') return '<span class="badge bg-danger"><i class="fas fa-times me-1"></i>Cancelled</span>';
+          if (status === 'Scheduled' || status === 'Rescheduled') return '<span class="badge bg-primary"><i class="fas fa-clock me-1"></i>Upcoming</span>';
+          return `<span class="badge bg-light text-dark">${escapeHtml(status||'')}</span>`;
+        }
+        function borderClass(status, canJoin){
+          if (canJoin) return 'lesson-border-ongoing';
+          if (status === 'Completed') return 'lesson-border-completed';
+          if (status === 'Cancelled') return 'lesson-border-cancelled';
+          return 'lesson-border-upcoming';
+        }
+
+        function tickClock(){
+          document.getElementById('tutorClock').textContent = new Date().toLocaleString();
+        }
+        setInterval(tickClock, 1000); tickClock();
+
+        async function getPrefs(){
+          try{
+            const res = await fetch(prefApi, { credentials:'include' });
+            if (!res.ok) throw new Error('prefs bad response');
+            const p = await res.json();
+            prefsJson = p.json || {};
+          }catch{
+            // fallback to localStorage
+            try { prefsJson = JSON.parse(localStorage.getItem(localPrefKey) || '{}'); } catch { prefsJson = {}; }
+          }
+        }
+
+        async function savePrefs(){
+          try{
+            // best-effort save to server
+            await fetch(prefApi, {
+              method:'POST',
+              credentials:'include',
+              headers:{ 'Content-Type':'application/json' },
+              body: JSON.stringify({ json: prefsJson || {} })
+            });
+          }catch{
+            // fallback local save
+            try { localStorage.setItem(localPrefKey, JSON.stringify(prefsJson || {})); } catch {}
+          }
+        }
+
+        const savePrefsDebounced = debounce(() => savePrefs(), 600);
+
+        function applyPrefs(){
+          const p = prefsJson || {};
+          const widgets = (p.widgets || {});
+          const hidden = new Set(widgets.hidden || []);
+          document.querySelectorAll('#widgets [data-widget]').forEach(el => {
+            el.classList.toggle('d-none', hidden.has(el.getAttribute('data-widget')));
+          });
+          (widgets.order || []).forEach(id => {
+            const el = document.querySelector(`#widgets [data-widget="${id}"]`);
+            if (el) document.getElementById('widgets').appendChild(el);
+          });
+
+          // default view
+          if (p.scheduleView === 'list') {
+            document.getElementById('listBtn').click();
+          } else {
+            document.getElementById('timelineBtn').click();
+          }
+
+          // notes
+          document.getElementById('quickNotes').value = (p.notes?.text || '');
+          document.getElementById('notesSaved').textContent = p.notes?.updatedAtUtc ? `Saved: ${new Date(p.notes.updatedAtUtc).toLocaleTimeString()}` : '—';
+
+          // weather
+          const loc = p.weather?.location;
+          if (loc && typeof loc.lat === 'number' && typeof loc.lon === 'number') {
+            document.getElementById('clearWeather').classList.remove('d-none');
+            window.loadWeather(loc.lat, loc.lon);
+          }
+        }
+
+        function saveOrder(){
+          const ids = Array.from(document.querySelectorAll('#widgets [data-widget]')).map(x => x.getAttribute('data-widget'));
+          prefsJson.widgets = prefsJson.widgets || {};
+          prefsJson.widgets.order = ids;
+          savePrefsDebounced();
+        }
+
+        if (typeof Sortable !== 'undefined') {
+          Sortable.create(document.getElementById('widgets'), { handle: '.widget-handle', animation: 150, onEnd: saveOrder });
+        }
+
+        document.getElementById('resetLayout').addEventListener('click', () => {
+          if (!confirm('Reset dashboard layout?')) return;
+          prefsJson = {};
+          try { localStorage.removeItem(localPrefKey); } catch {}
+          savePrefsDebounced();
+          applyPrefs();
+        });
+
+        document.getElementById('dismissProfile').addEventListener('click', () => {
+          sessionStorage.setItem('igb:tutorDash:profileDismissed:v1', 'true');
+          document.getElementById('profileBanner').classList.add('d-none');
+        });
+
+        let spark = null, trend = null;
+        async function ensureChartJs(){
+          if (typeof Chart !== 'undefined') return true;
+          return new Promise((resolve) => {
+            const s = document.createElement('script');
+            s.src = '/nobleui/vendors/chartjs/Chart.min.js';
+            s.onload = () => resolve(true);
+            s.onerror = () => resolve(false);
+            document.head.appendChild(s);
+          });
+        }
+
+        async function renderCharts(){
+          const d = state.data;
+          if (!d) return;
+          const ok = await ensureChartJs();
+          if (!ok || typeof Chart === 'undefined') return;
+          try { spark?.destroy(); } catch {}
+          try { trend?.destroy(); } catch {}
+
+          const sctx = document.getElementById('earningsSpark');
+          if (sctx) spark = new Chart(sctx, {
+            type:'line',
+            data:{ labels: Array.from({length: d.stats.earnings.trend6m.length}, (_,i)=> String(i+1)), datasets:[{ data: d.stats.earnings.trend6m, borderColor:'#198754', tension:0.25, fill:false }] },
+            options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ enabled:false } }, scales:{ x:{ display:false }, y:{ display:false } } }
+          });
+
+          const tctx = document.getElementById('earningsTrend');
+          if (tctx) trend = new Chart(tctx, {
+            type:'line',
+            data:{ labels: d.earnings.labels, datasets:[{ data: d.earnings.values, borderColor:'#0d6efd', backgroundColor:'rgba(13,110,253,0.18)', fill:true, tension:0.25 }] },
+            options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+          });
+        }
+
+        function renderProfile(){
+          const b = document.getElementById('profileBanner');
+          const dismissed = sessionStorage.getItem('igb:tutorDash:profileDismissed:v1') === 'true';
+          if (dismissed) { b.classList.add('d-none'); return; }
+          const p = state.data.profile;
+          if ((p.percent || 0) >= 100) { b.classList.add('d-none'); return; }
+          setText('profilePct', `${p.percent}%`);
+          document.getElementById('profileBar').style.width = `${p.percent}%`;
+          document.getElementById('profileChecklist').innerHTML = (p.items || []).map(i => {
+            const icon = i.done ? '✅' : '❌';
+            const link = i.url ? `<a href="${i.url}" class="ms-1">Fix</a>` : '';
+            return `<div class="small">${icon} ${escapeHtml(i.label)}${link}</div>`;
+          }).join('');
+          b.classList.remove('d-none');
+        }
+
+        function renderStats(){
+          const s = state.data.stats;
+          setText('statStudents', s.students.total);
+          setText('statActiveThisMonth', s.students.activeThisMonth);
+          setText('statNewStudents', `+${s.students.newThisMonth} new students`);
+          setText('statCourses', s.courses.total);
+          setText('statCurriculums', s.courses.curriculums);
+          setText('statWeekLessons', s.lessonsWeek.total);
+          setText('weekCompleted', `${s.lessonsWeek.completed} completed`);
+          setText('weekUpcoming', `${s.lessonsWeek.upcoming} upcoming`);
+          setText('weekCancelled', `${s.lessonsWeek.cancelled} cancelled`);
+          setText('statEarningsTotal', s.earnings.totalCredits);
+          setText('statEarningsMonth', s.earnings.thisMonthCredits);
+          setText('earningsChange', s.earnings.changePct >= 0 ? `+${s.earnings.changePct}% vs last month` : `${s.earnings.changePct}% vs last month`);
+          setText('statRating', (s.rating.average || 0).toFixed(1));
+          setText('statReviews', s.rating.reviews);
+          setText('ratingTrend', s.rating.changeThisMonth >= 0 ? `+${s.rating.changeThisMonth} this month` : `${s.rating.changeThisMonth} this month`);
+
+          // quick action badges
+          setText('newStudentsBadge', `+${s.students.newThisMonth} new`);
+          setText('activeStudentsText', s.students.activeThisMonth);
+          setText('monthEarningsText', s.earnings.thisMonthCredits);
+        }
+
+        function renderPending(){
+          const a = state.data.actions;
+          setText('pendingCount', a.total);
+          const list = document.getElementById('pendingList');
+          const empty = document.getElementById('pendingEmpty');
+          if (!a.items || a.items.length === 0){
+            list.innerHTML = '';
+            empty.classList.remove('d-none');
+            return;
+          }
+          empty.classList.add('d-none');
+          list.innerHTML = a.items.map(x => {
+            const border = x.priority === 'high' ? 'border-danger' : (x.priority === 'medium' ? 'border-warning' : 'border-info');
+            const btn = x.url ? `<a class="btn btn-sm btn-primary" href="${x.url}">${escapeHtml(x.actionText||'Open')}</a>` : '';
+            return `<div class="border rounded p-2 mb-2 ${border}">
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <div>
+                  <div class="fw-semibold">${escapeHtml(x.title)}</div>
+                  <div class="text-muted small">${escapeHtml(x.description)}</div>
+                </div>
+                ${btn}
+              </div>
+            </div>`;
+          }).join('');
+
+          // availability badge
+          document.getElementById('availabilityBadge').classList.toggle('d-none', state.data.profile.items.find(i => i.key === 'availability')?.done === true);
+          // feedback pending badge (best-effort from action items)
+          const fp = (a.items || []).find(i => i.key === 'feedback_pending');
+          const fb = document.getElementById('feedbackPendingBadge');
+          if (fp && fp.count > 0){ fb.textContent = `${fp.count} pending`; fb.classList.remove('d-none'); } else fb.classList.add('d-none');
+          const rr = (a.items || []).find(i => i.key === 'reschedule_requests');
+          const rb = document.getElementById('rescheduleBadge');
+          if (rr && rr.count > 0){ rb.textContent = rr.count; rb.classList.remove('d-none'); } else rb.classList.add('d-none');
+        }
+
+        function renderToday(){
+          const t = state.data.today;
+          setText('todayTitle', `Today's Schedule - ${t.dateLabel}`);
+          document.getElementById('todayBadges').innerHTML = `
+            <span class="badge bg-primary me-1">${t.lessonsCount} lessons</span>
+            <span class="badge bg-success me-1">${Math.round((t.totalMinutes||0)/60)} hours of teaching</span>
+            <span class="badge bg-secondary">${t.uniqueStudents} students</span>`;
+          document.getElementById('todayEmpty').classList.toggle('d-none', t.items.length !== 0);
+
+          const timeline = document.getElementById('todayTimeline');
+          const list = document.getElementById('todayList');
+          if (t.items.length === 0){ timeline.innerHTML=''; list.innerHTML=''; return; }
+
+          // timeline (simple vertical, with "now" marker)
+          timeline.innerHTML = `<div class="position-relative ps-3">
+            <div style="position:absolute;left:10px;top:0;bottom:0;width:2px;background:#e9ecef;"></div>
+            <div class="text-danger small mb-2"><i class="fas fa-circle me-1"></i>Now: ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+            ${t.items.map(l => {
+              const soon = minsTo(l.startUtc);
+              const startText = relStart(l.startUtc);
+              const soonClass = soon <= 5 ? 'text-danger fw-semibold' : (soon <= 60 ? 'text-warning' : 'text-muted');
+              const zoom = (l.zoomMeetingId || l.zoomPassword) ? `
+                <details class="small mt-1">
+                  <summary class="text-muted">Zoom details</summary>
+                  <div class="mt-1">Meeting ID: <span class="fw-semibold">${escapeHtml(l.zoomMeetingId||'—')}</span></div>
+                  <div>Password: <span class="fw-semibold">${escapeHtml(l.zoomPassword||'—')}</span></div>
+                </details>` : '';
+
+              const canStart = (l.status === 'Scheduled' || l.status === 'Rescheduled') && minsTo(l.startUtc) <= 15;
+              const btnPrimary = l.canJoin ? `<a class="btn btn-sm btn-primary pulse" target="_blank" href="${l.joinUrl||'#'}">Join Now</a>` :
+                (canStart && l.joinUrl ? `<a class="btn btn-sm btn-primary pulse" target="_blank" href="${l.joinUrl}">Start Class</a>` : `<a class="btn btn-sm btn-outline-secondary" href="/LessonBookings/Details?id=${l.id}">View Details</a>`);
+              const endBtn = l.canJoin ? `<form method="post" action="/LessonBookings/EndByAdmin" class="d-inline"><button class="btn btn-sm btn-outline-danger" type="button" disabled title="Tutor-end not implemented">End Class</button></form>` : '';
+              const resched = (minsTo(l.startUtc) > 15) ? `<a class="btn btn-sm btn-outline-warning" href="/LessonBookings/Reschedule?id=${l.id}" title="Reschedule"><i class="fas fa-exchange-alt"></i></a>` : '';
+
+              return `<div class="card mb-2 ${borderClass(l.status, l.canJoin)}">
+                <div class="card-body">
+                  <div class="row g-2 align-items-center">
+                    <div class="col-12 col-md-3">
+                      <div class="fw-semibold fs-5">${fmtTime(l.startUtc)}</div>
+                      <div class="text-muted small">${fmtTime(l.endUtc)}</div>
+                      <div class="text-muted small">${Math.round((l.durationMinutes||60)/60)} hour</div>
+                      <div class="small ${soonClass}">${startText}</div>
+                      <div class="mt-1">${statusBadge(l.status, l.canJoin)}</div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <div class="fw-semibold"><i class="fas fa-user me-2 text-muted"></i>${escapeHtml(l.studentName)}</div>
+                      <div class="text-muted small"><i class="fas fa-book me-1"></i>${escapeHtml(l.courseName)}</div>
+                      ${zoom}
+                    </div>
+                    <div class="col-12 col-md-3 d-flex flex-wrap gap-2 justify-content-md-end">
+                      ${btnPrimary}
+                      ${endBtn}
+                      ${resched}
+                      <a class="btn btn-sm btn-outline-secondary" href="/Schedule/ExportIcal?from=${new Date(l.startUtc).toISOString().slice(0,10)}&to=${new Date(l.startUtc).toISOString().slice(0,10)}" title="Add to calendar"><i class="fas fa-calendar-plus"></i></a>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>`;
+
+          // list view table
+          list.innerHTML = `<div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead><tr><th>Time</th><th>Student</th><th>Course</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+              <tbody>
+              ${t.items.map(l => `
+                <tr>
+                  <td class="text-muted">${fmtTime(l.startUtc)} - ${fmtTime(l.endUtc)}</td>
+                  <td>${escapeHtml(l.studentName)}</td>
+                  <td>${escapeHtml(l.courseName)}</td>
+                  <td>${statusBadge(l.status, l.canJoin)}</td>
+                  <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" href="/LessonBookings/Details?id=${l.id}">View</a>
+                  </td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>`;
+        }
+
+        function renderStudents(){
+          const s = state.data.students;
+          setText('studentsTotalBadge', `${s.total} students`);
+          const sc = document.getElementById('studentsScroller');
+          if (!s.items || s.items.length === 0){
+            sc.innerHTML = `<div class="text-muted">No students yet.</div>`;
+            return;
+          }
+          sc.innerHTML = s.items.map(st => {
+            const band = st.performanceBand === 'excellent' ? 'border-success' : (st.performanceBand === 'good' ? 'border-primary' : 'border-warning');
+            return `<div class="card p-3 ${band}" style="min-width:260px;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle bg-light" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
+                  <i class="fas fa-user text-muted"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">${escapeHtml(st.name)}</div>
+                  <div class="text-muted small">${escapeHtml(st.gradeLabel)}</div>
+                </div>
+              </div>
+              <div class="row g-2 mt-2 small text-muted">
+                <div class="col-6">Courses: <span class="fw-semibold text-dark">${st.courses}</span></div>
+                <div class="col-6">Lessons: <span class="fw-semibold text-dark">${st.completedLessons}/${st.totalLessons}</span></div>
+              </div>
+              <div class="mt-2">
+                <div class="d-flex justify-content-between small text-muted"><span>Progress</span><span>${st.progressPercent}%</span></div>
+                <div class="progress" style="height:8px;">
+                  <div class="progress-bar ${st.progressPercent>=80?'bg-success':(st.progressPercent>=60?'bg-primary':'bg-warning')}" style="width:${st.progressPercent}%"></div>
+                </div>
+              </div>
+              <div class="text-muted small mt-2">Last: ${st.lastLessonUtc ? fmtLocal(st.lastLessonUtc) : '—'}</div>
+              <div class="text-muted small">Next: ${st.nextLessonUtc ? fmtLocal(st.nextLessonUtc) : '—'}</div>
+              <div class="d-flex gap-2 mt-2 flex-wrap">
+                <a class="btn btn-sm btn-outline-primary" href="/Progress/Student?studentUserId=${st.studentId}" title="View Progress"><i class="fas fa-chart-line"></i></a>
+                <a class="btn btn-sm btn-outline-secondary" href="/Feedback/MyFeedbackTutor" title="Add Feedback"><i class="fas fa-star"></i></a>
+                <a class="btn btn-sm btn-outline-secondary" href="/TestReports/Create?studentUserId=${st.studentId}" title="Add Test Report"><i class="fas fa-file-alt"></i></a>
+                <a class="btn btn-sm btn-outline-secondary" href="/People/Student/${st.studentId}" title="View Profile"><i class="fas fa-id-card"></i></a>
+              </div>
+            </div>`;
+          }).join('');
+        }
+
+        function renderEarningsSection(){
+          const e = state.data.earnings;
+          setText('earnThisMonth', `${e.thisMonth} credits`);
+          setText('earnLastMonth', `${e.lastMonth} credits`);
+          setText('earnAvg', `${e.avgPerLesson} credits`);
+          setText('earnPending', `${e.pendingPayments} credits`);
+          const bc = document.getElementById('earnByCourse');
+          if (!e.byCourseTop5 || e.byCourseTop5.length === 0) { bc.innerHTML = `<div class="text-muted small">No earnings yet.</div>`; return; }
+          bc.innerHTML = e.byCourseTop5.map(r => `
+            <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+              <div>
+                <div class="fw-semibold">${escapeHtml(r.courseName)}</div>
+                <div class="text-muted small">${r.lessonsCompleted} lessons • ${r.creditsEarned} credits</div>
+              </div>
+              <div class="text-muted small">${r.percentOfTotal}%</div>
+            </div>`).join('');
+        }
+
+        function renderFeedback(){
+          const f = state.data.feedback;
+          setText('fbAvg', (f.average||0).toFixed(1));
+          setText('fbCount', f.reviews||0);
+          const recent = document.getElementById('fbRecent');
+          if (!f.recent3 || f.recent3.length === 0){
+            recent.innerHTML = `<div class="text-muted">No feedback yet.</div>`;
+          } else {
+            recent.innerHTML = f.recent3.map(x => `
+              <div class="border rounded p-2 mb-2">
+                <div class="d-flex justify-content-between">
+                  <div class="fw-semibold">${escapeHtml(x.studentName)}</div>
+                  <div class="text-muted small">${escapeHtml(x.relative)}</div>
+                </div>
+                <div class="text-muted small">${escapeHtml(x.courseName)} • Rating ${x.rating.toFixed(1)}</div>
+                <div class="small mt-1 text-muted">${escapeHtml(x.commentPreview || '')}</div>
+              </div>`).join('');
+          }
+          const br = document.getElementById('fbBreakdown');
+          const stars = f.breakdown?.stars || [5,4,3,2,1];
+          const counts = f.breakdown?.counts || [0,0,0,0,0];
+          const total = counts.reduce((a,b)=>a+b,0) || 1;
+          br.innerHTML = stars.map((s,i) => {
+            const pct = Math.round((counts[i]*100)/total);
+            return `<div class="d-flex align-items-center gap-2 small mb-1">
+              <div style="width:52px;">${s}★</div>
+              <div class="progress flex-grow-1" style="height:8px;"><div class="progress-bar bg-warning" style="width:${pct}%"></div></div>
+              <div class="text-muted" style="width:80px;text-align:right;">${pct}% (${counts[i]})</div>
+            </div>`;
+          }).join('');
+        }
+
+        function renderInsights(){
+          const ins = state.data.insights;
+          setText('insightsPeriod', ins.period || 'This Month');
+          const grid = document.getElementById('insightsGrid');
+          grid.innerHTML = (ins.items || []).map(i => {
+            const cls = i.severity === 'positive' ? 'border-success' : (i.severity === 'neutral' ? 'border-secondary' : 'border-info');
+            return `<div class="col-12 col-md-6 col-xl-4">
+              <div class="border rounded p-2 ${cls} h-100">
+                <div class="fw-semibold">${escapeHtml(i.title)}</div>
+                <div class="text-muted small">${escapeHtml(i.message)}</div>
+              </div>
+            </div>`;
+          }).join('');
+        }
+
+        async function load(){
+          showError(false);
+          try{
+            const [dashRes] = await Promise.all([
+              fetch('/api/tutor/dashboard', { credentials:'include' })
+            ]);
+            if (!dashRes.ok) throw new Error('bad response');
+            state.data = await dashRes.json();
+            setText('greeting', state.data.greeting || '—');
+            // quote
+            document.getElementById('dailyQuote').textContent = state.data.quote?.text || '—';
+            document.getElementById('dailyQuoteAuthor').textContent = state.data.quote?.author ? `— ${state.data.quote.author}` : '';
+            renderProfile();
+            renderStats();
+            renderToday();
+            renderPending();
+            renderStudents();
+            renderEarningsSection();
+            renderFeedback();
+            renderInsights();
+            renderCharts(); // lazy-load chart lib
+          }catch(e){
+            console.error(e);
+            showError(true);
+          }
+        }
+
+        retryBtn.addEventListener('click', () => load());
+
+        document.getElementById('timelineBtn').addEventListener('click', () => {
+          state.view = 'timeline';
+          prefsJson.scheduleView = 'timeline';
+          savePrefsDebounced();
+          document.getElementById('timelineBtn').classList.add('active');
+          document.getElementById('listBtn').classList.remove('active');
+          document.getElementById('todayTimeline').classList.remove('d-none');
+          document.getElementById('todayList').classList.add('d-none');
+        });
+        document.getElementById('listBtn').addEventListener('click', () => {
+          state.view = 'list';
+          prefsJson.scheduleView = 'list';
+          savePrefsDebounced();
+          document.getElementById('listBtn').classList.add('active');
+          document.getElementById('timelineBtn').classList.remove('active');
+          document.getElementById('todayList').classList.remove('d-none');
+          document.getElementById('todayTimeline').classList.add('d-none');
+        });
+
+        // Quick notes autosave
+        const notesEl = document.getElementById('quickNotes');
+        const notesSavedEl = document.getElementById('notesSaved');
+        const saveNotes = debounce(() => {
+          prefsJson.notes = prefsJson.notes || {};
+          prefsJson.notes.text = notesEl.value || '';
+          prefsJson.notes.updatedAtUtc = new Date().toISOString();
+          notesSavedEl.textContent = `Saved: ${new Date(prefsJson.notes.updatedAtUtc).toLocaleTimeString()}`;
+          savePrefsDebounced();
+        }, 600);
+        notesEl.addEventListener('input', saveNotes);
+
+        // Weather widget (Open-Meteo) - opt-in location
+        function weatherCodeToText(code){
+          const m = {
+            0:'Clear', 1:'Mainly clear', 2:'Partly cloudy', 3:'Overcast',
+            45:'Fog', 48:'Fog',
+            51:'Drizzle',53:'Drizzle',55:'Drizzle',
+            61:'Rain',63:'Rain',65:'Heavy rain',
+            71:'Snow',73:'Snow',75:'Heavy snow',
+            80:'Rain showers',81:'Rain showers',82:'Heavy showers',
+            95:'Thunderstorm',96:'Thunderstorm',99:'Thunderstorm'
+          };
+          return m[code] || `Weather code ${code}`;
+        }
+        async function loadWeather(lat, lon){
+          const status = document.getElementById('weatherStatus');
+          const dataBox = document.getElementById('weatherData');
+          status.textContent = 'Loading weather…';
+          try{
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current=temperature_2m,weather_code&timezone=auto`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('weather bad');
+            const json = await res.json();
+            const temp = json?.current?.temperature_2m;
+            const code = json?.current?.weather_code;
+            document.getElementById('weatherTemp').textContent = (temp !== undefined && temp !== null) ? `${temp}°C` : '—';
+            document.getElementById('weatherDesc').textContent = weatherCodeToText(code);
+            document.getElementById('weatherUpdated').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+            dataBox.classList.remove('d-none');
+            status.textContent = `Location set (${lat.toFixed(2)}, ${lon.toFixed(2)})`;
+          }catch{
+            status.textContent = 'Unable to load weather.';
+          }
+        }
+        window.loadWeather = loadWeather; // used by applyPrefs
+
+        document.getElementById('enableWeather').addEventListener('click', () => {
+          if (!navigator.geolocation) return alert('Geolocation not supported.');
+          navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            prefsJson.weather = prefsJson.weather || {};
+            prefsJson.weather.location = { lat, lon };
+            savePrefsDebounced();
+            document.getElementById('clearWeather').classList.remove('d-none');
+            loadWeather(lat, lon);
+          }, () => alert('Permission denied or unavailable.'));
+        });
+        document.getElementById('clearWeather').addEventListener('click', () => {
+          prefsJson.weather = {};
+          savePrefsDebounced();
+          document.getElementById('weatherStatus').textContent = 'Location not set.';
+          document.getElementById('weatherData').classList.add('d-none');
+          document.getElementById('clearWeather').classList.add('d-none');
+        });
+
+        // Keyboard shortcuts + help overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'shortcutOverlay';
+        overlay.className = 'd-none';
+        overlay.innerHTML = `
+          <div style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:1055;"></div>
+          <div role="dialog" aria-modal="true" aria-labelledby="shortcutTitle"
+               style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1060;">
+            <div class="card" style="width:min(820px,92vw);max-height:86vh;overflow:auto;">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="mb-0" id="shortcutTitle">Keyboard shortcuts</h5>
+                  <button class="btn btn-sm btn-outline-secondary" id="closeShortcuts" type="button">Close</button>
+                </div>
+                <div class="row g-2 small">
+                  <div class="col-12 col-md-6"><div class="border rounded p-2"><strong>?</strong> — Toggle this help</div></div>
+                  <div class="col-12 col-md-6"><div class="border rounded p-2"><strong>T</strong> — Toggle Timeline/List</div></div>
+                  <div class="col-12 col-md-6"><div class="border rounded p-2"><strong>N</strong> — Focus Quick Notes</div></div>
+                  <div class="col-12 col-md-6"><div class="border rounded p-2"><strong>G</strong> then <strong>S</strong> — Go to Schedule</div></div>
+                  <div class="col-12 col-md-6"><div class="border rounded p-2"><strong>G</strong> then <strong>E</strong> — Go to Earnings</div></div>
+                  <div class="col-12 col-md-6"><div class="border rounded p-2"><strong>G</strong> then <strong>F</strong> — Go to Feedback</div></div>
+                  <div class="col-12 col-md-6"><div class="border rounded p-2"><strong>G</strong> then <strong>R</strong> — Go to Reschedule Requests</div></div>
+                </div>
+                <div class="text-muted small mt-3">Tip: shortcuts are disabled while typing in inputs.</div>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+        function toggleOverlay(on){
+          overlay.classList.toggle('d-none', !on);
+          if (on) document.getElementById('closeShortcuts').focus();
+        }
+        overlay.querySelector('#closeShortcuts').addEventListener('click', () => toggleOverlay(false));
+        overlay.addEventListener('click', (e) => { if (e.target === overlay.firstElementChild) toggleOverlay(false); });
+
+        let seq = null;
+        const seqTimeout = 900;
+        function isTypingTarget(el){
+          if (!el) return false;
+          const tag = (el.tagName || '').toLowerCase();
+          return tag === 'input' || tag === 'textarea' || el.isContentEditable;
+        }
+        document.addEventListener('keydown', (e) => {
+          if (isTypingTarget(document.activeElement)) return;
+          if (e.key === '?' || (e.shiftKey && e.key === '/')) { e.preventDefault(); toggleOverlay(true); return; }
+          if (e.key === 'Escape') { toggleOverlay(false); return; }
+          if (e.key.toLowerCase() === 't') {
+            e.preventDefault();
+            if (state.view === 'timeline') document.getElementById('listBtn').click();
+            else document.getElementById('timelineBtn').click();
+            return;
+          }
+          if (e.key.toLowerCase() === 'n') { e.preventDefault(); notesEl.focus(); return; }
+          // "g" sequences
+          if (seq === null && e.key.toLowerCase() === 'g') {
+            seq = 'g';
+            setTimeout(() => { seq = null; }, seqTimeout);
+            return;
+          }
+          if (seq === 'g') {
+            const k = e.key.toLowerCase();
+            seq = null;
+            if (k === 's') window.location.href = '/Schedule/Tutor';
+            if (k === 'e') window.location.href = '/Earnings/MyEarnings';
+            if (k === 'f') window.location.href = '/Feedback/MyFeedbackTutor';
+            if (k === 'r') window.location.href = '/LessonBookings/RescheduleRequests';
+          }
+        });
+
+        // refresh on notifications
+        const loadDebounced = debounce(() => load(), 500);
+        window.igbTutorDashboard = { onNotify: () => loadDebounced() };
+
+        // Typed realtime events (requested list)
+        if (window.igbRealtime && typeof window.igbRealtime.on === 'function') {
+          const events = [
+            'lesson:starting_soon',
+            'lesson:started',
+            'lesson:ended',
+            'booking:new',
+            'reschedule:request',
+            'feedback:received',
+            'payment:received',
+            'message:new',
+            'notification:new',
+            'student:enrolled'
+          ];
+          events.forEach(ev => window.igbRealtime.on(ev, () => loadDebounced()));
+        }
+
+        (async function init(){
+          await getPrefs();
+          applyPrefs();
+          load();
+        })();
+      })();
+    </script>
+}
 
 

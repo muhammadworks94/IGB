@@ -1,0 +1,71 @@
+/* Button system
+   - Leverages Bootstrap 5 button CSS variables so it stays consistent with existing markup (.btn, .btn-primary, etc.)
+   - Adds "ghost" variants as a lightweight extra
+*/
+
+.btn {
+  border-radius: var(--igb-btn-radius);
+  padding: var(--igb-btn-padding-y) var(--igb-btn-padding-x);
+  font-weight: var(--igb-btn-font-weight);
+}
+
+/* Primary */
+.btn-primary {
+  --bs-btn-bg: var(--igb-color-primary);
+  --bs-btn-border-color: var(--igb-color-primary);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--igb-color-primary) 88%, #000);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--igb-color-primary) 88%, #000);
+  --bs-btn-active-bg: color-mix(in srgb, var(--igb-color-primary) 82%, #000);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--igb-color-primary) 82%, #000);
+  --bs-btn-focus-shadow-rgb: 30, 58, 138;
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--igb-color-primary);
+  --bs-btn-border-color: var(--igb-color-primary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--igb-color-primary);
+  --bs-btn-hover-border-color: var(--igb-color-primary);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: color-mix(in srgb, var(--igb-color-primary) 82%, #000);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--igb-color-primary) 82%, #000);
+  --bs-btn-focus-shadow-rgb: 30, 58, 138;
+}
+
+/* Secondary */
+.btn-secondary {
+  --bs-btn-bg: var(--igb-color-secondary);
+  --bs-btn-border-color: var(--igb-color-secondary);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--igb-color-secondary) 88%, #000);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--igb-color-secondary) 88%, #000);
+  --bs-btn-focus-shadow-rgb: 100, 116, 139;
+}
+.btn-outline-secondary {
+  --bs-btn-color: var(--igb-color-secondary);
+  --bs-btn-border-color: var(--igb-color-secondary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--igb-color-secondary);
+  --bs-btn-hover-border-color: var(--igb-color-secondary);
+  --bs-btn-active-color: #fff;
+  --bs-btn-focus-shadow-rgb: 100, 116, 139;
+}
+
+/* Semantic colors (success/warning/danger/info) */
+.btn-success { --bs-btn-bg: var(--igb-color-success); --bs-btn-border-color: var(--igb-color-success); --bs-btn-focus-shadow-rgb: 22, 163, 74; }
+.btn-warning { --bs-btn-bg: var(--igb-color-warning); --bs-btn-border-color: var(--igb-color-warning); --bs-btn-focus-shadow-rgb: 245, 158, 11; }
+.btn-danger  { --bs-btn-bg: var(--igb-color-danger);  --bs-btn-border-color: var(--igb-color-danger);  --bs-btn-focus-shadow-rgb: 220, 38, 38; }
+.btn-info    { --bs-btn-bg: var(--igb-color-info);    --bs-btn-border-color: var(--igb-color-info);    --bs-btn-focus-shadow-rgb: 14, 165, 233; }
+
+/* Ghost buttons (custom) */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid transparent;
+}
+.btn-ghost:hover {
+  background: var(--igb-color-surface-muted);
+  border-color: var(--igb-color-border);
+}
+.btn-ghost-primary { color: var(--igb-color-primary); }
+.btn-ghost-secondary { color: var(--igb-color-secondary); }
+.btn-ghost-danger { color: var(--igb-color-danger); }
+
+

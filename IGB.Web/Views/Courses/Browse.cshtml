@@ -3,16 +3,15 @@
     ViewData["Title"] = "Browse Courses";
 }
 
-<div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Browse Courses</li>
-        </ol>
-    </nav>
-    <h1 class="breadcrumb-title">Browse Courses</h1>
-    <p class="breadcrumb-subtitle">Request booking for a course (Admin approval required).</p>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Browse Courses",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Home", Url.Action("Index", "Home")),
+        new("Browse Courses")
+    },
+    Subtitle: "Request booking for a course (Admin approval required)."
+))
 
 <div class="container-fluid">
     <div class="card">

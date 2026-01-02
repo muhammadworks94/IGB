@@ -1,0 +1,154 @@
+@model IGB.Web.ViewModels.Student.CourseDetailsViewModel
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: Model.Name,
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Course Catalog", Url.Action("Index", "CourseCatalog")),
+        new(Model.Name)
+    }
+))
+
+<div class="container-fluid">
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card">
+                <img src="@(string.IsNullOrWhiteSpace(Model.ImagePath) ? "/img/avatar.png" : Model.ImagePath)"
+                     class="card-img-top"
+                     style="height:260px;object-fit:cover"
+                     alt="Course image" />
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-muted small">@Model.Curriculum • @Model.Grade</div>
+                            <div class="text-muted small">Tutor: @Model.TutorName</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="badge bg-primary">@Model.CreditCost credits</div>
+                            <div class="text-muted small mt-1">You have @Model.RemainingCredits</div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <h5>Description</h5>
+                        <div>@Html.Raw(Model.DescriptionHtml ?? "")</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>Topics</h5>
+                        @if (Model.Topics.Count == 0)
+                        {
+                            <div class="text-muted">No topics added yet.</div>
+                        }
+                        else
+                        {
+                            <ul>
+                                @foreach (var t in Model.Topics)
+                                {
+                                    <li>
+                                        <b>@t.Title</b>
+                                        @if (t.Children.Count > 0)
+                                        {
+                                            <ul>
+                                                @foreach (var st in t.Children)
+                                                {
+                                                    <li>@st.Title</li>
+                                                }
+                                            </ul>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Reviews</h5>
+                        <div class="text-muted small">@Model.AvgRating.ToString("0.0") / 5 • @Model.ReviewCount review(s)</div>
+                    </div>
+                    <hr />
+                    @if (Model.Reviews.Count == 0)
+                    {
+                        <div class="text-muted">No reviews yet.</div>
+                    }
+                    else
+                    {
+                        @foreach (var r in Model.Reviews)
+                        {
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <div class="fw-semibold">@r.StudentName</div>
+                                    <div class="text-muted small">@r.CreatedAtUtc.ToString("yyyy-MM-dd")</div>
+                                </div>
+                                <div class="text-warning">
+                                    @for (var i = 1; i <= 5; i++)
+                                    {
+                                        <span>@(i <= r.Rating ? "★" : "☆")</span>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(r.Comment))
+                                {
+                                    <div class="text-muted">@r.Comment</div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Request Enrollment</h5>
+                    <div class="text-muted small mb-2">Admins approve enrollments. Credits are deducted on approval.</div>
+
+                    @if (Model.HasPendingOrApproved)
+                    {
+                        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel("You already have a pending request or active enrollment for this course.", Variant: "info"))" />
+                    }
+                    else if (Model.RemainingCredits < Model.CreditCost)
+                    {
+                        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel("Insufficient credits for this course.", Variant: "danger"))" />
+                    }
+                    else
+                    {
+                        <form method="post" asp-action="RequestEnrollment">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="courseId" value="@Model.Id" />
+                            <button class="btn btn-primary w-100" type="submit">Request Enrollment</button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="mb-1">Quick links</h6>
+                    <a class="btn btn-outline-secondary w-100" href="@Url.Action("MyCourses","CourseCatalog")">My Courses</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,80 @@
+@model IGB.Web.ViewModels.Credits.CourseLedgerViewModel
+@{
+    ViewData["Title"] = "Credit Ledger";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Credit Ledger",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Courses", Url.Action("All", "Courses")),
+        new(Model.CourseName, Url.Action("Details", "CourseCatalog", new { id = Model.CourseId })),
+        new("Credit Ledger")
+    },
+    Subtitle: Model.IsAdminView ? $"Student: {Model.StudentName}" : null
+))
+
+<div class="container-fluid">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Credits allocated</div>
+                    <div class="fs-3 fw-semibold">@Model.CreditsAllocated</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Credits used</div>
+                    <div class="fs-3 fw-semibold">@Model.CreditsUsed</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Credits remaining</div>
+                    <div class="fs-3 fw-semibold">@Model.CreditsRemaining</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="mb-3">Ledger Transactions</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Reference</th>
+                        <th>Notes</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var t in Model.Transactions)
+                    {
+                        <tr>
+                            <td class="text-muted small">@t.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@t.Type</td>
+                            <td class="fw-semibold">@t.Amount</td>
+                            <td class="text-muted">@(t.ReferenceId?.ToString() ?? "-")</td>
+                            <td class="text-muted">@t.Notes</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <partial name="Components/_Pagination" model="Model.Pagination" />
+        </div>
+    </div>
+</div>
+
+

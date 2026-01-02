@@ -3,20 +3,22 @@
     ViewData["Title"] = "My Lessons";
 }
 
-<div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">My Lessons</li>
-        </ol>
-    </nav>
-    <h1 class="breadcrumb-title">My Lessons</h1>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Lessons",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Home", Url.Action("Index", "Home")),
+        new("My Lessons")
+    }
+))
 
 <div class="container-fluid">
     <div class="d-flex justify-content-end mb-3">
         <a asp-action="Create" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i>Request Lesson
+        </a>
+        <a asp-action="Ical" class="btn btn-outline-secondary ms-2">
+            <i class="fas fa-calendar-alt me-2"></i>Export iCal
         </a>
     </div>
 
@@ -73,12 +75,21 @@
                                 </div>
                             </td>
                             <td class="text-end">
-                                <form asp-action="RequestReschedule" method="post" class="d-inline">
+                                <a asp-action="Reschedule" asp-route-id="@l.Id" class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-rotate me-1"></i>Reschedule
+                                </a>
+                                @if (l.Status == IGB.Domain.Enums.LessonStatus.Completed)
+                                {
+                                    <a class="btn btn-sm btn-outline-primary" href="@Url.Action("RateTutor","Feedback", new { lessonId = l.Id })">
+                                        <i class="fas fa-star me-1"></i>Rate Tutor
+                                    </a>
+                                }
+                                <form asp-action="Cancel" method="post" class="d-inline" onsubmit="return confirm('Cancel this lesson?');">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@l.Id" />
-                                    <input type="hidden" name="note" value="Student requested reschedule" />
-                                    <button type="submit" class="btn btn-sm btn-outline-warning">
-                                        <i class="fas fa-rotate me-1"></i>Reschedule
+                                    <input type="hidden" name="reason" value="Cancelled by student" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-ban me-1"></i>Cancel
                                     </button>
                                 </form>
                             </td>

@@ -51,12 +51,12 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<Result<PagedResult<UserDto>>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<Result<PagedResult<UserDto>>> GetAllAsync(int page, int pageSize, string? q = null, CancellationToken cancellationToken = default)
     {
         try
         {
-            var users = await _repository.GetPagedAsync(page, pageSize, cancellationToken);
-            var totalCount = await _repository.GetCountAsync(cancellationToken);
+            var users = await _repository.GetPagedAsync(page, pageSize, q, cancellationToken);
+            var totalCount = await _repository.GetFilteredCountAsync(q, cancellationToken);
 
             var dtos = _mapper.Map<List<UserDto>>(users);
             var result = new PagedResult<UserDto>

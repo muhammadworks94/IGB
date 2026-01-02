@@ -15,17 +15,20 @@ public class AccountController : Controller
     private readonly IRegistrationService _registrationService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AccountController> _logger;
+    private readonly IGB.Web.Services.AdminDashboardRealtimeBroadcaster _rt;
 
     public AccountController(
         AppAuthService authenticationService,
         IRegistrationService registrationService,
         IConfiguration configuration,
-        ILogger<AccountController> logger)
+        ILogger<AccountController> logger,
+        IGB.Web.Services.AdminDashboardRealtimeBroadcaster rt)
     {
         _authenticationService = authenticationService;
         _registrationService = registrationService;
         _configuration = configuration;
         _logger = logger;
+        _rt = rt;
     }
 
     [HttpGet]
@@ -118,7 +121,16 @@ public class AccountController : Controller
     [AllowAnonymous]
     public IActionResult Register()
     {
-        return View(new RegisterViewModel { TimeZoneId = TimeZoneInfo.Local.Id });
+        // New multi-step registration experience
+        return RedirectToAction(nameof(RegisterWizard));
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult RegisterWizard()
+    {
+        ViewData["Title"] = "Register";
+        return View();
     }
 
     [HttpPost]
@@ -151,6 +163,24 @@ public class AccountController : Controller
         }
 
         var (userId, email, token) = result.Value;
+        await _rt.SendToAdminsAsync("user:registered", new
+        {
+            timeUtc = DateTimeOffset.UtcNow.ToString("O"),
+            relative = "Just now",
+            type = "User",
+            badge = "purple",
+            text = $"New student registered: {model.FirstName} {model.LastName}",
+            url = $"/AdminUsers/Students?q={Uri.EscapeDataString(model.Email)}"
+        }, cancellationToken);
+        await _rt.SendToAdminsAsync("activity:new", new
+        {
+            timeUtc = DateTimeOffset.UtcNow.ToString("O"),
+            relative = "Just now",
+            type = "User",
+            badge = "purple",
+            text = $"New student registered: {model.FirstName} {model.LastName}",
+            url = $"/AdminUsers/Students?q={Uri.EscapeDataString(model.Email)}"
+        }, cancellationToken);
         var autoConfirm = _configuration.GetValue<bool>("Auth:AutoConfirmEmails");
         if (autoConfirm)
         {

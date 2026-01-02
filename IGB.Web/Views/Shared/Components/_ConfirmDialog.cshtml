@@ -1,0 +1,42 @@
+@model IGB.Web.ViewModels.Components.ConfirmDialogViewModel
+
+@{
+    var btnVariant = Model.ConfirmButtonVariant switch
+    {
+        "primary" => "primary",
+        "success" => "success",
+        "warning" => "warning",
+        _ => "danger"
+    };
+}
+
+<div class="modal fade" id="@Model.Id" tabindex="-1" aria-labelledby="@($"{Model.Id}_label")" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="@($"{Model.Id}_label")">@Model.Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">@Model.Message</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Model.CancelText</button>
+
+                @if (!string.IsNullOrWhiteSpace(Model.FormAction))
+                {
+                    <form method="post" action="@Url.Action(Model.FormAction, Model.FormController, Model.FormRouteValues)" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-@btnVariant">@Model.ConfirmText</button>
+                    </form>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-@btnVariant" data-igb-confirm="true">@Model.ConfirmText</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+

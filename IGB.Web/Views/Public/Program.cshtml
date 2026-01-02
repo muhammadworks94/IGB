@@ -1,0 +1,46 @@
+@{
+    Layout = "_PublicLayout";
+    var slug = (ViewData["ProgramSlug"] as string) ?? "";
+    string title = slug.ToLowerInvariant() switch
+    {
+        "eep" => "EEP — Early Education Program",
+        "ieh" => "IEH — Interactive Education at Home",
+        "sew" => "SEW — Structured Education Workshops",
+        "ic" => "IC — Intensive Courses",
+        _ => "Programs"
+    };
+}
+
+<section class="igb-section">
+    <div class="container-xl">
+        <h1 class="igb-page-title">@title</h1>
+        <p class="igb-page-sub text-muted">This page is ready for program-specific content (curriculum, format, pricing, and outcomes).</p>
+        <div class="row g-3 mt-2">
+            <div class="col-12 col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-2">What you get</h5>
+                        <ul class="text-muted mb-0">
+                            <li>Structured learning plan</li>
+                            <li>Dedicated tutor guidance</li>
+                            <li>Scheduling + reminders</li>
+                            <li>Progress insights and reporting</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="fw-semibold">Start now</div>
+                        <div class="text-muted small mb-3">Create an account and we’ll help you choose the best track.</div>
+                        <a class="btn btn-primary igb-btn-primary w-100" href="/Account/Register">Get Started</a>
+                        <a class="btn btn-outline-primary igb-btn-ghost w-100 mt-2" href="/contact-us">Talk to us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+

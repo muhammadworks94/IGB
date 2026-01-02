@@ -1,0 +1,30 @@
+@model IGB.Web.ViewModels.Components.TextareaFieldViewModel
+
+@{
+    var id = $"fld_{Model.Name}".Replace(".", "_");
+    var describedById = !string.IsNullOrWhiteSpace(Model.HelpText) ? $"{id}_help" : null;
+    var invalid = !string.IsNullOrWhiteSpace(Model.ErrorMessage);
+}
+
+<div class="mb-3 @(Model.CssClass ?? "")">
+    <label for="@id" class="form-label">@Model.Label @if (Model.Required) { <span class="text-danger">*</span> }</label>
+    <textarea id="@id"
+              name="@Model.Name"
+              rows="@Model.Rows"
+              placeholder="@Model.Placeholder"
+              class="form-control @(invalid ? "is-invalid" : "")"
+              aria-invalid="@(invalid ? "true" : "false")"
+              aria-describedby="@describedById"
+              @(Model.Required ? "required" : null)
+              @(Model.Disabled ? "disabled" : null)>@Model.Value</textarea>
+    @if (!string.IsNullOrWhiteSpace(Model.HelpText))
+    {
+        <div id="@describedById" class="form-text">@Model.HelpText</div>
+    }
+    @if (invalid)
+    {
+        <div class="invalid-feedback">@Model.ErrorMessage</div>
+    }
+</div>
+
+

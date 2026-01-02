@@ -1,0 +1,18 @@
+@model IGB.Web.ViewModels.Components.BadgeViewModel
+
+@{
+    var variant = Model.Variant switch
+    {
+        "primary" => "primary",
+        "secondary" => "secondary",
+        "success" => "success",
+        "warning" => "warning",
+        "danger" => "danger",
+        "info" => "info",
+        _ => "secondary"
+    };
+}
+
+<span class="badge text-bg-@variant @(Model.CssClass ?? "")">@Model.Text</span>
+
+

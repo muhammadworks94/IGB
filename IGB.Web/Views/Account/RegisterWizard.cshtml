@@ -1,0 +1,278 @@
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IGB System - Register</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/theme/theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body { background: #f3f4f6; }
+        .wizard-shell { max-width: 980px; }
+        .step-card { cursor:pointer; border:1px solid var(--igb-color-border); border-radius: 14px; transition: .15s; background:#fff; }
+        .step-card:hover { box-shadow: var(--igb-shadow-2); transform: translateY(-1px); }
+        .step-card.active { border-color: var(--igb-color-primary); box-shadow: 0 0 0 3px rgba(30,58,138,.12); }
+        .wizard-step { display:none; }
+        .wizard-step.active { display:block; }
+        .progress-pill { background: #fff; border:1px solid var(--igb-color-border); border-radius: 999px; padding: .35rem .75rem; }
+        .req { color: var(--igb-color-danger); }
+        .muted { color: var(--igb-color-text-muted); }
+        .pw-meter .bar { height: 8px; border-radius: 999px; background:#e5e7eb; overflow:hidden; }
+        .pw-meter .bar > div { height:100%; width:0%; background: var(--igb-color-danger); transition: .2s; }
+    </style>
+</head>
+<body>
+<div class="container py-4 wizard-shell">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h3 class="mb-1">Create your account</h3>
+            <div class="muted">Multi-step registration (draft supported)</div>
+        </div>
+        <div class="progress-pill" id="stepIndicator">Step 1 of 4</div>
+    </div>
+
+    <div class="card igb-surface">
+        <div class="card-body p-4">
+
+            <!-- STEP 1 -->
+            <div class="wizard-step active" data-step="1">
+                <h5 class="mb-3">Step 1: Choose account type</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="step-card p-3" data-account="Student" role="button" tabindex="0" aria-label="Select Student">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="fw-semibold">Student</div>
+                                <i class="fas fa-user-graduate text-primary"></i>
+                            </div>
+                            <div class="muted small mt-2">Browse courses, book lessons, track progress.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="step-card p-3" data-account="Tutor" role="button" tabindex="0" aria-label="Select Tutor">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="fw-semibold">Tutor</div>
+                                <i class="fas fa-chalkboard-teacher text-primary"></i>
+                            </div>
+                            <div class="muted small mt-2">Teach students, manage lesson requests. Requires admin approval.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="step-card p-3" data-account="Guardian" role="button" tabindex="0" aria-label="Select Guardian">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="fw-semibold">Guardian</div>
+                                <i class="fas fa-user-shield text-primary"></i>
+                            </div>
+                            <div class="muted small mt-2">Manage linked students and view activity.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <div class="text-danger small d-none" id="step1Error">Please select an account type.</div>
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="wizard-step" data-step="2">
+                <h5 class="mb-3">Step 2: Basic information</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Full Name <span class="req">*</span></label>
+                        <input class="form-control" id="fullName" placeholder="2-50 letters" />
+                        <div class="invalid-feedback" id="fullNameErr"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email <span class="req">*</span></label>
+                        <input class="form-control" id="email" autocomplete="email" />
+                        <div class="invalid-feedback" id="emailErr"></div>
+                        <div class="form-text" id="emailHint"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Password <span class="req">*</span></label>
+                        <input class="form-control" id="password" type="password" autocomplete="new-password" />
+                        <div class="pw-meter mt-2">
+                            <div class="bar"><div id="pwBar"></div></div>
+                            <div class="small muted mt-1" id="pwText">Min 8, upper/lower/number/special.</div>
+                        </div>
+                        <div class="invalid-feedback d-block" id="passwordErr" style="display:none;"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Confirm Password <span class="req">*</span></label>
+                        <input class="form-control" id="confirmPassword" type="password" autocomplete="new-password" />
+                        <div class="invalid-feedback" id="confirmPasswordErr"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Phone <span class="req">*</span></label>
+                        <div class="input-group">
+                            <select class="form-select" id="phoneCc" aria-label="Phone country code">
+                                <option value="+1">+1 (US)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+971">+971 (AE)</option>
+                            </select>
+                            <input class="form-control" id="phone" type="tel" placeholder="Phone number" />
+                        </div>
+                        <div class="invalid-feedback d-block" id="phoneErr" style="display:none;"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">WhatsApp (optional)</label>
+                        <div class="input-group">
+                            <select class="form-select" id="waCc" aria-label="WhatsApp country code">
+                                <option value="+1">+1 (US)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+971">+971 (AE)</option>
+                            </select>
+                            <input class="form-control" id="whatsapp" type="tel" placeholder="WhatsApp number" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">Profile Image (optional, jpg/png ≤ 5MB)</label>
+                        <input class="form-control" id="profileImage" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+                        <div class="invalid-feedback d-block" id="profileImageErr" style="display:none;"></div>
+                        <div class="mt-2">
+                            <img id="profilePreview" src="/img/avatar.png" alt="Preview" style="width:84px;height:84px;object-fit:cover;border-radius:12px;border:1px solid var(--igb-color-border);" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Timezone</label>
+                        <input class="form-control" id="timeZoneId" placeholder="Auto-detected" />
+                        <div class="form-text">Auto-detected; you can override.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="wizard-step" data-step="3">
+                <h5 class="mb-3">Step 3: Role-specific information</h5>
+
+                <!-- Student -->
+                <div id="studentSection" class="d-none">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Date of Birth <span class="req">*</span></label>
+                            <input class="form-control" id="studentDob" type="date" />
+                            <div class="invalid-feedback" id="studentDobErr"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Curriculum <span class="req">*</span></label>
+                            <select class="form-select" id="curriculum"></select>
+                            <div class="invalid-feedback" id="curriculumErr"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Grade <span class="req">*</span></label>
+                            <select class="form-select" id="grade"></select>
+                            <div class="invalid-feedback" id="gradeErr"></div>
+                        </div>
+
+                        <div class="col-12"><hr /></div>
+
+                        <div class="col-12"><div class="fw-semibold">Guardian 1 (required)</div></div>
+                        <div class="col-md-4"><input class="form-control" id="g1Name" placeholder="Name" /><div class="invalid-feedback" id="g1NameErr"></div></div>
+                        <div class="col-md-3"><input class="form-control" id="g1Email" placeholder="Email" /></div>
+                        <div class="col-md-3"><input class="form-control" id="g1Phone" placeholder="Phone" /></div>
+                        <div class="col-md-2"><input class="form-control" id="g1Rel" placeholder="Relationship" /></div>
+
+                        <div class="col-12 mt-2"><div class="fw-semibold">Guardian 2 (optional)</div></div>
+                        <div class="col-md-4"><input class="form-control" id="g2Name" placeholder="Name" /></div>
+                        <div class="col-md-3"><input class="form-control" id="g2Email" placeholder="Email" /></div>
+                        <div class="col-md-3"><input class="form-control" id="g2Phone" placeholder="Phone" /></div>
+                        <div class="col-md-2"><input class="form-control" id="g2Rel" placeholder="Relationship" /></div>
+                    </div>
+                </div>
+
+                <!-- Tutor -->
+                <div id="tutorSection" class="d-none">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Date of Birth <span class="req">*</span></label>
+                            <input class="form-control" id="tutorDob" type="date" />
+                            <div class="invalid-feedback" id="tutorDobErr"></div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Specialities (comma separated) <span class="req">*</span></label>
+                            <input class="form-control" id="specialities" placeholder="Math, English, Science..." />
+                            <div class="invalid-feedback" id="specialitiesErr"></div>
+                        </div>
+
+                        <div class="col-12"><hr /></div>
+                        <div class="col-12"><div class="fw-semibold">Education History</div></div>
+                        <div class="col-12" id="eduList"></div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="addEdu"><i class="fas fa-plus me-1"></i>Add Education</button>
+                        </div>
+
+                        <div class="col-12 mt-2"><div class="fw-semibold">Work Experience</div></div>
+                        <div class="col-12" id="workList"></div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="addWork"><i class="fas fa-plus me-1"></i>Add Experience</button>
+                        </div>
+
+                        <div class="col-12"><hr /></div>
+                        <div class="col-md-12">
+                            <label class="form-label">Documents (CV, Certificates) ≤ 10MB each</label>
+                            <input class="form-control" id="tutorDocs" type="file" multiple />
+                            <div class="invalid-feedback d-block" id="tutorDocsErr" style="display:none;"></div>
+                        </div>
+                        <div class="col-12 small muted">
+                            Tutors require admin approval after email confirmation.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guardian -->
+                <div id="guardianSection" class="d-none">
+                    <div class="alert alert-info">No extra information is required for Guardians at this stage.</div>
+                </div>
+            </div>
+
+            <!-- STEP 4 -->
+            <div class="wizard-step" data-step="4">
+                <h5 class="mb-3">Step 4: Review & submit</h5>
+                <div id="reviewBox" class="p-3 igb-surface elevation-1"></div>
+
+                <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" id="terms" />
+                    <label class="form-check-label" for="terms">
+                        I agree to the Terms & Conditions <span class="req">*</span>
+                    </label>
+                </div>
+                <div class="text-danger small d-none" id="termsErr">Please accept Terms & Conditions.</div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between mt-4">
+                <div class="d-flex gap-2">
+                    <a href="/Account/Login" class="btn btn-ghost btn-ghost-secondary">Back to Login</a>
+                    <button type="button" class="btn btn-outline-secondary" id="saveDraftBtn"><i class="fas fa-save me-1"></i>Save draft</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" disabled>Previous</button>
+                    <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                    <button type="button" class="btn btn-success d-none" id="submitBtn"><i class="fas fa-check me-1"></i>Submit</button>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <div class="alert alert-danger d-none" id="submitErr"></div>
+                <div class="alert alert-success d-none" id="submitOk"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+<script src="~/js/components/toast.js" asp-append-version="true"></script>
+<script src="~/js/auth/register-wizard.js" asp-append-version="true"></script>
+</body>
+</html>
+
+

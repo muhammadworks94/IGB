@@ -1,0 +1,94 @@
+@model IGB.Web.ViewModels.Admin.AdminCreateUserViewModel
+@{
+    ViewData["Title"] = $"Add {Model.Role}";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: $"Add {Model.Role}",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new(Model.Role == "Tutor" ? "Tutors" : "Students", Url.Action(Model.Role == "Tutor" ? "Tutors" : "Students", "AdminUsers")),
+        new("Add")
+    }
+))
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <form method="post" asp-action="Create" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Role" />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">First Name</label>
+                        <input class="form-control" asp-for="FirstName" />
+                        <span class="text-danger" asp-validation-for="FirstName"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Last Name</label>
+                        <input class="form-control" asp-for="LastName" />
+                        <span class="text-danger" asp-validation-for="LastName"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input class="form-control" asp-for="Email" type="email" />
+                        <span class="text-danger" asp-validation-for="Email"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone (optional)</label>
+                        <input class="form-control" asp-for="PhoneNumber" />
+                        <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Temporary Password</label>
+                        <input class="form-control" asp-for="Password" type="password" />
+                        <div class="text-muted small">Minimum 8 characters.</div>
+                        <span class="text-danger" asp-validation-for="Password"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Time Zone (optional)</label>
+                        <input class="form-control" asp-for="TimeZoneId" placeholder="e.g. UTC" />
+                        <span class="text-danger" asp-validation-for="TimeZoneId"></span>
+                    </div>
+                    @if (string.Equals(Model.Role, "Tutor", StringComparison.OrdinalIgnoreCase))
+                    {
+                        <div class="col-md-6">
+                            <label class="form-label">Profile Photo (optional)</label>
+                            <input class="form-control" asp-for="ProfileImage" type="file" accept=".jpg,.jpeg,.png" />
+                            <div class="text-muted small">JPG/PNG up to 5MB.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Assign Courses (optional)</label>
+                            <select class="form-select" name="CourseIds" multiple size="6">
+                                @foreach (var c in (IEnumerable<dynamic>)(ViewBag.CourseOptions ?? Array.Empty<dynamic>()))
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </select>
+                            <div class="text-muted small">Hold Ctrl/Command to select multiple.</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" asp-for="GoToAvailabilityAfterCreate" type="checkbox" />
+                                <label class="form-check-label" asp-for="GoToAvailabilityAfterCreate">Open availability setup after create</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div asp-validation-summary="All" class="text-danger mt-3"></div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a class="btn btn-outline-secondary" href="@Url.Action(Model.Role == "Tutor" ? "Tutors" : "Students","AdminUsers")">Cancel</a>
+                    <button class="btn btn-primary" type="submit">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+
+

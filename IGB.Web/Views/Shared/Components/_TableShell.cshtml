@@ -1,0 +1,76 @@
+@model IGB.Web.ViewModels.Components.TableShellViewModel
+@using Microsoft.AspNetCore.Html
+
+@{
+    var hasError = !string.IsNullOrWhiteSpace(Model.ErrorMessage);
+    var isEmpty = Model.Pagination.TotalCount == 0 && !Model.IsLoading && !hasError;
+    var tableId = Model.Id;
+    const string dangerVariant = "danger";
+}
+
+<div class="igb-table-shell @(Model.CssClass ?? "")">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+        @if (!string.IsNullOrWhiteSpace(Model.Title))
+        {
+            <div class="h5 mb-0">@Model.Title</div>
+        }
+
+        <form method="get" class="d-flex align-items-center gap-2" role="search" aria-label="Table search">
+            @* Preserve current query string filters when searching (e.g., courseId/rating/flagged). *@
+            @foreach (var key in Context.Request.Query.Keys)
+            {
+                if (string.IsNullOrWhiteSpace(key)) continue;
+                if (string.Equals(key, Model.SearchParamName, StringComparison.OrdinalIgnoreCase)) continue;
+                if (string.Equals(key, "page", StringComparison.OrdinalIgnoreCase)) continue;
+                // allow pageSize to persist so users don't lose their selection
+                var value = Context.Request.Query[key].ToString();
+                if (string.IsNullOrWhiteSpace(value)) continue;
+                <input type="hidden" name="@key" value="@value" />
+            }
+            <input type="search"
+                   name="@Model.SearchParamName"
+                   value="@Model.SearchQuery"
+                   class="form-control form-control-sm"
+                   placeholder="@Model.SearchPlaceholder"
+                   aria-label="Search" />
+            <button class="btn btn-sm btn-outline-primary" type="submit">Search</button>
+        </form>
+    </div>
+
+    @if (Model.IsLoading)
+    {
+        <partial name="Components/_Loading" model="new LoadingViewModel(FullWidth: true)" />
+    }
+    else if (hasError)
+    {
+        <partial name="Components/_Alert" model="@(new AlertViewModel(Model.ErrorMessage!, Variant: dangerVariant))" />
+    }
+    else if (isEmpty)
+    {
+        <div class="text-muted py-4 text-center">
+            @(Model.RenderEmptyState != null ? Model.RenderEmptyState(Html) : new HtmlString("No data found."))
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table id="@tableId" class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    @foreach (var col in Model.Columns)
+                    {
+                        <th class="@(col.CssClass ?? "")" scope="col" aria-label="@(col.HeaderAriaLabel ?? col.Header)">@col.Header</th>
+                    }
+                </tr>
+                </thead>
+                <tbody>
+                @Model.RenderRows(Html)
+                </tbody>
+            </table>
+        </div>
+
+        <partial name="Components/_Pagination" model="Model.Pagination" />
+    }
+</div>
+
+

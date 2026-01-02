@@ -1,0 +1,210 @@
+@model List<IGB.Domain.Entities.TestReport>
+@{
+    ViewData["Title"] = "My Test Reports";
+    var courses = ViewBag.Courses as List<IGB.Domain.Entities.Course> ?? new();
+    var viewMode = (string?)ViewBag.ViewMode ?? "grid";
+    long? courseId = (long?)ViewBag.CourseId;
+    DateTime? from = (DateTime?)ViewBag.From;
+    DateTime? to = (DateTime?)ViewBag.To;
+    string? grade = (string?)ViewBag.Grade;
+    string? q = (string?)ViewBag.Query;
+    string sort = (string?)ViewBag.Sort ?? "date_desc";
+    int page = (int?)ViewBag.Page ?? 1;
+    int pageSize = (int?)ViewBag.PageSize ?? 10;
+    int total = (int?)ViewBag.Total ?? 0;
+    int fromRow = total == 0 ? 0 : ((page - 1) * pageSize) + 1;
+    int toRow = Math.Min(page * pageSize, total);
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Test Reports",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Tests")
+    }
+))
+
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <input type="hidden" name="view" value="@viewMode" />
+                <div class="col-md-3">
+                    <label class="form-label">Course</label>
+                    <select class="form-select" name="courseId">
+                        <option value="">All</option>
+                        @foreach (var c in courses)
+                        {
+                            <option value="@c.Id" selected="@(courseId == c.Id)">@c.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">From</label>
+                    <input class="form-control" name="from" type="date" value="@(from?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">To</label>
+                    <input class="form-control" name="to" type="date" value="@(to?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Grade</label>
+                    <select class="form-select" name="grade">
+                        <option value="">All</option>
+                        @foreach (var g in IGB.Web.ViewModels.TestReports.TestGradeCatalog.GradeOptions)
+                        {
+                            <option value="@g" selected="@(grade == g)">@g</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" name="q" value="@q" placeholder="Search by test name..." />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Sort by</label>
+                    <select class="form-select" name="sort">
+                        <option value="date_desc" selected="@(sort == "date_desc")">Date - Newest First</option>
+                        <option value="date_asc" selected="@(sort == "date_asc")">Date - Oldest First</option>
+                        <option value="grade_desc" selected="@(sort == "grade_desc")">Grade - High to Low</option>
+                        <option value="marks_desc" selected="@(sort == "marks_desc")">Marks - High to Low</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Rows</label>
+                    <select class="form-select" name="pageSize">
+                        <option value="10" selected="@(pageSize == 10)">10</option>
+                        <option value="25" selected="@(pageSize == 25)">25</option>
+                        <option value="50" selected="@(pageSize == 50)">50</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex gap-2 justify-content-end">
+                    <button class="btn btn-primary" type="submit">Apply Filters</button>
+                    <a class="btn btn-outline-secondary" href="@Url.Action("My","TestReports", new { view = viewMode })">Clear</a>
+                </div>
+            </form>
+
+            <div class="mt-3 d-flex justify-content-between align-items-center">
+                <div class="text-muted small">Showing @fromRow to @toRow of @total entries</div>
+                <div class="btn-group" role="group">
+                    <a class="btn btn-sm @(viewMode=="grid"?"btn-primary":"btn-outline-primary")" href="@Url.Action("My","TestReports", new { view="grid", courseId, from = from?.ToString("yyyy-MM-dd"), to = to?.ToString("yyyy-MM-dd"), grade, q, sort, page, pageSize })">Grid</a>
+                    <a class="btn btn-sm @(viewMode=="list"?"btn-primary":"btn-outline-primary")" href="@Url.Action("My","TestReports", new { view="list", courseId, from = from?.ToString("yyyy-MM-dd"), to = to?.ToString("yyyy-MM-dd"), grade, q, sort, page, pageSize })">List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="fs-5 fw-semibold">No test reports yet</div>
+                <div class="text-muted">When your tutor uploads test reports, you’ll see them here.</div>
+            </div>
+        </div>
+    }
+    else if (viewMode == "list")
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Course</th>
+                            <th>Test Name</th>
+                            <th>Tutor</th>
+                            <th>Marks</th>
+                            <th>Percentage</th>
+                            <th>Grade</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var r in Model)
+                        {
+                            <tr>
+                                <td class="text-muted">@r.TestDate.ToString("yyyy-MM-dd")</td>
+                                <td>@r.Course?.Name</td>
+                                <td class="fw-semibold">@r.TestName</td>
+                                <td class="text-muted">@r.TutorUser?.FullName</td>
+                                <td class="text-muted">@r.ObtainedMarks / @r.TotalMarks</td>
+                                <td class="text-muted">@r.Percentage.ToString("F2")%</td>
+                                <td><span class="badge bg-primary">@r.Grade</span></td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary" href="@Url.Action("MyDetails","TestReports", new { id = r.Id })">View</a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    @if (page > 1)
+                    {
+                        <a class="btn btn-outline-secondary" href="@Url.Action("My","TestReports", new { view=viewMode, courseId, from = from?.ToString("yyyy-MM-dd"), to = to?.ToString("yyyy-MM-dd"), grade, q, sort, page = page-1, pageSize })">Prev</a>
+                    }
+                    @if (page * pageSize < total)
+                    {
+                        <a class="btn btn-outline-secondary" href="@Url.Action("My","TestReports", new { view=viewMode, courseId, from = from?.ToString("yyyy-MM-dd"), to = to?.ToString("yyyy-MM-dd"), grade, q, sort, page = page+1, pageSize })">Next</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var r in Model)
+            {
+                var gradeVariant = r.Grade.StartsWith("A") ? "bg-success" : (r.Grade.StartsWith("B") ? "bg-primary" : (r.Grade.StartsWith("C") ? "bg-warning text-dark" : "bg-danger"));
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <span class="badge bg-secondary">@r.Course?.Name</span>
+                                <span class="text-muted small">@r.TestDate.ToString("yyyy-MM-dd")</span>
+                            </div>
+                            <div class="mt-3 fw-semibold fs-5">@r.TestName</div>
+                            <div class="text-muted small mt-1">
+                                Tutor: @r.TutorUser?.FullName
+                            </div>
+                            <div class="mt-3 d-flex justify-content-between align-items-center">
+                                <span class="badge @gradeVariant" style="font-size:1rem;">@r.Grade</span>
+                                <div class="text-muted">@r.ObtainedMarks / @r.TotalMarks</div>
+                            </div>
+                            <div class="mt-2">
+                                <div class="d-flex justify-content-between text-muted small">
+                                    <span>@r.Percentage.ToString("F2")%</span>
+                                    <span>100%</span>
+                                </div>
+                                <div class="progress" style="height:10px;">
+                                    <div class="progress-bar bg-success" style="width:@r.Percentage%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0">
+                            <a class="btn btn-primary w-100" href="@Url.Action("MyDetails","TestReports", new { id = r.Id })">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            @if (page > 1)
+            {
+                <a class="btn btn-outline-secondary" href="@Url.Action("My","TestReports", new { view=viewMode, courseId, from = from?.ToString("yyyy-MM-dd"), to = to?.ToString("yyyy-MM-dd"), grade, q, sort, page = page-1, pageSize })">Prev</a>
+            }
+            @if (page * pageSize < total)
+            {
+                <a class="btn btn-outline-secondary" href="@Url.Action("My","TestReports", new { view=viewMode, courseId, from = from?.ToString("yyyy-MM-dd"), to = to?.ToString("yyyy-MM-dd"), grade, q, sort, page = page+1, pageSize })">Next</a>
+            }
+        </div>
+    }
+</div>
+
+

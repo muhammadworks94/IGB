@@ -1,0 +1,36 @@
+@model IGB.Web.ViewModels.Components.DateTimeFieldViewModel
+
+@{
+    var id = $"fld_{Model.Name}".Replace(".", "_");
+    var describedById = !string.IsNullOrWhiteSpace(Model.HelpText) ? $"{id}_help" : null;
+    var invalid = !string.IsNullOrWhiteSpace(Model.ErrorMessage);
+    var type = Model.Mode switch
+    {
+        "time" => "time",
+        "datetime-local" => "datetime-local",
+        _ => "date"
+    };
+}
+
+<div class="mb-3 @(Model.CssClass ?? "")">
+    <label for="@id" class="form-label">@Model.Label @if (Model.Required) { <span class="text-danger">*</span> }</label>
+    <input id="@id"
+           name="@Model.Name"
+           type="@type"
+           value="@Model.Value"
+           class="form-control @(invalid ? "is-invalid" : "")"
+           aria-invalid="@(invalid ? "true" : "false")"
+           aria-describedby="@describedById"
+           @(Model.Required ? "required" : null)
+           @(Model.Disabled ? "disabled" : null) />
+    @if (!string.IsNullOrWhiteSpace(Model.HelpText))
+    {
+        <div id="@describedById" class="form-text">@Model.HelpText</div>
+    }
+    @if (invalid)
+    {
+        <div class="invalid-feedback">@Model.ErrorMessage</div>
+    }
+</div>
+
+

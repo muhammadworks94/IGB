@@ -1,0 +1,128 @@
+@model List<IGB.Domain.Entities.TestReport>
+@{
+    ViewData["Title"] = "Ward Test Reports";
+    var wards = ViewBag.Wards as IEnumerable<dynamic> ?? Array.Empty<dynamic>();
+    var courses = ViewBag.Courses as List<IGB.Domain.Entities.Course> ?? new();
+    long selectedStudentId = (long?)ViewBag.SelectedStudentId ?? 0;
+    string selectedStudentName = (string?)ViewBag.SelectedStudentName ?? "Ward";
+    long? courseId = (long?)ViewBag.CourseId;
+    DateTime? from = (DateTime?)ViewBag.From;
+    DateTime? to = (DateTime?)ViewBag.To;
+    string? grade = (string?)ViewBag.Grade;
+    string? q = (string?)ViewBag.Query;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: $"{selectedStudentName}'s Test Reports",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Ward"),
+        new("Test Reports")
+    }
+))
+
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Ward</label>
+                    <select class="form-select" name="studentUserId">
+                        @foreach (var w in wards)
+                        {
+                            long sid = (long)w.StudentUserId;
+                            <option value="@sid" selected="@(sid == selectedStudentId)">@w.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Course</label>
+                    <select class="form-select" name="courseId">
+                        <option value="">All</option>
+                        @foreach (var c in courses)
+                        {
+                            <option value="@c.Id" selected="@(courseId == c.Id)">@c.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">From</label>
+                    <input class="form-control" name="from" type="date" value="@(from?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">To</label>
+                    <input class="form-control" name="to" type="date" value="@(to?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Grade</label>
+                    <select class="form-select" name="grade">
+                        <option value="">All</option>
+                        @foreach (var g in IGB.Web.ViewModels.TestReports.TestGradeCatalog.GradeOptions)
+                        {
+                            <option value="@g" selected="@(grade == g)">@g</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" name="q" value="@q" placeholder="Search by test name..." />
+                </div>
+                <div class="col-md-6 d-flex justify-content-end gap-2">
+                    <button class="btn btn-primary" type="submit">Apply</button>
+                    <a class="btn btn-outline-secondary" href="@Url.Action("Ward","TestReports", new { studentUserId = selectedStudentId })">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="fs-5 fw-semibold">No test reports yet</div>
+                <div class="text-muted">No reports match your filters.</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Course</th>
+                            <th>Test Name</th>
+                            <th>Tutor</th>
+                            <th>Marks</th>
+                            <th>Grade</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var r in Model)
+                        {
+                            <tr>
+                                <td class="text-muted">@r.TestDate.ToString("yyyy-MM-dd")</td>
+                                <td>@r.Course?.Name</td>
+                                <td class="fw-semibold">@r.TestName</td>
+                                <td class="text-muted">@r.TutorUser?.FullName</td>
+                                <td class="text-muted">@r.ObtainedMarks / @r.TotalMarks (@r.Percentage.ToString("F2")%)</td>
+                                <td><span class="badge bg-primary">@r.Grade</span></td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary" href="@Url.Action("WardDetails","TestReports", new { id = r.Id, studentUserId = selectedStudentId })">View</a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+

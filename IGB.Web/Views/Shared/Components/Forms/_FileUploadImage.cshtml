@@ -1,0 +1,40 @@
+@model IGB.Web.ViewModels.Components.FileUploadImageViewModel
+
+@{
+    var id = $"fld_{Model.Name}".Replace(".", "_");
+    var previewId = $"{id}_preview";
+    var invalid = !string.IsNullOrWhiteSpace(Model.ErrorMessage);
+}
+
+<div class="mb-3 @(Model.CssClass ?? "")">
+    <label for="@id" class="form-label">@Model.Label</label>
+
+    <div class="d-flex align-items-center gap-3">
+        <div class="igb-image-preview">
+            <img id="@previewId"
+                 src="@(string.IsNullOrWhiteSpace(Model.CurrentImageUrl) ? "/img/avatar.png" : Model.CurrentImageUrl)"
+                 alt="Preview"
+                 style="width:84px;height:84px;object-fit:cover;border-radius: 12px; border:1px solid var(--igb-color-border);" />
+        </div>
+        <div class="flex-grow-1">
+            <input id="@id"
+                   name="@Model.Name"
+                   type="file"
+                   accept="@Model.Accept"
+                   class="form-control @(invalid ? "is-invalid" : "") igb-file-upload"
+                   data-preview-img-id="@previewId"
+                   aria-invalid="@(invalid ? "true" : "false")"
+                   @(Model.Disabled ? "disabled" : null) />
+            @if (!string.IsNullOrWhiteSpace(Model.HelpText))
+            {
+                <div class="form-text">@Model.HelpText</div>
+            }
+            @if (invalid)
+            {
+                <div class="invalid-feedback">@Model.ErrorMessage</div>
+            }
+        </div>
+    </div>
+</div>
+
+

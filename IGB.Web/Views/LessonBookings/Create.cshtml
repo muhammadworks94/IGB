@@ -4,16 +4,16 @@
     var bookings = ViewBag.ApprovedBookings as List<IGB.Domain.Entities.CourseBooking> ?? new();
 }
 
-<div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Request Lesson</li>
-        </ol>
-    </nav>
-    <h1 class="breadcrumb-title">Request Lesson</h1>
-    <p class="breadcrumb-subtitle">Pick a date range and provide 3 preferred time options.</p>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Request Lesson",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Courses", Url.Action("MyCourses", "CourseCatalog")),
+        new("Book Lesson")
+    },
+    Subtitle: "Pick a course, select a date range, then choose 3 preferred slots from the tutor calendar."
+))
 
 <div class="container-fluid">
     <div class="card">
@@ -33,8 +33,8 @@
                     @Html.AntiForgeryToken()
 
                     <div class="mb-3">
-                        <label class="form-label">Approved Course Booking</label>
-                        <select asp-for="CourseBookingId" class="form-select">
+                        <label class="form-label">Step 1: Select Course</label>
+                        <select asp-for="CourseBookingId" class="form-select" id="courseBookingId">
                             <option value="">-- Select --</option>
                             @foreach (var b in bookings)
                             {
@@ -48,36 +48,60 @@
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Date From</label>
-                            <input asp-for="DateFrom" class="form-control" type="date" />
+                            <label class="form-label">Step 2: Start Date</label>
+                            <input asp-for="DateFrom" class="form-control" type="date" id="dateFrom" />
                             <span asp-validation-for="DateFrom" class="text-danger"></span>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Date To</label>
-                            <input asp-for="DateTo" class="form-control" type="date" />
+                            <label class="form-label">End Date (optional)</label>
+                            <input asp-for="DateTo" class="form-control" type="date" id="dateTo" />
                             <span asp-validation-for="DateTo" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">Option 1</label>
-                            <input asp-for="Option1" class="form-control" type="datetime-local" />
-                            <span asp-validation-for="Option1" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Option 2</label>
-                            <input asp-for="Option2" class="form-control" type="datetime-local" />
-                            <span asp-validation-for="Option2" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Option 3</label>
-                            <input asp-for="Option3" class="form-control" type="datetime-local" />
-                            <span asp-validation-for="Option3" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Duration (minutes)</label>
-                            <input asp-for="DurationMinutes" class="form-control" type="number" min="30" max="180" />
+                            <label class="form-label">Lesson Duration</label>
+                            <select asp-for="DurationMinutes" class="form-select" id="durationMinutes">
+                                <option value="30">30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60" selected>60 minutes</option>
+                            </select>
                             <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="mb-2">
+                        <label class="form-label">Step 3: Select 3 Time Slot Options</label>
+                        <div class="text-muted small">Click three available slots in the calendar. They’ll populate Option 1–3.</div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-lg-8">
+                            <div id="availabilityMsg" class="alert alert-info d-none"></div>
+                            <div id="studentAvailabilityCalendar"></div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Option 1</label>
+                                        <input asp-for="Option1" class="form-control" type="datetime-local" id="opt1" />
+                                        <span asp-validation-for="Option1" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Option 2</label>
+                                        <input asp-for="Option2" class="form-control" type="datetime-local" id="opt2" />
+                                        <span asp-validation-for="Option2" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Option 3</label>
+                                        <input asp-for="Option3" class="form-control" type="datetime-local" id="opt3" />
+                                        <span asp-validation-for="Option3" class="text-danger"></span>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="clearSlotsBtn">Clear selected slots</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -93,6 +117,92 @@
     </div>
 </div>
 
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="/nobleui/vendors/fullcalendar/main.min.js"></script>
+    <script>
+      (function () {
+        const calEl = document.getElementById("studentAvailabilityCalendar");
+        if (!calEl || typeof FullCalendar === "undefined") return;
+
+        const sel = [];
+        function toLocalInputValue(d) {
+          const pad = n => String(n).padStart(2, "0");
+          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+        function syncOptions() {
+          document.getElementById("opt1").value = sel[0] ? toLocalInputValue(sel[0]) : "";
+          document.getElementById("opt2").value = sel[1] ? toLocalInputValue(sel[1]) : "";
+          document.getElementById("opt3").value = sel[2] ? toLocalInputValue(sel[2]) : "";
+        }
+
+        document.getElementById("clearSlotsBtn")?.addEventListener("click", function () {
+          sel.splice(0, sel.length);
+          syncOptions();
+          cal.refetchEvents();
+        });
+
+        async function loadSlots() {
+          const bookingId = document.getElementById("courseBookingId").value;
+          const msg = document.getElementById("availabilityMsg");
+          const showMsg = (html, kind) => {
+            if (!msg) return;
+            msg.className = `alert alert-${kind || 'info'}`;
+            msg.innerHTML = html;
+            msg.classList.remove("d-none");
+          };
+          const hideMsg = () => { if (msg) msg.classList.add("d-none"); };
+
+          if (!bookingId) { showMsg("Select a course to see available tutor slots.", "info"); return []; }
+          const df = document.getElementById("dateFrom").value;
+          const dt = document.getElementById("dateTo").value || df;
+          const duration = document.getElementById("durationMinutes").value;
+          if (!df) { showMsg("Select a start date to see available tutor slots.", "info"); return []; }
+
+          const fromUtc = new Date(df + "T00:00:00").toISOString();
+          const toUtc = new Date(dt + "T23:59:59").toISOString();
+          const url = `/api/lessons/availability?courseBookingId=${encodeURIComponent(bookingId)}&fromUtc=${encodeURIComponent(fromUtc)}&toUtc=${encodeURIComponent(toUtc)}&durationMinutes=${encodeURIComponent(duration)}`;
+          const res = await fetch(url, { credentials: "include" });
+          if (!res.ok) { showMsg("Unable to load tutor availability right now. Please try again.", "warning"); return []; }
+          const data = await res.json();
+          if (!data.tutorAssigned) { showMsg("No tutor is assigned to this course yet. Please contact admin.", "warning"); return []; }
+          const slots = (data.slots || []);
+          if (slots.length === 0) { showMsg("No available slots found for the selected range. Try a different date range or ask your tutor to set availability.", "info"); return []; }
+          hideMsg();
+          return slots.map(s => ({
+            title: "Available",
+            start: s.startUtc,
+            end: s.endUtc,
+            color: "#d1e7dd"
+          }));
+        }
+
+        const cal = new FullCalendar.Calendar(calEl, {
+          initialView: "timeGridWeek",
+          height: 650,
+          nowIndicator: true,
+          allDaySlot: false,
+          events: async function (fetchInfo, successCallback) {
+            successCallback(await loadSlots());
+          },
+          eventClick: function (info) {
+            const dt = new Date(info.event.start);
+            const key = dt.toISOString();
+            if (sel.find(x => x.toISOString() === key)) return;
+            if (sel.length >= 3) sel.shift();
+            sel.push(dt);
+            sel.sort((a,b) => a - b);
+            syncOptions();
+          }
+        });
+
+        ["courseBookingId","dateFrom","dateTo","durationMinutes"].forEach(id => {
+          document.getElementById(id)?.addEventListener("change", () => cal.refetchEvents());
+        });
+
+        cal.render();
+      })();
+    </script>
+}
 
 

@@ -1,0 +1,68 @@
+@model IGB.Web.ViewModels.Feedback.StudentMyFeedbackViewModel
+@{
+    ViewData["Title"] = "My Feedback";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Feedback",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Feedback")
+    }
+))
+
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Course Id (optional)</label>
+                    <input class="form-control" name="courseId" type="number" value="@(Model.CourseId?.ToString() ?? "")" />
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary" type="submit">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="mb-3">Feedback From Tutors</h5>
+
+            @foreach (var r in Model.Items)
+            {
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <div class="fw-semibold">@r.CourseName • @r.TutorName</div>
+                        <div class="text-muted small">@r.CreatedAtUtc.ToString("yyyy-MM-dd") • Rating: @r.Rating</div>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(r.Comments))
+                    {
+                        <div class="mt-2 text-muted">@r.Comments</div>
+                    }
+                    @if (r.Attachments.Count > 0)
+                    {
+                        <div class="mt-2">
+                            <div class="text-muted small">Attachments</div>
+                            <ul class="mb-0">
+                                @foreach (var a in r.Attachments)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("Download", "Feedback", new { attachmentId = a.Id })">@a.Kind</a>
+                                        <span class="text-muted small">(@a.FileName)</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
+
+            <partial name="Components/_Pagination" model="Model.Pagination" />
+        </div>
+    </div>
+</div>
+
+

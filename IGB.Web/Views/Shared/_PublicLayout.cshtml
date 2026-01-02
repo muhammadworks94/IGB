@@ -1,0 +1,53 @@
+@using System.Globalization
+@{
+    Layout = null;
+    var uiCulture = CultureInfo.CurrentUICulture;
+    var htmlLang = uiCulture?.Name ?? "en";
+    var htmlDir = (uiCulture?.TextInfo?.IsRightToLeft ?? false) ? "rtl" : "ltr";
+}
+<!DOCTYPE html>
+<html lang="@htmlLang" dir="@htmlDir">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IGB - @ViewData["Title"]</title>
+    <base href="/" />
+
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- IGB Theme tokens + utilities -->
+    <link rel="stylesheet" href="css/theme/theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="css/public/public.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Head", required: false)
+</head>
+<body class="igb-public">
+    <partial name="_PublicNavbar" />
+
+    <main class="igb-public-main">
+        @RenderBody()
+    </main>
+
+    <footer class="igb-public-footer border-top">
+        <div class="container-xl py-4 d-flex flex-column flex-md-row gap-2 align-items-center justify-content-between">
+            <div class="text-muted small">© @DateTime.Now.Year IGB. All rights reserved.</div>
+            <div class="d-flex gap-3 small">
+                <a class="text-decoration-none igb-link-muted" href="/about-us">About</a>
+                <a class="text-decoration-none igb-link-muted" href="/services">Services</a>
+                <a class="text-decoration-none igb-link-muted" href="/courses">Courses</a>
+                <a class="text-decoration-none igb-link-muted" href="/contact-us">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="js/public/public-nav.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+

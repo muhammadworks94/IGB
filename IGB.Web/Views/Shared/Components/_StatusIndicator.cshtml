@@ -1,0 +1,19 @@
+@model IGB.Web.ViewModels.Components.StatusIndicatorViewModel
+
+@{
+    var variant = Model.Variant switch
+    {
+        "success" => "success",
+        "warning" => "warning",
+        "danger" => "danger",
+        "info" => "info",
+        _ => "secondary"
+    };
+}
+
+<span class="igb-status igb-status-@variant @(Model.CssClass ?? "")">
+    <span class="igb-status-dot" aria-hidden="true"></span>
+    <span>@Model.Text</span>
+</span>
+
+

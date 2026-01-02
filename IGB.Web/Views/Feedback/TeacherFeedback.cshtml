@@ -1,0 +1,123 @@
+@model IGB.Web.ViewModels.Feedback.AdminTeacherFeedbackPageViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "Teacher Feedback";
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+    var courses = ViewBag.Courses as System.Collections.IEnumerable;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Teacher Feedback",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Feedback"),
+        new("Teacher Feedback")
+    }
+))
+
+<div class="container-fluid">
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <input type="hidden" name="q" value="@Model.Query" />
+                <div class="col-md-6">
+                    <label class="form-label">Course</label>
+                    <select class="form-select" name="courseId">
+                        <option value="">All</option>
+                        @if (courses != null)
+                        {
+                            foreach (dynamic c in courses)
+                            {
+                                var selected = (Model.CourseId.HasValue && ((long)c.Id) == Model.CourseId.Value);
+                                <option value="@c.Id" selected="@selected">@c.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Rating</label>
+                    <select class="form-select" name="rating">
+                        <option value="">Any</option>
+                        @for (var i = 5; i >= 1; i--)
+                        {
+                            <option value="@i" selected="@(Model.Rating == i)">@i</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Flagged</label>
+                    <select class="form-select" name="flagged">
+                        <option value="">Any</option>
+                        <option value="true" selected="@(Model.Flagged == true)">Flagged</option>
+                        <option value="false" selected="@(Model.Flagged == false)">Not flagged</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">Apply</button>
+                    <a class="btn btn-outline-secondary" href="@Url.Action("TeacherFeedback","Feedback")">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @{
+        var table = new IGB.Web.ViewModels.Components.TableShellViewModel(
+            Id: "teacher-feedback-table",
+            Title: "Feedback (Student → Teacher)",
+            Columns: new List<IGB.Web.ViewModels.Components.TableColumn>
+            {
+                new("Date"),
+                new("Rating"),
+                new("Student"),
+                new("Teacher"),
+                new("Course"),
+                new("Flagged"),
+                new("Actions")
+            },
+            SearchQuery: Model.Query,
+            RenderRows: html =>
+            {
+                var rows = new System.Text.StringBuilder();
+                foreach (var r in Model.Items)
+                {
+                    rows.AppendLine("<tr>");
+                    rows.AppendLine($"<td class=\"text-muted small\">{r.CreatedAtUtc:yyyy-MM-dd}</td>");
+                    rows.AppendLine($"<td class=\"fw-semibold\">{r.Rating}</td>");
+                    rows.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(r.StudentName)}</td>");
+                    rows.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(r.TutorName)}</td>");
+                    rows.AppendLine($"<td class=\"text-muted\">{System.Net.WebUtility.HtmlEncode(r.CourseName)}</td>");
+                    rows.AppendLine("<td>");
+                    rows.AppendLine(r.IsFlagged
+                        ? "<span class=\"badge bg-danger\">Yes</span>"
+                        : "<span class=\"badge bg-success\">No</span>");
+                    rows.AppendLine("</td>");
+                    rows.AppendLine("<td class=\"text-nowrap\">");
+                    rows.AppendLine($"<a class=\"btn btn-sm btn-outline-secondary\" href=\"{Url.Action("TutorReview", "Feedback", new { lessonId = r.LessonId })}\">Details</a>");
+                    if (!r.IsFlagged)
+                    {
+                        rows.AppendLine($"<form method=\"post\" action=\"{Url.Action("FlagTutorFeedback","Feedback")}\" class=\"d-inline ms-1\">");
+                        rows.AppendLine($"<input name=\"__RequestVerificationToken\" type=\"hidden\" value=\"{csrf}\" />");
+                        rows.AppendLine($"<input type=\"hidden\" name=\"id\" value=\"{r.FeedbackId}\" />");
+                        rows.AppendLine($"<input type=\"hidden\" name=\"reason\" value=\"Flagged by admin\" />");
+                        rows.AppendLine("<button class=\"btn btn-sm btn-outline-danger\" type=\"submit\">Flag</button>");
+                        rows.AppendLine("</form>");
+                    }
+                    rows.AppendLine("</td>");
+                    rows.AppendLine("</tr>");
+                }
+                return new Microsoft.AspNetCore.Html.HtmlString(rows.ToString());
+            },
+            Pagination: Model.Pagination
+        );
+    }
+
+    <partial name="Components/_TableShell" model="table" />
+</div>
+
+

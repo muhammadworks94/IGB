@@ -1,0 +1,24 @@
+@model IGB.Web.ViewModels.Components.ModalViewModel
+@using Microsoft.AspNetCore.Html
+
+<div class="modal fade" id="@Model.Id" tabindex="-1" aria-labelledby="@($"{Model.Id}_label")" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content @(Model.CssClass ?? "")">
+            <div class="modal-header">
+                <h5 class="modal-title" id="@($"{Model.Id}_label")">@Model.Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Model.Body(Html)
+            </div>
+            @if (Model.Footer != null)
+            {
+                <div class="modal-footer">
+                    @Model.Footer(Html)
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,199 @@
+@model IGB.Web.ViewModels.Reports.ProgressReportViewModel
+@{
+    ViewData["Title"] = "Progress Tracker";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Progress Tracker",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Reports"),
+        new("Progress Tracker")
+    }
+))
+
+<div class="container-fluid">
+    <style>
+        /* Chart.js can look broken if canvas auto-stretches; use a fixed-height box */
+        .igb-chart-box {
+            position: relative;
+            height: 240px;
+            overflow: hidden; /* prevent canvas spill-over onto the table */
+            margin-bottom: .25rem;
+        }
+
+        .igb-chart-box canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Total students</div>
+                    <div class="fs-2 fw-semibold">@Model.TotalStudents</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Students at risk</div>
+                    <div class="fs-2 fw-semibold text-danger">@Model.StudentsAtRisk</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">On track</div>
+                    <div class="fs-2 fw-semibold text-success">@Model.StudentsOnTrack</div>
+                    <a class="btn btn-sm btn-outline-secondary mt-2" href="@Url.Action("ProgressExportCsv","Reports")">Export CSV</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Progress by course (avg %)</h5>
+                    <div class="igb-chart-box">
+                        <canvas id="courseChart"></canvas>
+                    </div>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-sm">
+                            <thead><tr><th>Course</th><th>Students</th><th>Avg %</th></tr></thead>
+                            <tbody>
+                            @foreach (var r in Model.ProgressByCourse)
+                            {
+                                <tr><td>@r.CourseName</td><td>@r.Students</td><td>@r.AvgPercent%</td></tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Progress by grade (avg %)</h5>
+                    <div class="igb-chart-box">
+                        <canvas id="gradeChart"></canvas>
+                    </div>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-sm">
+                            <thead><tr><th>Grade</th><th>Students</th><th>Avg %</th></tr></thead>
+                            <tbody>
+                            @foreach (var r in Model.ProgressByGrade)
+                            {
+                                <tr><td>@r.GradeName</td><td>@r.Students</td><td>@r.AvgPercent%</td></tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="mb-3">Students at risk</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Avg progress %</th>
+                        <th>Attendance %</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model.AtRisk)
+                    {
+                        <tr>
+                            <td>@r.StudentName</td>
+                            <td class="fw-semibold @(r.AvgProgressPercent < 40 ? "text-danger" : "text-warning")">@r.AvgProgressPercent%</td>
+                            <td class="fw-semibold @(r.AttendancePercent < 70 ? "text-danger" : "text-warning")">@r.AttendancePercent%</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-muted small">PDF/Excel export can be added; CSV export is available now.</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/nobleui/vendors/chartjs/Chart.min.js"></script>
+    <script>
+      (function(){
+        if (typeof Chart === 'undefined') return;
+        const courseLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CourseChart.Select(x => x.Label)));
+        const courseValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CourseChart.Select(x => x.Value)));
+        const gradeLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GradeChart.Select(x => x.Label)));
+        const gradeValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GradeChart.Select(x => x.Value)));
+
+        const truncate = (s, max) => (typeof s === 'string' && s.length > max) ? (s.substring(0, max - 1) + '…') : s;
+
+        const baseOptions = (maxValue) => ({
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.raw}%`
+              }
+            }
+          },
+          indexAxis: 'y',
+          scales: {
+            x: {
+              min: 0,
+              max: maxValue,
+              ticks: { callback: (v) => `${v}%` }
+            },
+            y: {
+              ticks: {
+                autoSkip: false,
+                callback: function(value) {
+                  // value is index in Category scale; use label
+                  const label = (this.getLabelForValue ? this.getLabelForValue(value) : value);
+                  return truncate(label, 22);
+                }
+              }
+            }
+          }
+        });
+
+        // If all values are tiny, cap at a smaller max so the chart is readable, otherwise default to 100%.
+        const courseMax = Math.max(...courseValues, 0);
+        const gradeMax = Math.max(...gradeValues, 0);
+        const courseAxisMax = courseMax <= 20 ? 20 : 100;
+        const gradeAxisMax = gradeMax <= 20 ? 20 : 100;
+
+        new Chart(document.getElementById('courseChart'), {
+          type: 'bar',
+          data: { labels: courseLabels, datasets: [{ data: courseValues, backgroundColor: '#0d6efd' }] },
+          options: baseOptions(courseAxisMax)
+        });
+
+        new Chart(document.getElementById('gradeChart'), {
+          type: 'bar',
+          data: { labels: gradeLabels, datasets: [{ data: gradeValues, backgroundColor: '#198754' }] },
+          options: baseOptions(gradeAxisMax)
+        });
+      })();
+    </script>
+}
+
+

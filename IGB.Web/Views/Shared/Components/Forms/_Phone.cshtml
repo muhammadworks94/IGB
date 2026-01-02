@@ -1,0 +1,48 @@
+@model IGB.Web.ViewModels.Components.PhoneFieldViewModel
+
+@{
+    var ccId = $"fld_{Model.CountryCodeName}".Replace(".", "_");
+    var phoneId = $"fld_{Model.PhoneName}".Replace(".", "_");
+    var invalid = !string.IsNullOrWhiteSpace(Model.ErrorMessage);
+}
+
+<div class="mb-3 @(Model.CssClass ?? "")">
+    <label class="form-label">@Model.Label @if (Model.Required) { <span class="text-danger">*</span> }</label>
+
+    <div class="input-group">
+        <select id="@ccId"
+                name="@Model.CountryCodeName"
+                class="form-select"
+                aria-label="Country code"
+                @(Model.Disabled ? "disabled" : null)>
+            @foreach (var opt in Model.CountryCodes)
+            {
+                <option value="@opt.Value" selected="@(opt.Value == Model.CountryCodeValue)" disabled="@(opt.Disabled)">
+                    @opt.Label
+                </option>
+            }
+        </select>
+
+        <input id="@phoneId"
+               name="@Model.PhoneName"
+               type="tel"
+               value="@Model.PhoneValue"
+               placeholder="@Model.Placeholder"
+               class="form-control @(invalid ? "is-invalid" : "")"
+               autocomplete="tel"
+               aria-invalid="@(invalid ? "true" : "false")"
+               @(Model.Required ? "required" : null)
+               @(Model.Disabled ? "disabled" : null) />
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.HelpText))
+    {
+        <div class="form-text">@Model.HelpText</div>
+    }
+    @if (invalid)
+    {
+        <div class="invalid-feedback d-block">@Model.ErrorMessage</div>
+    }
+</div>
+
+

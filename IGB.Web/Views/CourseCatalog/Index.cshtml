@@ -1,0 +1,113 @@
+@model IGB.Web.ViewModels.Student.CourseCatalogViewModel
+@{
+    ViewData["Title"] = "Course Catalog";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Course Catalog",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Course Catalog")
+    },
+    Subtitle: $"Remaining credits: {Model.RemainingCredits}"
+))
+
+<div class="container-fluid">
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" name="q" value="@Model.Query" placeholder="Search courses..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Curriculum</label>
+                    <select class="form-select" name="curriculumId" id="catCurriculum">
+                        <option value="">All</option>
+                        @foreach (var c in Model.Curricula)
+                        {
+                            <option value="@c.Id" selected="@(Model.CurriculumId == c.Id)">@c.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Grade</label>
+                    <select class="form-select" name="gradeId" id="catGrade">
+                        <option value="">All</option>
+                        @foreach (var g in Model.Grades)
+                        {
+                            <option value="@g.Id" selected="@(Model.GradeId == g.Id)">@g.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Max credits</label>
+                    <input class="form-control" name="maxCredits" type="number" min="1" value="@(Model.MaxCredits?.ToString() ?? "")" />
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button class="btn btn-primary" type="submit">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        @foreach (var c in Model.Items)
+        {
+            var desc = (c.Description ?? "").Trim();
+            if (desc.Length > 140) desc = desc.Substring(0, 140) + "...";
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <img src="@(string.IsNullOrWhiteSpace(c.ImagePath) ? "/img/avatar.png" : c.ImagePath)"
+                         class="card-img-top"
+                         style="height:180px;object-fit:cover"
+                         alt="Course image" />
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title mb-1">@c.Name</h5>
+                            <span class="badge bg-primary">@c.CreditCost credits</span>
+                        </div>
+                        <div class="text-muted small mb-2">@c.Curriculum • @c.Grade</div>
+                        <div class="text-muted small mb-2">Tutor: @c.TutorName</div>
+                        <p class="card-text flex-grow-1">@desc</p>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-outline-primary" href="@Url.Action("Details","CourseCatalog", new { id = c.Id })">View</a>
+                            <a class="btn btn-primary" href="@Url.Action("Details","CourseCatalog", new { id = c.Id })">Enroll</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="mt-3 d-flex justify-content-end">
+        <partial name="Components/_Pagination" model="Model.Pagination" />
+    </div>
+</div>
+
+<script>
+  // Curriculum -> Grades list
+  document.getElementById('catCurriculum')?.addEventListener('change', async function () {
+    const cid = this.value;
+    const gradeSel = document.getElementById('catGrade');
+    if (!gradeSel) return;
+    gradeSel.innerHTML = "<option value=''>All</option>";
+    if (!cid) return;
+    const res = await fetch('/api/registration/grades?curriculumId=' + encodeURIComponent(cid));
+    if (!res.ok) return;
+    const list = await res.json();
+    gradeSel.innerHTML = "<option value=''>All</option>" + list.map(x => `<option value="${x.id}">${x.name}</option>`).join("");
+  });
+</script>
+
+

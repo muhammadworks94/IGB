@@ -1,0 +1,73 @@
+@model IGB.Web.ViewModels.Feedback.TutorMyFeedbackViewModel
+@{
+    ViewData["Title"] = "My Feedback";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Feedback",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Feedback")
+    },
+    Subtitle: $"Avg: {Model.AverageRating:F1} • Reviews: {Model.ReviewCount}"
+))
+
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Course Id (optional)</label>
+                    <input class="form-control" name="courseId" type="number" value="@(Model.CourseId?.ToString() ?? "")" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">From</label>
+                    <input class="form-control" name="from" type="date" value="@(Model.From?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To</label>
+                    <input class="form-control" name="to" type="date" value="@(Model.To?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary" type="submit">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="mb-3">Feedback Received</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Rating</th>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Comments</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model.Items)
+                    {
+                        <tr>
+                            <td class="text-muted small">@r.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                            <td class="fw-semibold">@r.Rating</td>
+                            <td>@r.StudentName</td>
+                            <td class="text-muted">@r.CourseName</td>
+                            <td class="text-muted">@r.Comments</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <partial name="Components/_Pagination" model="Model.Pagination" />
+        </div>
+    </div>
+</div>
+
+

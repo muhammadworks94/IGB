@@ -1,0 +1,30 @@
+/* Base styles that consume theme tokens */
+
+html, body {
+  font-family: var(--igb-font-sans);
+  color: var(--igb-color-text);
+  background: var(--igb-color-bg);
+  line-height: var(--igb-leading-normal);
+}
+
+/* Typography system (utilities + sensible defaults) */
+h1, .h1 { font-size: var(--igb-text-3xl); line-height: var(--igb-leading-tight); font-weight: 700; }
+h2, .h2 { font-size: var(--igb-text-2xl); line-height: var(--igb-leading-tight); font-weight: 700; }
+h3, .h3 { font-size: var(--igb-text-xl);  line-height: var(--igb-leading-tight); font-weight: 600; }
+h4, .h4 { font-size: var(--igb-text-lg);  line-height: var(--igb-leading-tight); font-weight: 600; }
+h5, .h5 { font-size: var(--igb-text-md);  line-height: var(--igb-leading-tight); font-weight: 600; }
+h6, .h6 { font-size: var(--igb-text-sm);  line-height: var(--igb-leading-tight); font-weight: 600; }
+
+.text-body { font-size: var(--igb-text-md); }
+.text-caption { font-size: var(--igb-text-sm); color: var(--igb-color-text-muted); }
+.text-xs { font-size: var(--igb-text-xs); }
+
+/* A consistent surface/border look for cards/panels */
+.igb-surface {
+  background: var(--igb-color-surface);
+  border: 1px solid var(--igb-color-border);
+  border-radius: var(--igb-radius-lg);
+  box-shadow: var(--igb-shadow-1);
+}
+
+

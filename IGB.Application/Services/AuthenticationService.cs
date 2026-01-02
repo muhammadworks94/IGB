@@ -1,6 +1,7 @@
 using IGB.Application.DTOs;
 using IGB.Domain.Interfaces;
 using IGB.Shared.Common;
+using IGB.Shared.Security;
 using Microsoft.Extensions.Logging;
 using BCrypt.Net;
 
@@ -92,10 +93,9 @@ public class AuthenticationService : IAuthenticationService
                 return Result.Failure("Current password and new password are required.");
             }
 
-            if (newPassword.Length < 8)
-            {
-                return Result.Failure("New password must be at least 8 characters.");
-            }
+            var pwErrors = PasswordPolicy.Validate(newPassword);
+            if (pwErrors.Count > 0)
+                return Result.Failure(string.Join(" ", pwErrors));
 
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)

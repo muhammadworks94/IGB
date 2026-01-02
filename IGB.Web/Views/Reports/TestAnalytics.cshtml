@@ -1,0 +1,346 @@
+@model IGB.Web.ViewModels.Reports.TestAnalyticsViewModel
+@{
+    ViewData["Title"] = "Test Analytics";
+    var curricula = ViewBag.Curricula as List<IGB.Domain.Entities.Curriculum> ?? new();
+    var grades = ViewBag.Grades as List<IGB.Domain.Entities.Grade> ?? new();
+    var courses = ViewBag.Courses as List<IGB.Domain.Entities.Course> ?? new();
+}
+
+<div class="breadcrumb-header">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Reports</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Test Analytics</li>
+        </ol>
+    </nav>
+    
+    <!-- Title, Filters, and Action Buttons in one row -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
+        <h1 class="breadcrumb-title mb-0">Test Analytics</h1>
+        
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <form method="get" id="testAnalyticsFilterForm" class="d-flex gap-2 align-items-center">
+                <div style="width: 130px;">
+                    <input class="form-control form-control-sm" name="from" type="date" value="@(Model.From?.ToString("yyyy-MM-dd") ?? "")" placeholder="From" />
+                </div>
+                <div style="width: 130px;">
+                    <input class="form-control form-control-sm" name="to" type="date" value="@(Model.To?.ToString("yyyy-MM-dd") ?? "")" placeholder="To" />
+                </div>
+                <div style="width: 150px;">
+                    <select class="form-select form-select-sm" name="curriculumId">
+                        <option value="">All Curricula</option>
+                        @foreach (var c in curricula)
+                        {
+                            <option value="@c.Id" selected="@(Model.CurriculumId == c.Id)">@c.Name</option>
+                        }
+                    </select>
+                </div>
+                <div style="width: 120px;">
+                    <select class="form-select form-select-sm" name="gradeId">
+                        <option value="">All Grades</option>
+                        @foreach (var g in grades)
+                        {
+                            <option value="@g.Id" selected="@(Model.GradeId == g.Id)">@g.Name</option>
+                        }
+                    </select>
+                </div>
+                <div style="width: 150px;">
+                    <select class="form-select form-select-sm" name="courseId">
+                        <option value="">All Courses</option>
+                        @foreach (var c in courses)
+                        {
+                            <option value="@c.Id" selected="@(Model.CourseId == c.Id)">@c.Name</option>
+                        }
+                    </select>
+                </div>
+                <button class="btn btn-primary btn-sm" type="submit">
+                    <i class="fas fa-filter me-1"></i>Apply
+                </button>
+            </form>
+            <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("TestAnalytics","Reports")">
+                <i class="fas fa-rotate-left me-1"></i>Reset
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <style>
+        /* Keep charts contained and consistent across the dashboard */
+        .igb-chart-box {
+            position: relative;
+            height: 280px;
+            overflow: hidden;
+        }
+        .igb-chart-box canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Total Tests Conducted</div>
+                <div class="fs-3 fw-semibold">@Model.TotalTestsConducted</div>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Average Score</div>
+                <div class="fs-3 fw-semibold">@Model.AvgScore.ToString("F2")%</div>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Pass Rate (C or above)</div>
+                <div class="fs-3 fw-semibold">@Model.PassRatePercent%</div>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Tests This Month</div>
+                <div class="fs-3 fw-semibold">@Model.TestsThisMonth</div>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Grade Distribution</h5>
+                    <div class="igb-chart-box">
+                        <canvas id="gradeDist"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Average Scores by Course (Top 10)</h5>
+                    <div class="igb-chart-box">
+                        <canvas id="avgByCourse"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Test Trends Over Time</h5>
+                    <div class="igb-chart-box">
+                        <canvas id="trend"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Top Performing Students</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Avg %</th>
+                                <th>Tests</th>
+                                <th>Best Grade</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var r in Model.TopStudents)
+                            {
+                                <tr>
+                                    <td>@r.StudentName</td>
+                                    <td class="text-muted">@r.AvgPercent.ToString("F2")%</td>
+                                    <td class="text-muted">@r.Tests</td>
+                                    <td><span class="badge bg-primary">@r.BestGrade</span></td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-muted small">Top list includes students with at least 2 tests in the filtered range.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Topics with Most Improvement Needs</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>Topic</th>
+                                <th class="text-end">Count</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var t in Model.TopicsNeedingImprovement)
+                            {
+                                <tr>
+                                    <td>@t.TopicTitle</td>
+                                    <td class="text-end text-muted">@t.Count</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-muted small">Counted when a report has “Areas for Improvement” and includes the topic.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/nobleui/vendors/chartjs/Chart.min.js"></script>
+    <script>
+      (function(){
+        if (typeof Chart === 'undefined') return;
+
+        const gradeLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GradeDistribution.Select(x => x.Label)));
+        const gradeValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GradeDistribution.Select(x => x.Value)));
+        const courseLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AvgScoresByCourse.Select(x => x.Label)));
+        const courseValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AvgScoresByCourse.Select(x => x.Value)));
+        const trendLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TestTrends.Select(x => x.Month)));
+        const trendValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TestTrends.Select(x => x.Count)));
+
+        const truncate = (s, max) => (typeof s === 'string' && s.length > max) ? (s.substring(0, max - 1) + '…') : s;
+        const palette = ['#0d6efd','#198754','#ffc107','#dc3545','#6f42c1','#20c997','#0dcaf0','#fd7e14','#6c757d','#6610f2','#2c7be5','#00d97e'];
+
+        // ---------- Grade Distribution (Doughnut) ----------
+        // Too many legend items looks messy; group the tail into "Other".
+        const gradePairs = gradeLabels.map((l, i) => ({ label: l, value: Number(gradeValues[i] ?? 0) }))
+          .filter(x => x.value > 0)
+          .sort((a,b) => b.value - a.value);
+
+        const maxSlices = 7;
+        const top = gradePairs.slice(0, maxSlices);
+        const rest = gradePairs.slice(maxSlices);
+        const otherValue = rest.reduce((sum, x) => sum + x.value, 0);
+        if (otherValue > 0) top.push({ label: 'Other', value: otherValue });
+
+        const gdLabels = top.map(x => x.label);
+        const gdValues = top.map(x => x.value);
+        const gdTotal = gdValues.reduce((s, v) => s + v, 0) || 1;
+
+        const ctx1 = document.getElementById('gradeDist');
+        if (ctx1) new Chart(ctx1, {
+          type: 'doughnut',
+          data: {
+            labels: gdLabels,
+            datasets: [{
+              data: gdValues,
+              backgroundColor: gdLabels.map((_, i) => palette[i % palette.length]),
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  boxWidth: 10,
+                  boxHeight: 10,
+                  padding: 12,
+                  font: { size: 11 },
+                  generateLabels: (chart) => {
+                    // Truncate legend labels so they don't wrap/overlap.
+                    const labels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                    return labels.map(x => ({ ...x, text: truncate(x.text, 14) }));
+                  }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => {
+                    const v = Number(ctx.raw ?? 0);
+                    const pct = Math.round((v * 1000) / gdTotal) / 10;
+                    return `${ctx.label}: ${v} (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // ---------- Avg by Course (Bar) ----------
+        const ctx2 = document.getElementById('avgByCourse');
+        if (ctx2) new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: courseLabels.map(l => truncate(l, 16)),
+            datasets: [{
+              data: courseValues,
+              backgroundColor: '#0d6efd',
+              borderRadius: 6,
+              maxBarThickness: 34
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: (ctx) => `${ctx.raw}%` } }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { callback: (v) => `${v}%` }
+              },
+              x: {
+                ticks: { maxRotation: 0, autoSkip: true }
+              }
+            }
+          }
+        });
+
+        // ---------- Trends (Line) ----------
+        const ctx3 = document.getElementById('trend');
+        if (ctx3) new Chart(ctx3, {
+          type: 'line',
+          data: {
+            labels: trendLabels,
+            datasets: [{
+              data: trendValues,
+              borderColor: '#198754',
+              backgroundColor: 'rgba(25,135,84,0.12)',
+              fill: true,
+              tension: 0.25,
+              pointRadius: 3,
+              pointHoverRadius: 5
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: (ctx) => `${ctx.raw} tests` } }
+            },
+            scales: {
+              y: { beginAtZero: true, ticks: { precision: 0 } }
+            }
+          }
+        });
+      })();
+    </script>
+}
+
+

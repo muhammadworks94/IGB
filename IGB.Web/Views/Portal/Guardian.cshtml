@@ -1,16 +1,57 @@
 @{
     ViewData["Title"] = "Parent/Guardian Portal";
+    var wardCount = (int?)ViewBag.WardCount ?? 0;
+    var wardAvg = (int?)ViewBag.WardAvgProgress ?? 0;
+    var next = ViewBag.NextWardLesson;
 }
 
-<div class="breadcrumb-header">
-    <h1 class="breadcrumb-title">Parent/Guardian Portal</h1>
-    <p class="breadcrumb-subtitle">View student activity and announcements (features will be expanded in next phases).</p>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Parent/Guardian Portal",
+    Subtitle: "View student activity and announcements (features will be expanded in next phases)."
+))
 
 <div class="container-fluid">
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Wards linked</div>
+                <div class="fs-3 fw-semibold">@wardCount</div>
+            </div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Average ward progress</div>
+                <div class="fs-3 fw-semibold">@wardAvg%</div>
+                <div class="progress mt-2" style="height:8px;">
+                    <div class="progress-bar @(wardAvg >= 70 ? "bg-success" : (wardAvg >= 40 ? "bg-warning" : "bg-danger"))" style="width:@wardAvg%"></div>
+                </div>
+            </div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Next lesson</div>
+                @if (next != null)
+                {
+                    <div class="fw-semibold">@next.Course</div>
+                    <div class="text-muted small">@(((DateTimeOffset)next.When).ToString("yyyy-MM-dd HH:mm")) (UTC)</div>
+                }
+                else
+                {
+                    <div class="text-muted">—</div>
+                }
+            </div></div>
+        </div>
+    </div>
+
     <div class="row g-3">
         <div class="col-md-6 col-lg-4">
             <a class="btn btn-outline-primary w-100" asp-controller="Profile" asp-action="Index">My Profile</a>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <a class="btn btn-outline-primary w-100" asp-controller="Progress" asp-action="Ward">My Ward Progress</a>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <a class="btn btn-outline-primary w-100" asp-controller="Schedule" asp-action="My" onclick="alert('Guardian schedule view is via Ward Progress for now.'); return false;">My Ward Schedule</a>
         </div>
     </div>
 </div>

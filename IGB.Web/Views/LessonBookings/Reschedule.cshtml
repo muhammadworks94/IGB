@@ -1,0 +1,191 @@
+@model IGB.Web.ViewModels.LessonRescheduleViewModel
+@{
+    ViewData["Title"] = "Reschedule Lesson";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Reschedule Lesson",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Schedule", Url.Action("My", "LessonBookings")),
+        new("Reschedule Lesson")
+    },
+    Subtitle: $"{Model.CourseName} • Current (UTC): {Model.ScheduledStartUtc:yyyy-MM-dd HH:mm}"
+))
+
+<div class="container-fluid">
+    @if (Model.RescheduleCount >= Model.MaxReschedules)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel("Maximum reschedules reached for this lesson.", Variant: "danger"))" />
+    }
+    else if (Model.IsLateWindow)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel($"This is within 24 hours of the lesson. Admin approval is required. Late penalty: {Model.LatePenaltyCredits} credits (if configured).", Variant: "warning"))" />
+    }
+    else
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel("This reschedule is > 24 hours away and will be auto-approved if your selected slots are available.", Variant: "info"))" />
+    }
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="LessonId" />
+        <input type="hidden" asp-for="CourseBookingId" />
+
+        <div class="row g-3">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Date From</label>
+                            <input asp-for="DateFrom" class="form-control" type="date" id="dateFrom" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date To</label>
+                            <input asp-for="DateTo" class="form-control" type="date" id="dateTo" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Duration</label>
+                            <select asp-for="DurationMinutes" class="form-select" id="durationMinutes">
+                                <option value="30">30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60">60 minutes</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Reason</label>
+                            <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Why are you rescheduling?"></textarea>
+                            <span asp-validation-for="Reason" class="text-danger"></span>
+                        </div>
+                        <div class="text-muted small">Reschedules used: @Model.RescheduleCount / @Model.MaxReschedules</div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="mb-2">Selected Options (local)</h6>
+                        <div class="mb-2">
+                            <label class="form-label">Option 1</label>
+                            <input asp-for="Option1" class="form-control" type="datetime-local" id="opt1" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Option 2</label>
+                            <input asp-for="Option2" class="form-control" type="datetime-local" id="opt2" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Option 3</label>
+                            <input asp-for="Option3" class="form-control" type="datetime-local" id="opt3" />
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary w-100" id="clearSlotsBtn">Clear selected slots</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Pick 3 Available Slots</h5>
+                            <div class="text-muted small">Click any 3 slots. Auto-approval uses the first available preference.</div>
+                        </div>
+                        <div id="availabilityMsg" class="alert alert-info d-none"></div>
+                        <div id="studentAvailabilityCalendar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex justify-content-end gap-2">
+            <a class="btn btn-secondary" href="@Url.Action("My","LessonBookings")">Cancel</a>
+            <button class="btn btn-primary" type="submit">Submit Reschedule</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="/nobleui/vendors/fullcalendar/main.min.js"></script>
+    <script>
+      (function () {
+        const calEl = document.getElementById("studentAvailabilityCalendar");
+        if (!calEl || typeof FullCalendar === "undefined") return;
+
+        const courseBookingId = "@Model.CourseBookingId";
+        const sel = [];
+        function toLocalInputValue(d) {
+          const pad = n => String(n).padStart(2, "0");
+          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+        function syncOptions() {
+          document.getElementById("opt1").value = sel[0] ? toLocalInputValue(sel[0]) : "";
+          document.getElementById("opt2").value = sel[1] ? toLocalInputValue(sel[1]) : "";
+          document.getElementById("opt3").value = sel[2] ? toLocalInputValue(sel[2]) : "";
+        }
+        document.getElementById("clearSlotsBtn")?.addEventListener("click", function () {
+          sel.splice(0, sel.length);
+          syncOptions();
+          cal.refetchEvents();
+        });
+
+        async function loadSlots() {
+          const df = document.getElementById("dateFrom").value;
+          const dt = document.getElementById("dateTo").value || df;
+          const duration = document.getElementById("durationMinutes").value;
+          const msg = document.getElementById("availabilityMsg");
+          const showMsg = (html, kind) => {
+            if (!msg) return;
+            msg.className = `alert alert-${kind || 'info'}`;
+            msg.innerHTML = html;
+            msg.classList.remove("d-none");
+          };
+          const hideMsg = () => { if (msg) msg.classList.add("d-none"); };
+
+          if (!df) { showMsg("Select a start date to see available tutor slots.", "info"); return []; }
+          const fromUtc = new Date(df + "T00:00:00").toISOString();
+          const toUtc = new Date(dt + "T23:59:59").toISOString();
+          const url = `/api/lessons/availability?courseBookingId=${encodeURIComponent(courseBookingId)}&fromUtc=${encodeURIComponent(fromUtc)}&toUtc=${encodeURIComponent(toUtc)}&durationMinutes=${encodeURIComponent(duration)}`;
+          const res = await fetch(url, { credentials: "include" });
+          if (!res.ok) { showMsg("Unable to load tutor availability right now. Please try again.", "warning"); return []; }
+          const data = await res.json();
+          if (!data.tutorAssigned) { showMsg("No tutor is assigned to this course yet. Please contact admin.", "warning"); return []; }
+          const slots = (data.slots || []);
+          if (slots.length === 0) { showMsg("No available slots found for the selected range. Try a different date range or ask your tutor to set availability.", "info"); return []; }
+          hideMsg();
+          return slots.map(s => ({
+            title: "Available",
+            start: s.startUtc,
+            end: s.endUtc,
+            color: "#d1e7dd"
+          }));
+        }
+
+        const cal = new FullCalendar.Calendar(calEl, {
+          initialView: "timeGridWeek",
+          height: 650,
+          nowIndicator: true,
+          allDaySlot: false,
+          events: async function (fetchInfo, successCallback) {
+            successCallback(await loadSlots());
+          },
+          eventClick: function (info) {
+            const dt = new Date(info.event.start);
+            const key = dt.toISOString();
+            if (sel.find(x => x.toISOString() === key)) return;
+            if (sel.length >= 3) sel.shift();
+            sel.push(dt);
+            sel.sort((a,b) => a - b);
+            syncOptions();
+          }
+        });
+
+        ["dateFrom","dateTo","durationMinutes"].forEach(id => {
+          document.getElementById(id)?.addEventListener("change", () => cal.refetchEvents());
+        });
+
+        cal.render();
+      })();
+    </script>
+}
+
+

@@ -515,17 +515,12 @@ body:has(.offcanvas.show) .main-content {
     z-index: 1055;
 }
 
-/* Add dark overlay mask for all offcanvas elements */
+/* IMPORTANT:
+   Do NOT paint an overlay via .offcanvas::before.
+   It ends up sitting *inside* the offcanvas stacking context and makes the panel look disabled/greyed-out. */
 .offcanvas.show::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1040;
-    pointer-events: none;
+    content: none !important;
+    display: none !important;
 }
 
 /* Force dark overlay for Bootstrap offcanvas backdrop */
@@ -553,17 +548,11 @@ body:has(.offcanvas-backdrop.show) {
     position: relative;
 }
 
+/* Let Bootstrap's .offcanvas-backdrop handle the overlay. */
 body:has(.offcanvas.show)::before,
 body:has(.offcanvas-backdrop.show)::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1040;
-    pointer-events: none;
+    content: none !important;
+    display: none !important;
 }
 
 /* Ensure offcanvas content remains visible */
@@ -592,15 +581,8 @@ body.offcanvas-open .offcanvas {
 
 /* Add dark overlay mask for offcanvas-open body */
 body.offcanvas-open::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1040;
-    pointer-events: none;
+    content: none !important;
+    display: none !important;
 }
 
 /* Primary Color for Links */
@@ -5120,11 +5102,13 @@ thead.table-dark th,
 }
 
 .card:has(.table-responsive) .card-header {
-    padding: 0.5rem 1rem !important;
+    /* Requested: keep at least 10px padding so headings aren't "cut" */
+    padding: 10px !important;
 }
 
 .card:has(.table-responsive) .card-body {
-    padding: 0 !important;
+    /* Requested: keep at least 10px padding so table titles/controls aren't "cut" */
+    padding: 10px !important;
 }
 
 .bd-example-modal-xl .form-group.login-box-msg.row .justify-content-bold {
@@ -6214,6 +6198,30 @@ html, body, .wrapper, .content, .content-wrapper, .main-content {
 /* ========================================
    NOBLE UI CUSTOMIZATIONS
 ======================================== */
+
+/* ========================================
+   GLOBAL CARD PADDING (SYSTEM-WIDE)
+   Prevents content looking "cut" against card edges.
+======================================== */
+.card .card-header {
+    padding: 1.25rem !important;
+}
+
+.card .card-body {
+    padding: 1.25rem !important;
+}
+
+/* Headings inside cards often sit flush; give them a bit more breathing room */
+.card .card-title,
+.card .card-body > h1,
+.card .card-body > h2,
+.card .card-body > h3,
+.card .card-body > h4,
+.card .card-body > h5,
+.card .card-body > h6 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+}
 
 /* ===== NO CUSTOM NAVBAR CSS - PURE NOBLE UI ===== */
 
@@ -7720,18 +7728,121 @@ html, body {
     box-shadow: none !important;
 }
 
-/* Ensure offcanvas is properly styled */
+/* Ensure offcanvas is properly styled and clearly visible */
 .offcanvas {
-    z-index: 1045 !important;
+    z-index: 1055 !important;
+    background-color: #ffffff !important;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
+    border-left: 1px solid #e0e0e0 !important;
+}
+
+.offcanvas.show {
+    z-index: 1055 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .offcanvas-backdrop {
     z-index: 1040 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    opacity: 1 !important;
 }
 
-/* Remove offcanvas backdrop */
+/* Offcanvas form styling */
+.offcanvas-body {
+    padding: 1.5rem;
+    background-color: #ffffff !important;
+    overflow-y: auto;
+}
+
+.offcanvas-header {
+    padding: 1.25rem 1.5rem;
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.offcanvas-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529 !important;
+}
+
+/* Ensure offcanvas forms are properly styled */
+.offcanvas .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.offcanvas .form-control,
+.offcanvas .form-select {
+    border-radius: 0.375rem;
+}
+
+.offcanvas .form-select[multiple] {
+    padding: 0.5rem;
+}
+
+/* Offcanvas backdrop should be visible for proper UX */
 .offcanvas-backdrop {
+    background: rgba(0, 0, 0, 0.5) !important;
+    opacity: 1 !important;
+}
+
+/* Add Tutor Modal Styling */
+#addTutorModal .modal-dialog {
+    max-width: 800px;
+}
+
+#addTutorModal .modal-content {
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+#addTutorModal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e0e0e0;
+    border-radius: 8px 8px 0 0;
+    padding: 1.25rem 1.5rem;
+}
+
+#addTutorModal .modal-title {
+    color: #212529;
+    font-size: 1.35rem;
+}
+
+#addTutorModal .modal-body {
+    padding: 1.5rem;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+#addTutorModal .modal-footer {
+    border-top: 1px solid #e0e0e0;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Ensure modal backdrop is visible */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    opacity: 1 !important;
+}
+
+.modal-backdrop.show {
+    opacity: 1 !important;
+}
+
+/* Ensure proper modal cleanup - remove any lingering backdrops */
+body:not(.modal-open) .modal-backdrop {
     display: none !important;
+}
+
+/* Prevent body scroll lock when no modal is open */
+body:not(.modal-open) {
+    overflow: auto !important;
+    padding-right: 0 !important;
 }
 
 /* Enhanced Quick Filters Styling */
@@ -8728,4 +8839,67 @@ html, body {
     font-size: 1rem;
     font-weight: 700;
     color: #212529;
+}
+
+/* =========================================================
+   Compact Header with Search and Actions
+   ========================================================= */
+.breadcrumb-header .d-flex.justify-content-between {
+    margin-bottom: 0.75rem;
+}
+
+.breadcrumb-header .breadcrumb-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.breadcrumb-header form {
+    min-width: 300px;
+}
+
+.breadcrumb-header form .form-control-sm {
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Responsive header actions */
+@media (max-width: 768px) {
+    .breadcrumb-header .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+    
+    .breadcrumb-header form {
+        width: 100%;
+        max-width: 100% !important;
+    }
+    
+    .breadcrumb-header .d-flex.gap-2 {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+/* =========================================================
+   FIX: Button hover/active text contrast (Portal + general)
+   ========================================================= */
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active,
+.btn-outline-primary.active,
+.btn-check:checked + .btn-outline-primary {
+    color: #fff !important;
+    background-color: var(--primary-color, var(--bs-primary)) !important;
+    border-color: var(--primary-color, var(--bs-primary)) !important;
+}
+
+.btn-outline-primary:hover *,
+.btn-outline-primary:focus *,
+.btn-outline-primary:active *,
+.btn-outline-primary.active * {
+    color: #fff !important;
 }

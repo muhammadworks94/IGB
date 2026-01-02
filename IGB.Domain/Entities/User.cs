@@ -25,6 +25,16 @@ public class User : BaseEntity
     public string? EmailConfirmationTokenHash { get; set; }
     public DateTime? EmailConfirmationSentAt { get; set; }
 
+    // Password reset (API + future UI flow)
+    public string? PasswordResetTokenHash { get; set; }
+    public DateTime? PasswordResetSentAt { get; set; }
+    public DateTime? PasswordResetExpiresAt { get; set; }
+
+    // Refresh token (single active session token; can be extended to multi-session later)
+    public string? RefreshTokenHash { get; set; }
+    public DateTime? RefreshTokenIssuedAt { get; set; }
+    public DateTime? RefreshTokenExpiresAt { get; set; }
+
     // Approval workflow
     public UserApprovalStatus ApprovalStatus { get; set; } = UserApprovalStatus.Pending;
     public DateTime? ApprovedAt { get; set; }

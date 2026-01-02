@@ -7,26 +7,21 @@
     var inactiveUsersApprox = Math.Max(Model.TotalUsers - activeUsersApprox, 0);
 }
 
-<!-- Breadcrumb Header -->
-<div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item active" aria-current="page">Home</li>
-        </ol>
-    </nav>
-    <h1 class="breadcrumb-title">Dashboard</h1>
-    <p class="breadcrumb-subtitle">Welcome to your IGB System Dashboard - Manage your educational platform efficiently</p>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Dashboard",
+    Breadcrumbs: new List<BreadcrumbItem> { new("Home") },
+    Subtitle: "Welcome to your IGB System Dashboard - Manage your educational platform efficiently"
+))
 
-    @if (User.IsInRole("SuperAdmin"))
-    {
-        <form asp-action="SendTestNotification" method="post" class="mt-2">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-bell me-2"></i>Send Test Notification (SignalR)
-            </button>
-        </form>
-    }
-</div>
+@if (User.IsInRole("SuperAdmin"))
+{
+    <form asp-action="SendTestNotification" method="post" class="mt-2">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-bell me-2"></i>Send Test Notification (SignalR)
+        </button>
+    </form>
+}
 
 <div class="container-fluid @(isSuperAdmin ? "admin-dashboard-container" : "")">
     
@@ -372,7 +367,7 @@
                                 <a class="quick-action-btn quick-action-tile" asp-controller="Approvals" asp-action="Index">
                                     <i class="fas fa-user-check"></i><span>Pending Approvals</span>
                                 </a>
-                                <a class="quick-action-btn quick-action-tile" asp-controller="Courses" asp-action="Index">
+                                <a class="quick-action-btn quick-action-tile" asp-controller="Courses" asp-action="All">
                                     <i class="fas fa-book-open"></i><span>Manage Courses</span>
                                 </a>
                                 <a class="quick-action-btn quick-action-tile" asp-controller="Grades" asp-action="Index">

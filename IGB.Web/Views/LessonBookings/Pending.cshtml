@@ -1,56 +1,99 @@
 @model List<IGB.Domain.Entities.LessonBooking>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
-    ViewData["Title"] = "Pending Lesson Requests";
+    ViewData["Title"] = "Pending Bookings";
+    var q = ViewBag.Query as string;
+    var page = (int)(ViewBag.Page ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 10);
+    var total = (int)(ViewBag.Total ?? 0);
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+    var pagination = new PaginationViewModel(page, pageSize, total, Action: "Pending", Controller: "LessonBookings", RouteValues: new { q });
 }
 
-<div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Lesson Requests</li>
-        </ol>
-    </nav>
-    <h1 class="breadcrumb-title">Pending Lesson Requests</h1>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Pending Bookings",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Lessons"),
+        new("Pending Bookings")
+    }
+))
 
 <div class="container-fluid">
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Course</th>
-                        <th>Status</th>
-                        <th>Options</th>
-                        <th class="text-end">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var l in Model)
-                    {
-                        <tr>
-                            <td>@(l.StudentUser?.FullName ?? l.StudentUser?.Email ?? l.StudentUserId.ToString())</td>
-                            <td>@l.Course?.Name</td>
-                            <td><span class="badge bg-warning">@l.Status</span></td>
-                            <td class="small text-muted">
-                                1) @l.Option1.ToString("yyyy-MM-dd HH:mm")<br/>
-                                2) @l.Option2.ToString("yyyy-MM-dd HH:mm")<br/>
-                                3) @l.Option3.ToString("yyyy-MM-dd HH:mm")
-                            </td>
-                            <td class="text-end">
-                                <a asp-action="Schedule" asp-route-id="@l.Id" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-calendar-check me-1"></i>Schedule
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
+    @{
+        var tableVm = new TableShellViewModel(
+            Id: "pendingLessons",
+            Columns: new List<TableColumn>
+            {
+                new("Student"),
+                new("Course"),
+                new("Status"),
+                new("Options (UTC)"),
+                new("Actions", CssClass: "text-end")
+            },
+            RenderRows: html =>
+            {
+                var sb = new System.Text.StringBuilder();
+                foreach (var l in Model)
+                {
+                    var student = l.StudentUser != null ? $"{l.StudentUser.FirstName} {l.StudentUser.LastName}".Trim() : l.StudentUserId.ToString();
+                    var scheduleUrl = Url.Action("Schedule", "LessonBookings", new { id = l.Id }) ?? "#";
+                    var rejectUrl = Url.Action("Reject", "LessonBookings") ?? "#";
+                    sb.AppendLine($@"
+<tr>
+  <td>{System.Net.WebUtility.HtmlEncode(student)}</td>
+  <td>{System.Net.WebUtility.HtmlEncode(l.Course?.Name ?? "")}</td>
+  <td><span class='badge bg-warning'>{System.Net.WebUtility.HtmlEncode(l.Status.ToString())}</span></td>
+  <td class='small text-muted'>
+    1) {l.Option1:yyyy-MM-dd HH:mm}<br/>
+    2) {l.Option2:yyyy-MM-dd HH:mm}<br/>
+    3) {l.Option3:yyyy-MM-dd HH:mm}
+  </td>
+  <td class='text-end'>
+    <a class='btn btn-sm btn-primary' href='{scheduleUrl}'><i class='fas fa-calendar-check me-1'></i>Schedule</a>
+    <button class='btn btn-sm btn-outline-danger' type='button' onclick='openReject({l.Id})'>Reject</button>
+  </td>
+</tr>");
+                }
+                return new Microsoft.AspNetCore.Html.HtmlString(sb.ToString());
+            },
+            Pagination: pagination,
+            SearchQuery: q,
+            SearchPlaceholder: "Student or course..."
+        );
+    }
+
+    @await Html.PartialAsync("Components/_TableShell", tableVm)
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="@Url.Action("Reject","LessonBookings")">
+                <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                <input type="hidden" name="id" id="rejectLessonId" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Reason</label>
+                    <textarea class="form-control" name="reason" rows="3" placeholder="Reason for rejection..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
+<script>
+  function openReject(id) {
+    document.getElementById('rejectLessonId').value = id;
+    new bootstrap.Modal(document.getElementById('rejectModal')).show();
+  }
+</script>
 

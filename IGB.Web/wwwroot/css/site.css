@@ -35,3 +35,44 @@
 .alert {
     margin-bottom: 1rem;
 }
+
+/* ===== Star rating (5 stars) ===== */
+.star-rating-wrap { width: 100%; }
+.star-rating {
+    display: inline-flex;
+    gap: 0.25rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 10px;
+    background: #fff;
+    position: relative;
+    pointer-events: auto !important;
+}
+.star-rating .star-btn {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.55rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #d1d5db; /* gray-300 */
+    user-select: none;
+    transition: transform .06s ease, color .12s ease;
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1;
+}
+.star-rating .star-btn:hover { transform: translateY(-1px); }
+.star-rating .star-btn:focus-visible {
+    outline: 3px solid rgba(13,110,253,0.25);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+.star-rating .star-btn.is-on {
+    color: #f59e0b; /* amber-500 */
+}

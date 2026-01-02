@@ -1,0 +1,43 @@
+@model IGB.Web.ViewModels.Progress.StudentProgressDashboardViewModel
+@{
+    ViewData["Title"] = "My Ward Progress";
+    var wards = (IEnumerable<dynamic>?)ViewBag.Wards ?? Array.Empty<dynamic>();
+    var selectedId = (long?)ViewBag.SelectedStudentId;
+    var selectedName = (string?)ViewBag.SelectedStudentName ?? "Ward";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Progress",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Ward"),
+        new("Progress")
+    },
+    Subtitle: selectedName
+))
+
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label">Select ward</label>
+                    <select class="form-select" name="studentUserId">
+                        @foreach (var w in wards)
+                        {
+                            <option value="@w.StudentUserId" selected="@(w.StudentUserId == selectedId)">@w.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" type="submit">View</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <partial name="My" model="Model" />
+</div>
+
+

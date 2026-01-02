@@ -34,10 +34,26 @@ public class LessonBooking : BaseEntity
 
     public LessonStatus Status { get; set; } = LessonStatus.Pending;
 
+    // Decision (admin/staff)
+    public DateTimeOffset? DecisionAtUtc { get; set; }
+    public long? DecisionByUserId { get; set; }
+    public string? DecisionNote { get; set; }
+
     // Reschedule
     public bool RescheduleRequested { get; set; } = false;
     public DateTimeOffset? RescheduleRequestedAt { get; set; }
     public string? RescheduleNote { get; set; }
+    public int RescheduleCount { get; set; } = 0;
+
+    // Cancellation
+    public bool CancellationRequested { get; set; } = false; // tutor-initiated request that needs admin
+    public DateTimeOffset? CancellationRequestedAt { get; set; }
+    public long? CancellationRequestedByUserId { get; set; }
+    public string? CancellationNote { get; set; }
+
+    public DateTimeOffset? CancelledAtUtc { get; set; }
+    public long? CancelledByUserId { get; set; }
+    public string? CancelReason { get; set; }
 
     // Zoom placeholders (Phase 4 will populate)
     public string? ZoomMeetingId { get; set; }
@@ -47,9 +63,14 @@ public class LessonBooking : BaseEntity
     // Session tracking
     public DateTimeOffset? SessionStartedAt { get; set; }
     public DateTimeOffset? SessionEndedAt { get; set; }
+    public DateTimeOffset? StudentJoinedAt { get; set; }
+    public DateTimeOffset? TutorJoinedAt { get; set; }
     public bool StudentAttended { get; set; } = false;
     public bool TutorAttended { get; set; } = false;
     public long? EndedByAdminUserId { get; set; }
+
+    // Attendance notes (optional; for missing class reports)
+    public string? AttendanceNote { get; set; }
 }
 
 

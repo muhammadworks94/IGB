@@ -1,0 +1,138 @@
+@model IGB.Web.ViewModels.Reports.AttendanceLogsViewModel
+@{
+    ViewData["Title"] = "Attendance Logs";
+}
+
+<div class="breadcrumb-header">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Reports</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Attendance Logs</li>
+        </ol>
+    </nav>
+    
+    <!-- Title, Search, Filters, and Action Buttons in one row -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
+        <h1 class="breadcrumb-title mb-0">Attendance Logs</h1>
+        
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <form method="get" id="attendanceLogsFilterForm" class="d-flex gap-2 align-items-center">
+                <input type="hidden" name="pageSize" value="@Model.Pagination.PageSize" />
+                <div style="width: 200px;">
+                    <input class="form-control form-control-sm" name="q" value="@Model.Query" placeholder="Search..." />
+                </div>
+                <div style="width: 150px;">
+                    <input class="form-control form-control-sm" name="from" type="date" value="@(Model.From?.ToString("yyyy-MM-dd") ?? "")" placeholder="From" />
+                </div>
+                <div style="width: 150px;">
+                    <input class="form-control form-control-sm" name="to" type="date" value="@(Model.To?.ToString("yyyy-MM-dd") ?? "")" placeholder="To" />
+                </div>
+                <button class="btn btn-primary btn-sm" type="submit">
+                    <i class="fas fa-search me-1"></i>Filter
+                </button>
+                <a class="btn btn-outline-secondary btn-sm" id="exportCsvLink" href="@Url.Action("AttendanceLogsExportCsv","Reports", new { q = Model.Query, from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") })">
+                    <i class="fas fa-file-csv me-1"></i>Export CSV
+                </a>
+                <a class="btn btn-outline-secondary btn-sm" target="_blank" id="exportPdfLink" href="@Url.Action("AttendanceLogsExportPdf","Reports", new { q = Model.Query, from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") })">
+                    <i class="fas fa-file-pdf me-1"></i>PDF
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Lesson</th>
+                        <th>Course</th>
+                        <th>Student</th>
+                        <th>Tutor</th>
+                        <th>Scheduled (UTC)</th>
+                        <th>Session (UTC)</th>
+                        <th>Join times (UTC)</th>
+                        <th>Attendance</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model.Rows)
+                    {
+                        var dur = (r.SessionStartedAtUtc.HasValue && r.SessionEndedAtUtc.HasValue)
+                            ? (r.SessionEndedAtUtc.Value - r.SessionStartedAtUtc.Value).TotalMinutes.ToString("F0") + " min"
+                            : "—";
+                        <tr>
+                            <td class="text-muted">#@r.LessonId</td>
+                            <td>@r.CourseName</td>
+                            <td>@r.StudentName</td>
+                            <td>@r.TutorName</td>
+                            <td class="text-muted">@r.ScheduledStartUtc.ToString("yyyy-MM-dd HH:mm") - @r.ScheduledEndUtc.ToString("HH:mm")</td>
+                            <td class="text-muted">
+                                @(r.SessionStartedAtUtc?.ToString("yyyy-MM-dd HH:mm") ?? "—")
+                                -
+                                @(r.SessionEndedAtUtc?.ToString("HH:mm") ?? "—")
+                                <div class="text-muted small">@dur</div>
+                            </td>
+                            <td class="text-muted small">
+                                Student: @(r.StudentJoinedAtUtc?.ToString("HH:mm") ?? "—")<br/>
+                                Tutor: @(r.TutorJoinedAtUtc?.ToString("HH:mm") ?? "—")
+                            </td>
+                            <td>
+                                <span class="badge @(r.StudentAttended ? "bg-success" : "bg-danger")">S</span>
+                                <span class="badge @(r.TutorAttended ? "bg-success" : "bg-danger")">T</span>
+                            </td>
+                            <td class="text-muted">@r.Status</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <partial name="Components/_Pagination" model="Model.Pagination" />
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('attendanceLogsFilterForm');
+        if (form) {
+            function updateExportLinks() {
+                const q = form.querySelector('[name="q"]')?.value || '';
+                const from = form.querySelector('[name="from"]')?.value || '';
+                const to = form.querySelector('[name="to"]')?.value || '';
+                
+                const csvLink = document.getElementById('exportCsvLink');
+                const pdfLink = document.getElementById('exportPdfLink');
+                
+                if (csvLink) {
+                    csvLink.href = '@Url.Action("AttendanceLogsExportCsv","Reports")' + 
+                        '?q=' + encodeURIComponent(q) + 
+                        '&from=' + encodeURIComponent(from) + 
+                        '&to=' + encodeURIComponent(to);
+                }
+                if (pdfLink) {
+                    pdfLink.href = '@Url.Action("AttendanceLogsExportPdf","Reports")' + 
+                        '?q=' + encodeURIComponent(q) + 
+                        '&from=' + encodeURIComponent(from) + 
+                        '&to=' + encodeURIComponent(to);
+                }
+            }
+            
+            form.addEventListener('change', updateExportLinks);
+            form.addEventListener('input', function(e) {
+                if (e.target.name === 'q') {
+                    updateExportLinks();
+                }
+            });
+        }
+    });
+</script>
+

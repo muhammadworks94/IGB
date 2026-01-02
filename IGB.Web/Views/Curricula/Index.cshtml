@@ -1,24 +1,55 @@
-@model List<IGB.Domain.Entities.Curriculum>
+@model IGB.Web.ViewModels.Admin.CurriculumListViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     ViewData["Title"] = "Curricula";
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
 
 <div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Curricula</li>
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="#">Courses</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Curriculums</li>
         </ol>
     </nav>
-    <h1 class="breadcrumb-title">Curricula</h1>
+    
+    <!-- Title, Search, and Action Buttons in one row -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
+        <h1 class="breadcrumb-title mb-0">Curriculums</h1>
+        
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <!-- Search Form -->
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <div style="width: 250px;">
+                    <input class="form-control form-control-sm" name="q" value="@Model.Query" placeholder="Search by name..." />
+                </div>
+                <button class="btn btn-primary btn-sm" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "Curricula")">
+                    <i class="fas fa-times"></i>
+                </a>
+            </form>
+            
+            <!-- Action Buttons -->
+            <a asp-action="Create" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-plus me-2"></i>Add Curriculum
+            </a>
+        </div>
+    </div>
 </div>
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-end mb-3">
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Add Curriculum
-        </a>
-    </div>
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
 
     <div class="card">
         <div class="card-body">
@@ -32,25 +63,40 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var c in Model)
+                    @foreach (var c in Model.Items)
                     {
+                        var statusBadge = c.IsActive ? "<span class='badge bg-success'>Active</span>" : "<span class='badge bg-secondary'>Inactive</span>";
+                        var gradesUrl = Url.Action("Index", "Grades", new { curriculumId = c.Id }) ?? "#";
+                        var editUrl = Url.Action("Edit", "Curricula", new { id = c.Id }) ?? "#";
+                        var delUrl = Url.Action("Delete", "Curricula", new { id = c.Id }) ?? "#";
+
                         <tr>
                             <td>@c.Name</td>
-                            <td>
-                                <span class="badge @(c.IsActive ? "bg-success" : "bg-secondary")">
-                                    @(c.IsActive ? "Active" : "Inactive")
-                                </span>
-                            </td>
+                            <td>@Html.Raw(statusBadge)</td>
                             <td class="text-end">
-                                <a asp-controller="Grades" asp-action="Index" asp-route-curriculumId="@c.Id" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-sitemap me-1"></i>Grades
-                                </a>
+                                <a class="btn btn-sm btn-outline-primary" href="@gradesUrl"><i class="fas fa-sitemap me-1"></i>Grades</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="@editUrl"><i class="fas fa-edit me-1"></i>Edit</a>
+                                <form method="post" action="@delUrl" class="d-inline" onsubmit="return confirm('Delete curriculum? Use cascade if it has grades/courses.');">
+                                    <input type="hidden" name="cascade" value="false" />
+                                    <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash me-1"></i>Delete</button>
+                                </form>
+                                <form method="post" action="@delUrl" class="d-inline" onsubmit="return confirm('Cascade delete curriculum + grades + courses + topics?');">
+                                    <input type="hidden" name="cascade" value="true" />
+                                    <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-bomb me-1"></i>Delete (cascade)</button>
+                                </form>
                             </td>
                         </tr>
                     }
                     </tbody>
                 </table>
             </div>
+
+            @if (Model.Pagination != null)
+            {
+                <partial name="Components/_Pagination" model="Model.Pagination" />
+            }
         </div>
     </div>
 </div>

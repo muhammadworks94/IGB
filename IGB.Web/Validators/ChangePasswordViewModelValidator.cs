@@ -1,5 +1,6 @@
 using FluentValidation;
 using IGB.Web.ViewModels;
+using IGB.Shared.Security;
 
 namespace IGB.Web.Validators;
 
@@ -12,7 +13,8 @@ public class ChangePasswordViewModelValidator : AbstractValidator<ChangePassword
 
         RuleFor(x => x.NewPassword)
             .NotEmpty().WithMessage("New password is required")
-            .MinimumLength(8).WithMessage("New password must be at least 8 characters");
+            .Must(p => PasswordPolicy.IsValid(p))
+            .WithMessage("Password does not meet requirements (min 8, upper, lower, number, special).");
 
         RuleFor(x => x.ConfirmNewPassword)
             .Equal(x => x.NewPassword)

@@ -1,0 +1,124 @@
+@model IGB.Web.ViewModels.Feedback.AdminAllFeedbackViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "All Feedback";
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "All Feedback",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Feedback"),
+        new("All Feedback")
+    }
+))
+
+<div class="container-fluid">
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" name="q" value="@Model.Query" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Course Id</label>
+                    <input class="form-control" name="courseId" type="number" value="@(Model.CourseId?.ToString() ?? "")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Rating</label>
+                    <input class="form-control" name="rating" type="number" min="1" max="5" value="@(Model.Rating?.ToString() ?? "")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Flagged</label>
+                    <select class="form-select" name="flagged">
+                        <option value="">Any</option>
+                        <option value="true" selected="@(Model.Flagged == true)">Flagged</option>
+                        <option value="false" selected="@(Model.Flagged == false)">Not flagged</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" type="submit">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="mb-3">Feedback</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Kind</th>
+                        <th>Date</th>
+                        <th>Rating</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Course</th>
+                        <th>Flagged</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model.Items)
+                    {
+                        <tr>
+                            <td class="text-muted">@r.Kind</td>
+                            <td class="text-muted small">@r.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                            <td class="fw-semibold">@r.Rating</td>
+                            <td>@r.FromName</td>
+                            <td>@r.ToName</td>
+                            <td class="text-muted">@r.CourseName</td>
+                            <td>
+                                @if (r.IsFlagged)
+                                {
+                                    <span class="badge bg-danger">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">No</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!r.IsFlagged)
+                                {
+                                    if (r.Kind == "Student→Tutor")
+                                    {
+                                        <form method="post" action="@Url.Action("FlagTutorFeedback","Feedback")" class="d-inline">
+                                            <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                                            <input type="hidden" name="id" value="@r.FeedbackId" />
+                                            <input type="hidden" name="reason" value="Flagged by admin" />
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Flag</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" action="@Url.Action("FlagStudentFeedback","Feedback")" class="d-inline">
+                                            <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                                            <input type="hidden" name="id" value="@r.FeedbackId" />
+                                            <input type="hidden" name="reason" value="Flagged by admin" />
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Flag</button>
+                                        </form>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <partial name="Components/_Pagination" model="Model.Pagination" />
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,73 @@
+@model IGB.Web.ViewModels.Feedback.TutorFeedbackDetailsViewModel
+@{
+    ViewData["Title"] = "Tutor Rating Details";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Tutor Rating Details",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Portal")),
+        new("Users", Url.Action("Index", "Users")),
+        new("Tutor Profile", $"/People/Tutor/{Model.TutorUserId}"),
+        new("Rating Details")
+    }
+))
+
+<div class="container-fluid">
+    <div class="row g-3">
+        <div class="col-12 col-xl-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-2">Summary</h6>
+                    <div class="small">
+                        <div><strong>Tutor:</strong> <a href="/People/Tutor/@Model.TutorUserId">@Model.TutorName</a></div>
+                        <div><strong>Student:</strong> @Model.StudentDisplayName</div>
+                        <div><strong>Course:</strong> @Model.CourseName</div>
+                        <div><strong>Date:</strong> @DateTime.SpecifyKind(Model.CreatedAtUtc, DateTimeKind.Utc).ToLocalTime().ToString("dd MMM yyyy")</div>
+                        <div><strong>Lesson:</strong> <a href="/LessonBookings/Details?id=@Model.LessonId">#@Model.LessonId</a></div>
+                    </div>
+                    <hr />
+                    <div class="d-flex align-items-end gap-2">
+                        <div class="display-6 fw-bold mb-0">@Model.Rating</div>
+                        <div class="text-muted">/ 5</div>
+                    </div>
+                    <div class="text-muted small">Overall rating</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-8">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-3">Rating Breakdown</h6>
+                    <div class="row g-2 small">
+                        <div class="col-12 col-md-6"><strong>Subject Knowledge:</strong> @Model.SubjectKnowledge / 5</div>
+                        <div class="col-12 col-md-6"><strong>Communication:</strong> @Model.Communication / 5</div>
+                        <div class="col-12 col-md-6"><strong>Punctuality:</strong> @Model.Punctuality / 5</div>
+                        <div class="col-12 col-md-6"><strong>Teaching Method:</strong> @Model.TeachingMethod / 5</div>
+                        <div class="col-12 col-md-6"><strong>Friendliness:</strong> @Model.Friendliness / 5</div>
+                    </div>
+
+                    <hr class="my-3" />
+                    <h6 class="mb-2">Comments</h6>
+                    @if (string.IsNullOrWhiteSpace(Model.Comments))
+                    {
+                        <div class="text-muted">No comments provided.</div>
+                    }
+                    else
+                    {
+                        <div class="small">@Model.Comments</div>
+                    }
+
+                    <div class="mt-3 d-flex gap-2 flex-wrap">
+                        <a class="btn btn-outline-secondary" href="/People/Tutor/@Model.TutorUserId">Back to Tutor</a>
+                        <a class="btn btn-outline-primary" href="/LessonBookings/Details?id=@Model.LessonId">Open Lesson</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

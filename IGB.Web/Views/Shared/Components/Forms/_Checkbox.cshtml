@@ -1,0 +1,29 @@
+@model IGB.Web.ViewModels.Components.CheckboxFieldViewModel
+
+@{
+    var id = $"fld_{Model.Name}".Replace(".", "_");
+    var describedById = !string.IsNullOrWhiteSpace(Model.HelpText) ? $"{id}_help" : null;
+    var invalid = !string.IsNullOrWhiteSpace(Model.ErrorMessage);
+}
+
+<div class="mb-3 form-check @(Model.CssClass ?? "")">
+    <input id="@id"
+           name="@Model.Name"
+           type="checkbox"
+           class="form-check-input @(invalid ? "is-invalid" : "")"
+           checked="@(Model.Checked)"
+           aria-invalid="@(invalid ? "true" : "false")"
+           aria-describedby="@describedById"
+           @(Model.Disabled ? "disabled" : null) />
+    <label class="form-check-label" for="@id">@Model.Label</label>
+    @if (!string.IsNullOrWhiteSpace(Model.HelpText))
+    {
+        <div id="@describedById" class="form-text">@Model.HelpText</div>
+    }
+    @if (invalid)
+    {
+        <div class="invalid-feedback d-block">@Model.ErrorMessage</div>
+    }
+</div>
+
+

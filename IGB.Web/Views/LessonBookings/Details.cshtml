@@ -1,0 +1,101 @@
+@{
+    var lesson = (IGB.Domain.Entities.LessonBooking)ViewBag.Lesson;
+    var logs = ViewBag.Logs as IEnumerable<IGB.Domain.Entities.LessonChangeLog> ?? Array.Empty<IGB.Domain.Entities.LessonChangeLog>();
+    ViewData["Title"] = $"Lesson #{lesson.Id}";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: $"Lesson #{lesson.Id}",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Schedules", Url.Action("Overview", "Schedule")),
+        new("Lesson Details")
+    }
+))
+
+<div class="container-fluid">
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Details</h5>
+                    <div class="small">
+                        <div><strong>Course:</strong> @lesson.Course?.Name</div>
+                        <div><strong>Student:</strong> @lesson.StudentUser?.FullName (@lesson.StudentUser?.Email)</div>
+                        <div><strong>Tutor:</strong> @lesson.TutorUser?.FullName (@lesson.TutorUser?.Email)</div>
+                        <div><strong>Status:</strong> @lesson.Status</div>
+                        <div><strong>Scheduled:</strong> @(lesson.ScheduledStart?.ToString("yyyy-MM-dd HH:mm") ?? "—") - @(lesson.ScheduledEnd?.ToString("HH:mm") ?? "—") (UTC)</div>
+                        <hr/>
+                        <div><strong>Zoom Meeting ID:</strong> @lesson.ZoomMeetingId</div>
+                        <div><strong>Zoom Password:</strong> @lesson.ZoomPassword</div>
+                        <div><strong>Zoom Join URL:</strong>
+                            @if (!string.IsNullOrWhiteSpace(lesson.ZoomJoinUrl))
+                            {
+                                <a target="_blank" href="@lesson.ZoomJoinUrl">@lesson.ZoomJoinUrl</a>
+                            }
+                            else { <span class="text-muted">—</span> }
+                        </div>
+                        <hr/>
+                        <div><strong>Session start:</strong> @(lesson.SessionStartedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—") (UTC)</div>
+                        <div><strong>Session end:</strong> @(lesson.SessionEndedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—") (UTC)</div>
+                        <div><strong>Student joined:</strong> @(lesson.StudentJoinedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—") (UTC)</div>
+                        <div><strong>Tutor joined:</strong> @(lesson.TutorJoinedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—") (UTC)</div>
+                        <div><strong>Attendance:</strong> Student=@(lesson.StudentAttended ? "Yes" : "No"), Tutor=@(lesson.TutorAttended ? "Yes" : "No")</div>
+                        @if (!string.IsNullOrWhiteSpace(lesson.AttendanceNote))
+                        {
+                            <div><strong>Attendance note:</strong> @lesson.AttendanceNote</div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="mb-3">Quick actions</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-outline-warning" href="@Url.Action("Schedule","LessonBookings", new { id = lesson.Id })">Reschedule / Assign tutor</a>
+                        <form method="post" asp-action="CancelByStaff" class="d-inline" onsubmit="return confirm('Cancel this lesson?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@lesson.Id" />
+                            <input type="hidden" name="reason" value="Cancelled by staff" />
+                            <button type="submit" class="btn btn-outline-danger">Cancel</button>
+                        </form>
+                        <a class="btn btn-secondary" href="@Url.Action("Overview","Schedule")">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Change log</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>Action</th>
+                                <th>Note</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var x in logs)
+                            {
+                                <tr>
+                                    <td class="text-muted">@x.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@x.Action</td>
+                                    <td class="text-muted">@x.Note</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

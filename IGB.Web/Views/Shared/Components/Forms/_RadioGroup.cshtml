@@ -1,0 +1,43 @@
+@model IGB.Web.ViewModels.Components.RadioGroupViewModel
+
+@{
+    var groupId = $"fld_{Model.Name}".Replace(".", "_");
+    var describedById = !string.IsNullOrWhiteSpace(Model.HelpText) ? $"{groupId}_help" : null;
+    var invalid = !string.IsNullOrWhiteSpace(Model.ErrorMessage);
+}
+
+<fieldset class="mb-3 @(Model.CssClass ?? "")" aria-describedby="@describedById">
+    <legend class="col-form-label pt-0">@Model.Label @if (Model.Required) { <span class="text-danger">*</span> }</legend>
+
+    @foreach (var opt in Model.Options)
+    {
+        var id = $"{groupId}_{opt.Value}".Replace(".", "_");
+        <div class="form-check">
+            <input id="@id"
+                   name="@Model.Name"
+                   type="radio"
+                   class="form-check-input @(invalid ? "is-invalid" : "")"
+                   value="@opt.Value"
+                   checked="@(opt.Value == Model.Value)"
+                   @(Model.Disabled || opt.Disabled ? "disabled" : null) />
+            <label class="form-check-label" for="@id">
+                <span>@opt.Label</span>
+                @if (!string.IsNullOrWhiteSpace(opt.Description))
+                {
+                    <span class="d-block text-caption">@opt.Description</span>
+                }
+            </label>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.HelpText))
+    {
+        <div id="@describedById" class="form-text">@Model.HelpText</div>
+    }
+    @if (invalid)
+    {
+        <div class="invalid-feedback d-block">@Model.ErrorMessage</div>
+    }
+</fieldset>
+
+

@@ -29,18 +29,6 @@
                 </a>
             </li>
 
-            @* SuperAdmin only *@
-            @if (isAuthenticated && isSuperAdmin)
-            {
-                <!-- Users -->
-                <li class="nav-item">
-                    <a asp-controller="Users" asp-action="Index" class="nav-link">
-                        <i class="link-icon fas fa-users"></i>
-                        <span class="link-title">Users</span>
-                    </a>
-                </li>
-            }
-
             @* Admin + SuperAdmin *@
             @if (isAuthenticated && isAdmin)
             {
@@ -56,12 +44,75 @@
             @* Admin + SuperAdmin *@
             @if (isAuthenticated && isAdmin)
             {
-                <!-- Curricula -->
+                <!-- Teachers -->
                 <li class="nav-item">
-                    <a asp-controller="Curricula" asp-action="Index" class="nav-link">
-                        <i class="link-icon fas fa-layer-group"></i>
-                        <span class="link-title">Curricula</span>
+                    <a class="nav-link" data-bs-toggle="collapse" href="#teachersMenu" role="button" aria-expanded="false" aria-controls="teachersMenu">
+                        <i class="link-icon fas fa-chalkboard-teacher"></i>
+                        <span class="link-title">Teachers</span>
+                        <i class="link-arrow fas fa-chevron-down"></i>
                     </a>
+                    <div class="collapse" id="teachersMenu">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item submenu-item">
+                                <a class="nav-link" asp-controller="AdminUsers" asp-action="Tutors">Teachers</a>
+                            </li>
+                            <li class="nav-item submenu-item">
+                                <a class="nav-link" asp-controller="Feedback" asp-action="TeacherFeedback">Teacher Feedback</a>
+                            </li>
+                            <li class="nav-item submenu-item">
+                                <a class="nav-link" asp-controller="Reports" asp-action="Progress">Teacher Progress</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Students -->
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#studentsMenu" role="button" aria-expanded="false" aria-controls="studentsMenu">
+                        <i class="link-icon fas fa-user-graduate"></i>
+                        <span class="link-title">Students</span>
+                        <i class="link-arrow fas fa-chevron-down"></i>
+                    </a>
+                    <div class="collapse" id="studentsMenu">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item submenu-item">
+                                <a class="nav-link" asp-controller="AdminUsers" asp-action="Students">Students</a>
+                            </li>
+                            <li class="nav-item submenu-item">
+                                <a class="nav-link" asp-controller="Feedback" asp-action="StudentFeedback">Student Feedback</a>
+                            </li>
+                            <li class="nav-item submenu-item">
+                                <a class="nav-link" asp-controller="Reports" asp-action="Progress">Student Progress</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Guardians -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/People/Guardians">
+                        <i class="link-icon fas fa-user-friends"></i>
+                        <span class="link-title">Guardians</span>
+                    </a>
+                </li>
+
+                <!-- Academics -->
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#academicsMenu" role="button" aria-expanded="false" aria-controls="academicsMenu">
+                        <i class="link-icon fas fa-graduation-cap"></i>
+                        <span class="link-title">Academics</span>
+                        <i class="link-arrow fas fa-chevron-down"></i>
+                    </a>
+                    <div class="collapse" id="academicsMenu">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item submenu-item">
+                                <a class="nav-link" asp-controller="Curricula" asp-action="Index">Curricula</a>
+                            </li>
+                            <li class="nav-item submenu-item">
+                                <a class="nav-link" asp-controller="Courses" asp-action="All">Courses</a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
             }
 
@@ -85,6 +136,29 @@
                     <a asp-controller="LessonBookings" asp-action="Pending" class="nav-link">
                         <i class="link-icon fas fa-calendar-alt"></i>
                         <span class="link-title">Lesson Requests</span>
+                    </a>
+                </li>
+            }
+
+            @* Tutor shortcuts *@
+            @if (isAuthenticated && isTutor)
+            {
+                <li class="nav-item">
+                    <a asp-controller="Progress" asp-action="Students" class="nav-link">
+                        <i class="link-icon fas fa-user-graduate"></i>
+                        <span class="link-title">Students</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="TestReports" asp-action="Index" class="nav-link">
+                        <i class="link-icon fas fa-clipboard-list"></i>
+                        <span class="link-title">Test Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Schedule" asp-action="Tutor" class="nav-link">
+                        <i class="link-icon fas fa-calendar"></i>
+                        <span class="link-title">My Schedule</span>
                     </a>
                 </li>
             }
@@ -121,6 +195,66 @@
                     <a asp-controller="LessonBookings" asp-action="My" class="nav-link">
                         <i class="link-icon fas fa-user-clock"></i>
                         <span class="link-title">My Lessons</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Schedule" asp-action="My" class="nav-link">
+                        <i class="link-icon fas fa-calendar"></i>
+                        <span class="link-title">My Schedule</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="TestReports" asp-action="My" class="nav-link">
+                        <i class="link-icon fas fa-clipboard-list"></i>
+                        <span class="link-title">My Tests</span>
+                    </a>
+                </li>
+            }
+
+            @* Admin shortcuts *@
+            @if (isAuthenticated && isAdmin)
+            {
+                <li class="nav-item">
+                    <a asp-controller="Schedule" asp-action="Overview" class="nav-link">
+                        <i class="link-icon fas fa-calendar-check"></i>
+                        <span class="link-title">Schedules</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Reports" asp-action="MissingClasses" class="nav-link">
+                        <i class="link-icon fas fa-user-times"></i>
+                        <span class="link-title">Missing Classes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Reports" asp-action="AttendanceLogs" class="nav-link">
+                        <i class="link-icon fas fa-clipboard-check"></i>
+                        <span class="link-title">Attendance Logs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Reports" asp-action="Progress" class="nav-link">
+                        <i class="link-icon fas fa-chart-line"></i>
+                        <span class="link-title">Progress Tracker</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Reports" asp-action="TestAnalytics" class="nav-link">
+                        <i class="link-icon fas fa-chart-bar"></i>
+                        <span class="link-title">Test Analytics</span>
+                    </a>
+                </li>
+            }
+
+            @* Guardian shortcuts *@
+            @if (isAuthenticated && User.IsInRole("Guardian"))
+            {
+                <li class="nav-item">
+                    <a asp-controller="TestReports" asp-action="Ward" class="nav-link">
+                        <i class="link-icon fas fa-clipboard-list"></i>
+                        <span class="link-title">Ward Tests</span>
                     </a>
                 </li>
             }

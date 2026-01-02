@@ -1,0 +1,103 @@
+@{
+    var path = (Context?.Request?.Path.Value ?? "/").ToLowerInvariant();
+    bool active(string startsWith) => path == startsWith || path.StartsWith(startsWith + "/");
+}
+
+<header class="igb-public-nav-wrap">
+    <nav class="navbar navbar-expand-lg igb-public-nav fixed-top" aria-label="Primary">
+        <div class="container-xl">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/" aria-label="IGB Home">
+                <img class="igb-logo" src="/img/logo.svg" height="40" width="40" alt="IGB platform logo" />
+                <span class="igb-brand-text">IGB</span>
+            </a>
+
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#publicNavbar"
+                    aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="publicNavbar">
+                <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
+                    <li class="nav-item">
+                        <a class="nav-link @(active("") || active("/") ? "active" : "")" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(active("/about-us") ? "active" : "")" href="/about-us">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(active("/services") ? "active" : "")" href="/services">Services</a>
+                    </li>
+
+                    <li class="nav-item dropdown igb-mega">
+                        <a class="nav-link dropdown-toggle @(active("/programs") ? "active" : "")"
+                           href="#" id="programsDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Programs
+                        </a>
+                        <div class="dropdown-menu igb-mega-menu p-0" aria-labelledby="programsDropdown">
+                            <div class="container-xl py-3">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <a class="igb-mega-card" href="/programs/eep">
+                                            <div class="igb-mega-icon"><i class="fas fa-seedling"></i></div>
+                                            <div class="igb-mega-body">
+                                                <div class="igb-mega-title">EEP</div>
+                                                <div class="igb-mega-desc">Early Education Program with strong foundations and confidence building.</div>
+                                                <div class="igb-mega-link">Learn More <i class="fas fa-arrow-right ms-1"></i></div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <a class="igb-mega-card" href="/programs/ieh">
+                                            <div class="igb-mega-icon"><i class="fas fa-house-user"></i></div>
+                                            <div class="igb-mega-body">
+                                                <div class="igb-mega-title">IEH</div>
+                                                <div class="igb-mega-desc">Interactive Education at Home with flexible schedules and guided practice.</div>
+                                                <div class="igb-mega-link">Learn More <i class="fas fa-arrow-right ms-1"></i></div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <a class="igb-mega-card" href="/programs/sew">
+                                            <div class="igb-mega-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                                            <div class="igb-mega-body">
+                                                <div class="igb-mega-title">SEW</div>
+                                                <div class="igb-mega-desc">Structured Education Workshops designed for focus, engagement, and progress.</div>
+                                                <div class="igb-mega-link">Learn More <i class="fas fa-arrow-right ms-1"></i></div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <a class="igb-mega-card" href="/programs/ic">
+                                            <div class="igb-mega-icon"><i class="fas fa-bolt"></i></div>
+                                            <div class="igb-mega-body">
+                                                <div class="igb-mega-title">IC</div>
+                                                <div class="igb-mega-desc">Intensive Courses for exams, catch-up, and accelerated mastery.</div>
+                                                <div class="igb-mega-link">Learn More <i class="fas fa-arrow-right ms-1"></i></div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link @(active("/courses") ? "active" : "")" href="/courses">Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(active("/contact-us") ? "active" : "")" href="/contact-us">Contact Us</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex gap-2 align-items-center mt-3 mt-lg-0">
+                    <a class="btn btn-outline-primary igb-btn-ghost" href="/Account/Login">Login</a>
+                    <a class="btn btn-primary igb-btn-primary" href="/Account/Register">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+

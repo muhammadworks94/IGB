@@ -1,0 +1,68 @@
+@model IGB.Web.ViewModels.Tutor.TutorEarningsViewModel
+@{
+    ViewData["Title"] = "My Earnings";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Earnings",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Earnings")
+    },
+    Subtitle: $"{Model.Year}-{Model.Month:00} • Total: {Model.MonthTotal} credits"
+))
+
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label">Year</label>
+                    <input class="form-control" name="year" type="number" value="@Model.Year" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Month</label>
+                    <input class="form-control" name="month" type="number" min="1" max="12" value="@Model.Month" />
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary" type="submit">Apply</button>
+                    <a class="btn btn-outline-secondary" href="@Url.Action("ExportCsv","Earnings", new { year = Model.Year, month = Model.Month })">Export CSV</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="mb-3">Earnings History</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Credits earned</th>
+                        <th>Lesson</th>
+                        <th>Notes</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model.Items)
+                    {
+                        <tr>
+                            <td class="text-muted small">@r.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td class="fw-semibold">@r.CreditsEarned</td>
+                            <td class="text-muted">@(r.LessonBookingId?.ToString() ?? "-")</td>
+                            <td class="text-muted">@r.Notes</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <partial name="Components/_Pagination" model="Model.Pagination" />
+        </div>
+    </div>
+</div>
+
+

@@ -28,6 +28,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
+    <!-- IGB Theme (design tokens + components + utilities) -->
+    <link rel="stylesheet" href="css/theme/theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="css/schedule/fullcalendar-tweaks.css" asp-append-version="true" />
+
     <link rel="stylesheet" href="css/app.css?v=@DateTime.Now.Ticks" />
     <link rel="stylesheet" href="css/css/custom/admin-dashboard.css" asp-append-version="true" />
     <link rel="icon" type="image/png" href="img/icon.png" />
@@ -68,9 +72,7 @@
             </div>
 
             <!-- Footer -->
-            <footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between px-4 py-3 border-top small">
-                <p class="text-muted mb-1 mb-md-0">Copyright © @DateTime.Now.Year IGB System. All rights reserved.</p>
-            </footer>
+            <partial name="_Footer" />
         </div>
     </div>
 
@@ -154,6 +156,11 @@
     </script>
     
     <script src="nobleui/js/template.js"></script>
+    <script src="js/layout.js" asp-append-version="true"></script>
+    <script src="js/components/toast.js" asp-append-version="true"></script>
+    <script src="js/components/file-upload-preview.js" asp-append-version="true"></script>
+    <script src="js/auth/auth-service.js" asp-append-version="true"></script>
+    <script src="js/auth/permissions.js" asp-append-version="true"></script>
     <script src="js/site.min.js" asp-append-version="true"></script>
     <script src="js/nav-notifications.js" asp-append-version="true"></script>
 
@@ -168,6 +175,13 @@
                 .withUrl("/hubs/notifications")
                 .withAutomaticReconnect()
                 .build();
+
+            // Expose a safe global hook so pages can subscribe to custom events (e.g., activity:new).
+            window.igbRealtime = window.igbRealtime || {};
+            window.igbRealtime.connection = connection;
+            window.igbRealtime.on = function (eventName, handler) {
+                try { connection.on(eventName, handler); } catch { /* ignore */ }
+            };
 
             function showToast(title, message) {
                 const container = document.getElementById('toastContainer');
@@ -194,6 +208,9 @@
             connection.on("Notify", (payload) => {
                 showToast(payload?.title, payload?.message);
                 try { window.igbNavNotifications?.onNotify?.(payload); } catch { /* ignore */ }
+                try { window.igbAdminDashboard?.onNotify?.(payload); } catch { /* ignore */ }
+                try { window.igbStudentDashboard?.onNotify?.(payload); } catch { /* ignore */ }
+                try { window.igbTutorDashboard?.onNotify?.(payload); } catch { /* ignore */ }
             });
 
             connection.start().catch(() => { /* ignore */ });

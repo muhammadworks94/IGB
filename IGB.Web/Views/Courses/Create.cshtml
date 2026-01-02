@@ -4,15 +4,15 @@
     var gradeId = (long)ViewBag.GradeId;
 }
 
-<div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item"><a asp-action="Index" asp-route-gradeId="@gradeId">Courses</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Create</li>
-        </ol>
-    </nav>
-    <h1 class="breadcrumb-title">Create Course</h1>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Create Course",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        // Use Courses/All to avoid collision with PublicController "/courses" route.
+        new("Courses", Url.Action("All", "Courses", new { gradeId })),
+        new("Create")
+    }
+))
 
 <div class="container-fluid">
     <div class="card">
@@ -38,7 +38,7 @@
                     <label asp-for="IsActive" class="form-check-label">Active</label>
                 </div>
                 <div class="d-flex justify-content-end gap-2">
-                    <a asp-action="Index" asp-route-gradeId="@gradeId" class="btn btn-secondary">Cancel</a>
+                    <a asp-action="All" asp-route-gradeId="@gradeId" class="btn btn-secondary">Cancel</a>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save</button>
                 </div>
             </form>

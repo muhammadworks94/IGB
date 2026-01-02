@@ -1,0 +1,45 @@
+@model IGB.Web.ViewModels.Components.CardViewModel
+
+@{
+    const string dangerVariant = "danger";
+}
+
+<div class="card @(Model.CssClass ?? "")">
+    @if (!string.IsNullOrWhiteSpace(Model.Title) || !string.IsNullOrWhiteSpace(Model.Subtitle))
+    {
+        <div class="card-header bg-transparent border-bottom-0 pb-0">
+            @if (!string.IsNullOrWhiteSpace(Model.Title))
+            {
+                <h5 class="card-title mb-1">@Model.Title</h5>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+            {
+                <p class="text-caption mb-0">@Model.Subtitle</p>
+            }
+        </div>
+    }
+
+    <div class="card-body">
+        @if (Model.IsLoading)
+        {
+            <partial name="Components/_Loading" model="new LoadingViewModel(FullWidth: true)" />
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <partial name="Components/_Alert" model="@(new AlertViewModel(Model.ErrorMessage!, Variant: dangerVariant))" />
+        }
+        else
+        {
+            @Model.Body?.Invoke(Html)
+        }
+    </div>
+
+    @if (Model.Footer != null)
+    {
+        <div class="card-footer bg-transparent">
+            @Model.Footer(Html)
+        </div>
+    }
+</div>
+
+

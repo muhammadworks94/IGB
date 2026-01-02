@@ -1,0 +1,175 @@
+@model IGB.Domain.Entities.TestReport
+@{
+    ViewData["Title"] = Model.TestName;
+    var topicTitles = Model.Topics.Where(t => !t.IsDeleted && t.CourseTopic != null).Select(t => t.CourseTopic!.Title).ToList();
+    var labels = ViewBag.TrendLabels as List<string> ?? new();
+    var values = ViewBag.TrendValues as List<double> ?? new();
+    var isPdf = (Model.TestFileContentType ?? "").Equals("application/pdf", StringComparison.OrdinalIgnoreCase);
+    var isImage = (Model.TestFileContentType ?? "").StartsWith("image/", StringComparison.OrdinalIgnoreCase);
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: Model.TestName,
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Tests", Url.Action("My", "TestReports")),
+        new(Model.TestName)
+    }
+))
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a class="btn btn-outline-secondary" href="@Url.Action("My","TestReports")">Back</a>
+        <a class="btn btn-outline-secondary" target="_blank" href="@Url.Action("MyDetailsPdf","TestReports", new { id = Model.Id })">Download Report (PDF)</a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small">Course</div>
+                            <div class="fw-semibold">@Model.Course?.Name</div>
+                            <div class="text-muted small mt-1">Tutor: @Model.TutorUser?.FullName</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-muted small">Test Date</div>
+                            <div class="fw-semibold">@Model.TestDate.ToString("yyyy-MM-dd")</div>
+                            <div class="text-muted small">(@((DateOnly.FromDateTime(DateTime.UtcNow.Date).DayNumber - Model.TestDate.DayNumber)) days ago)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="mb-3">Marks Summary</h5>
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4 text-center">
+                            <span class="badge bg-success" style="font-size:1.3rem;">@Model.Grade</span>
+                            <div class="text-muted mt-2">@Model.Percentage.ToString("F2")%</div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="fs-4 fw-semibold">@Model.ObtainedMarks / @Model.TotalMarks</div>
+                            <div class="progress mt-2" style="height:12px;">
+                                <div class="progress-bar bg-success" style="width:@Model.Percentage%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="mb-3">Performance Breakdown</h5>
+                    <div class="mb-3">
+                        <div class="fw-semibold">Topics Covered</div>
+                        @if (topicTitles.Count == 0)
+                        {
+                            <div class="text-muted">—</div>
+                        }
+                        else
+                        {
+                            <ul class="mb-0">
+                                @foreach (var t in topicTitles)
+                                {
+                                    <li>@t</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                    <div class="mb-3">
+                        <div class="fw-semibold text-success">Strengths</div>
+                        <div>@(string.IsNullOrWhiteSpace(Model.Strengths) ? "—" : Model.Strengths)</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="fw-semibold text-warning">Areas for Improvement</div>
+                        <div>@(string.IsNullOrWhiteSpace(Model.AreasForImprovement) ? "—" : Model.AreasForImprovement)</div>
+                    </div>
+                    <div class="mb-0">
+                        <div class="fw-semibold">Tutor Comments</div>
+                        <div>@(string.IsNullOrWhiteSpace(Model.TutorComments) ? "—" : Model.TutorComments)</div>
+                        <div class="text-muted small mt-1">@Model.TutorUser?.FullName • @Model.TestDate.ToString("yyyy-MM-dd")</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Your Progress in @Model.Course?.Name</h5>
+                    <div style="height:260px;">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                    @{
+                        var avg = values.Count == 0 ? 0 : values.Average();
+                        var best = values.Count == 0 ? 0 : values.Max();
+                        var latest = values.Count == 0 ? 0 : values.Last();
+                    }
+                    <div class="row g-2 mt-3">
+                        <div class="col-md-4"><div class="text-muted small">Average</div><div class="fw-semibold">@avg.ToString("F1")%</div></div>
+                        <div class="col-md-4"><div class="text-muted small">Best</div><div class="fw-semibold">@best.ToString("F1")%</div></div>
+                        <div class="col-md-4"><div class="text-muted small">Latest</div><div class="fw-semibold">@latest.ToString("F1")%</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Test Paper</h5>
+                    @if (string.IsNullOrWhiteSpace(Model.TestFileUrl))
+                    {
+                        <div class="text-muted">Test paper not uploaded.</div>
+                    }
+                    else
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="text-muted small">@Model.TestFileName</div>
+                            <a class="btn btn-sm btn-outline-primary" href="@Model.TestFileUrl" target="_blank">Download</a>
+                        </div>
+                        @if (isPdf)
+                        {
+                            <iframe src="@Model.TestFileUrl" style="width:100%;height:520px;border:1px solid #e5e7eb;"></iframe>
+                        }
+                        else if (isImage)
+                        {
+                            <img src="@Model.TestFileUrl" alt="Test paper" class="img-fluid rounded border" />
+                        }
+                        else
+                        {
+                            <div class="text-muted">Preview not available for this file type.</div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/nobleui/vendors/chartjs/Chart.min.js"></script>
+    <script>
+      (function(){
+        if (typeof Chart === 'undefined') return;
+        const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(labels));
+        const values = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(values));
+        const ctx = document.getElementById('trendChart');
+        if (!ctx) return;
+        new Chart(ctx, {
+          type: 'line',
+          data: { labels, datasets: [{ label: 'Percentage', data: values, borderColor: '#0d6efd', tension: 0.25, fill: false }] },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, max: 100 } },
+            plugins: { legend: { display: false } }
+          }
+        });
+      })();
+    </script>
+}
+
+

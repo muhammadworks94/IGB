@@ -1,0 +1,26 @@
+/* Status indicator used by Components/_StatusIndicator.cshtml */
+.igb-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--igb-color-border);
+  background: var(--igb-color-surface);
+  font-size: var(--igb-text-sm);
+}
+
+.igb-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--igb-color-info);
+}
+
+.igb-status-success .igb-status-dot { background: var(--igb-color-success); }
+.igb-status-warning .igb-status-dot { background: var(--igb-color-warning); }
+.igb-status-danger .igb-status-dot { background: var(--igb-color-danger); }
+.igb-status-info .igb-status-dot { background: var(--igb-color-info); }
+.igb-status-secondary .igb-status-dot { background: var(--igb-color-secondary); }
+
+

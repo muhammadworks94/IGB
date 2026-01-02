@@ -1,0 +1,116 @@
+@model IGB.Web.ViewModels.Admin.CourseEditViewModel
+@{
+    ViewData["Title"] = Model.Id.HasValue ? "Edit Course" : "Create Course";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: Model.Id.HasValue ? "Edit Course" : "Create Course",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Courses"),
+        new("All Courses", Url.Action("All", "Courses")),
+        new(Model.Id.HasValue ? "Edit" : "Create")
+    }
+))
+
+<div class="container-fluid">
+    <form method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        @if (Model.Id.HasValue) { <input type="hidden" name="Id" value="@Model.Id" /> }
+
+        <div class="row g-3">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Course name</label>
+                            <input class="form-control" asp-for="Name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" asp-for="Description" id="courseDescription" rows="6"></textarea>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Curriculum</label>
+                                <select class="form-select" asp-for="CurriculumId" id="courseCurriculum">
+                                    @foreach (var c in Model.Curricula)
+                                    {
+                                        <option value="@c.Id">@c.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Grade</label>
+                                <select class="form-select" asp-for="GradeId" id="courseGrade">
+                                    @foreach (var g in Model.Grades)
+                                    {
+                                        <option value="@g.Id">@g.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Credits required</label>
+                                <input class="form-control" asp-for="CreditCost" type="number" min="1" />
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="IsActive" />
+                                    <label class="form-check-label" asp-for="IsActive">Active</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-2 fw-semibold">Course image</div>
+                        <img src="@(string.IsNullOrWhiteSpace(Model.ExistingImagePath) ? "/img/avatar.png" : Model.ExistingImagePath)"
+                             alt="Course image"
+                             style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;border:1px solid var(--igb-color-border);" />
+                        <div class="mt-2">
+                            <input class="form-control" asp-for="Image" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+                            <span asp-validation-for="Image" class="text-danger"></span>
+                            <div class="form-text">JPG/PNG ≤ 5MB.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex justify-content-end gap-2">
+            <a class="btn btn-secondary" href="@Url.Action("All","Courses")">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Summernote (already loaded globally)
+        try { $('#courseDescription').summernote({ height: 220 }); } catch {}
+
+        // Grade filter by curriculum
+        document.getElementById('courseCurriculum')?.addEventListener('change', async function () {
+            const cid = this.value;
+            const gradeSel = document.getElementById('courseGrade');
+            if (!gradeSel) return;
+            gradeSel.innerHTML = "";
+            if (!cid) return;
+            const res = await fetch('/api/registration/grades?curriculumId=' + encodeURIComponent(cid));
+            if (!res.ok) return;
+            const list = await res.json();
+            gradeSel.innerHTML = list.map(x => `<option value="${x.id}">${x.name}</option>`).join("");
+        });
+    </script>
+}
+
+

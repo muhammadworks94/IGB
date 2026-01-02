@@ -4,15 +4,14 @@
     var curriculumId = (long)ViewBag.CurriculumId;
 }
 
-<div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item"><a asp-action="Index" asp-route-curriculumId="@curriculumId">Grades</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Create</li>
-        </ol>
-    </nav>
-    <h1 class="breadcrumb-title">Create Grade</h1>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Create Grade",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Grades", Url.Action("Index", "Grades", new { curriculumId })),
+        new("Create")
+    }
+))
 
 <div class="container-fluid">
     <div class="card">

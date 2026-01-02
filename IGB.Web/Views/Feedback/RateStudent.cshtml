@@ -1,0 +1,99 @@
+@model IGB.Web.ViewModels.Feedback.RateStudentViewModel
+@{
+    ViewData["Title"] = "Student Feedback";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Feedback",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Students"),
+        new(Model.StudentName),
+        new("Feedback")
+    },
+    Subtitle: $"{Model.CourseName}"
+))
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="LessonId" />
+                <input type="hidden" asp-for="StudentUserId" />
+                <input type="hidden" asp-for="StudentName" />
+                <input type="hidden" asp-for="CourseName" />
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.Rating),
+                            Value: Model.Rating,
+                            Label: "Overall Rating"
+                        ))
+                        <span asp-validation-for="Rating" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.Participation),
+                            Value: Model.Participation,
+                            Label: "Participation"
+                        ))
+                        <span asp-validation-for="Participation" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.HomeworkCompletion),
+                            Value: Model.HomeworkCompletion,
+                            Label: "Homework Completion"
+                        ))
+                        <span asp-validation-for="HomeworkCompletion" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.Attentiveness),
+                            Value: Model.Attentiveness,
+                            Label: "Attentiveness"
+                        ))
+                        <span asp-validation-for="Attentiveness" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        @await Html.PartialAsync("_StarRating", new IGB.Web.ViewModels.Components.StarRatingViewModel(
+                            Name: nameof(Model.Improvement),
+                            Value: Model.Improvement,
+                            Label: "Improvement"
+                        ))
+                        <span asp-validation-for="Improvement" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Comments</label>
+                        <textarea class="form-control" asp-for="Comments" rows="4" placeholder="Notes for the student..."></textarea>
+                        <span asp-validation-for="Comments" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Upload test results (PDF/JPG/PNG)</label>
+                        <input class="form-control" asp-for="TestResultsFile" type="file" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Upload previous homework (PDF/JPG/PNG)</label>
+                        <input class="form-control" asp-for="HomeworkFile" type="file" />
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a class="btn btn-secondary" href="@Url.Action("MyEarnings","Earnings")">Back</a>
+                    <button class="btn btn-primary" type="submit">Submit Feedback</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

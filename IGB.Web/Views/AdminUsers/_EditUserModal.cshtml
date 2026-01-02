@@ -1,0 +1,253 @@
+@model IGB.Web.ViewModels.EditUserViewModel
+@{
+    var isTutor = string.Equals(Model.Role, "Tutor", StringComparison.OrdinalIgnoreCase);
+}
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold" id="editUserModalLabel">
+                    <i class="fas fa-user-edit me-2"></i>Edit @(isTutor ? "Tutor" : "Student")
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="@Url.Action("Edit", "AdminUsers", new { id = Model.Id })" enctype="multipart/form-data" id="editUserForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="Role" />
+                    <input type="hidden" name="returnTo" value="@(ViewBag.ReturnTo ?? (isTutor ? "Tutors" : "Students"))" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input class="form-control" asp-for="FirstName" required maxlength="100" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                            <div class="invalid-feedback">First name is required.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input class="form-control" asp-for="LastName" required maxlength="100" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                            <div class="invalid-feedback">Last name is required.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone (optional)</label>
+                            <input class="form-control" asp-for="PhoneNumber" type="tel" maxlength="20" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        @if (isTutor)
+                        {
+                            <div class="col-md-6">
+                                <label class="form-label">Time Zone (optional)</label>
+                                <select class="form-select" asp-for="TimeZoneId">
+                                    <option value="">-- Select Time Zone --</option>
+                                    <optgroup label="UTC">
+                                        <option value="UTC">UTC (Coordinated Universal Time)</option>
+                                    </optgroup>
+                                    <optgroup label="Americas">
+                                        <option value="America/New_York">Eastern Time (US & Canada)</option>
+                                        <option value="America/Chicago">Central Time (US & Canada)</option>
+                                        <option value="America/Denver">Mountain Time (US & Canada)</option>
+                                        <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
+                                        <option value="America/Toronto">Toronto</option>
+                                        <option value="America/Mexico_City">Mexico City</option>
+                                        <option value="America/Sao_Paulo">São Paulo</option>
+                                    </optgroup>
+                                    <optgroup label="Europe">
+                                        <option value="Europe/London">London</option>
+                                        <option value="Europe/Paris">Paris</option>
+                                        <option value="Europe/Berlin">Berlin</option>
+                                        <option value="Europe/Rome">Rome</option>
+                                        <option value="Europe/Madrid">Madrid</option>
+                                        <option value="Europe/Amsterdam">Amsterdam</option>
+                                        <option value="Europe/Athens">Athens</option>
+                                        <option value="Europe/Moscow">Moscow</option>
+                                    </optgroup>
+                                    <optgroup label="Asia">
+                                        <option value="Asia/Dubai">Dubai</option>
+                                        <option value="Asia/Karachi">Karachi</option>
+                                        <option value="Asia/Kolkata">Kolkata</option>
+                                        <option value="Asia/Dhaka">Dhaka</option>
+                                        <option value="Asia/Bangkok">Bangkok</option>
+                                        <option value="Asia/Singapore">Singapore</option>
+                                        <option value="Asia/Hong_Kong">Hong Kong</option>
+                                        <option value="Asia/Shanghai">Shanghai</option>
+                                        <option value="Asia/Tokyo">Tokyo</option>
+                                        <option value="Asia/Seoul">Seoul</option>
+                                    </optgroup>
+                                    <optgroup label="Australia & Pacific">
+                                        <option value="Australia/Sydney">Sydney</option>
+                                        <option value="Australia/Melbourne">Melbourne</option>
+                                        <option value="Australia/Perth">Perth</option>
+                                        <option value="Pacific/Auckland">Auckland</option>
+                                    </optgroup>
+                                    <optgroup label="Africa & Middle East">
+                                        <option value="Africa/Cairo">Cairo</option>
+                                        <option value="Africa/Johannesburg">Johannesburg</option>
+                                        <option value="Asia/Riyadh">Riyadh</option>
+                                        <option value="Asia/Tehran">Tehran</option>
+                                    </optgroup>
+                                </select>
+                                <div class="text-muted small mt-1">Leave empty for default timezone.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Profile Photo (optional)</label>
+                                @if (!string.IsNullOrWhiteSpace(Model.CurrentProfileImagePath))
+                                {
+                                    <div class="mb-2">
+                                        <img src="@Model.CurrentProfileImagePath" alt="Current profile" class="img-thumbnail" style="max-height: 80px;" />
+                                        <div class="text-muted small">Current photo</div>
+                                    </div>
+                                }
+                                <input class="form-control" asp-for="ProfileImage" type="file" accept=".jpg,.jpeg,.png" />
+                                <div class="text-muted small mt-1">JPG/PNG up to 5MB. Leave empty to keep current.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Assign Courses (optional)</label>
+                                <select class="form-select" name="CourseIds" multiple size="6" style="min-height: 150px;">
+                                    @foreach (var c in (IEnumerable<dynamic>)(ViewBag.CourseOptions ?? Array.Empty<dynamic>()))
+                                    {
+                                        var courseId = (long)c.Id;
+                                        var isSelected = Model.CourseIds != null && Model.CourseIds.Contains(courseId);
+                                        if (isSelected)
+                                        {
+                                            <option value="@courseId" selected>@c.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@courseId">@c.Name</option>
+                                        }
+                                    }
+                                </select>
+                                <div class="text-muted small mt-1">Hold Ctrl/Command to select multiple courses.</div>
+                            </div>
+                        }
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" asp-for="IsActive" type="checkbox" />
+                                <label class="form-check-label" asp-for="IsActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div asp-validation-summary="All" class="text-danger mt-3"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="editUserForm" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const form = document.getElementById('editUserForm');
+        const modal = document.getElementById('editUserModal');
+        if (!form || !modal) return;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const formData = new FormData(form);
+            const returnTo = form.querySelector('input[name="returnTo"]')?.value || '';
+            const userId = form.querySelector('input[name="Id"]')?.value || '';
+            
+            // Build the URL properly
+            let url = form.action;
+            if (!url || url === '') {
+                url = '@Url.Action("Edit", "AdminUsers")';
+            }
+            url = url + (url.includes('?') ? '&' : '?') + 'id=' + encodeURIComponent(userId);
+            if (returnTo) {
+                url += '&returnTo=' + encodeURIComponent(returnTo);
+            }
+
+            // Show loading state
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton ? submitButton.innerHTML : '';
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+            }
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    // If response is not JSON, try to parse as text
+                    return response.text().then(text => {
+                        console.error('Non-JSON response:', text.substring(0, 500));
+                        // Try to extract error message from HTML if possible
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(text, 'text/html');
+                        const errorMsg = doc.querySelector('.text-danger, .validation-summary-errors')?.textContent || 'Server returned an error';
+                        throw new Error(errorMsg);
+                    });
+                }
+            })
+            .then(data => {
+                if (data && data.success) {
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) {
+                        bsModal.hide();
+                    }
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        location.reload();
+                    }
+                } else {
+                    alert(data?.message || 'Error updating user. Please check the form and try again.');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalButtonText;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the user: ' + error.message);
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
+                }
+            });
+        });
+
+        modal.addEventListener('hidden.bs.modal', function() {
+            form.classList.remove('was-validated');
+            // Clean up any lingering backdrop
+            setTimeout(function() {
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(b => b.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            }, 100);
+        }, { once: true });
+    })();
+</script>
+

@@ -1,0 +1,161 @@
+@model IGB.Web.ViewModels.TestReports.TutorTestReportsIndexViewModel
+@{
+    ViewData["Title"] = "Test Reports";
+    var students = ViewBag.Students as List<IGB.Domain.Entities.User> ?? new();
+    var courses = ViewBag.Courses as List<IGB.Domain.Entities.Course> ?? new();
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Test Reports",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Test Reports")
+    }
+))
+
+<div class="container-fluid">
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Total Reports Created</div>
+                <div class="fs-3 fw-semibold">@Model.TotalReports</div>
+            </div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Average Score</div>
+                <div class="fs-3 fw-semibold">@Model.AvgPercentage.ToString("F2")%</div>
+            </div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card"><div class="card-body">
+                <div class="text-muted small">Recent Reports (last 7 days)</div>
+                <div class="fs-3 fw-semibold">@Model.RecentThisWeek</div>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Student</label>
+                    <select class="form-select" name="studentId">
+                        <option value="">All</option>
+                        @foreach (var s in students)
+                        {
+                            <option value="@s.Id" selected="@(Model.StudentId == s.Id)">@s.FullName</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Course</label>
+                    <select class="form-select" name="courseId">
+                        <option value="">All</option>
+                        @foreach (var c in courses)
+                        {
+                            <option value="@c.Id" selected="@(Model.CourseId == c.Id)">@c.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Grade</label>
+                    <select class="form-select" name="grade">
+                        <option value="">All</option>
+                        @foreach (var g in IGB.Web.ViewModels.TestReports.TestGradeCatalog.GradeOptions)
+                        {
+                            <option value="@g" selected="@(Model.Grade == g)">@g</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">From</label>
+                    <input class="form-control" name="from" type="date" value="@(Model.From?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">To</label>
+                    <input class="form-control" name="to" type="date" value="@(Model.To?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" name="q" value="@Model.Query" placeholder="Test name, student, course, id..." />
+                </div>
+                <div class="col-md-6 d-flex gap-2 justify-content-end">
+                    <a class="btn btn-outline-secondary" href="@Url.Action("ExportCsv","TestReports", new { studentId = Model.StudentId, courseId = Model.CourseId, grade = Model.Grade, from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd"), q = Model.Query })">Export CSV</a>
+                    <a class="btn btn-primary" href="@Url.Action("Create","TestReports")">
+                        <i class="fas fa-plus me-2"></i>Add Test Report
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Test</th>
+                        <th>Marks</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model.Rows)
+                    {
+                        <tr>
+                            <td class="text-muted">@r.TestDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    @{
+                                        var parts = (r.StudentName ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                        var initials = parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}" : (parts.Length == 1 && parts[0].Length > 0 ? parts[0][0].ToString() : "U");
+                                    }
+                                    <partial name="Components/_Avatar" model="@(new IGB.Web.ViewModels.Components.AvatarViewModel(ImageUrl: r.StudentAvatarUrl, Initials: initials, Alt: (r.StudentName ?? "Student"), SizePx: 28))" />
+                                    <div>
+                                        <div class="fw-semibold">@r.StudentName</div>
+                                        <div class="text-muted small">#@r.StudentId</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@r.CourseName</td>
+                            <td class="fw-semibold">@r.TestName</td>
+                            <td class="text-muted">@r.ObtainedMarks / @r.TotalMarks (@r.Percentage.ToString("F2")%)</td>
+                            <td><span class="badge bg-primary">@r.Grade</span></td>
+                            <td>
+                                <span class="badge @(r.IsDraft ? "bg-secondary" : "bg-success")">@(r.IsDraft ? "Draft" : "Submitted")</span>
+                            </td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details","TestReports", new { id = r.Id })">View</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="@Url.Action("Edit","TestReports", new { id = r.Id })">Edit</a>
+                                <form method="post" asp-action="Delete" asp-route-id="@r.Id" class="d-inline" onsubmit="return confirm('Delete this test report?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

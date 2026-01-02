@@ -1,0 +1,333 @@
+@model IGB.Web.ViewModels.TestReports.TestReportUpsertViewModel
+@{
+    ViewData["Title"] = "Create Test Report";
+    var students = ViewBag.Students as List<IGB.Domain.Entities.User> ?? new();
+    var selectedStudentName = (string?)ViewBag.SelectedStudentName;
+    var selectedStudentId = Model.StudentUserId > 0 ? Model.StudentUserId : (long?)null;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Create Test Report",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Students", Url.Action("Students", "Progress")),
+        new(selectedStudentName ?? "Student", selectedStudentId.HasValue ? Url.Action("Student", "Progress", new { studentUserId = selectedStudentId.Value }) : null),
+        new("Add Test Report")
+    }
+))
+
+<div class="container-fluid">
+    <form method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a class="btn btn-outline-secondary" href="@(selectedStudentId.HasValue ? Url.Action("Student","Progress", new { studentUserId = selectedStudentId.Value }) : Url.Action("Students","Progress"))">Back</a>
+            <div class="d-flex gap-2">
+                <button type="submit" name="submitType" value="draft" class="btn btn-outline-secondary">Save as Draft</button>
+                <button type="submit" name="submitType" value="submit" class="btn btn-primary">Submit Report</button>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-7">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Basic Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Student</label>
+                                <select class="form-select" asp-for="StudentUserId" id="studentSelect">
+                                    <option value="">-- Select student --</option>
+                                    @foreach (var s in students)
+                                    {
+                                        <option value="@s.Id" selected="@(Model.StudentUserId == s.Id)">@s.FullName</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="StudentUserId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Course</label>
+                                <select class="form-select" asp-for="CourseId" id="courseSelect">
+                                    <option value="">-- Select course --</option>
+                                </select>
+                                <span asp-validation-for="CourseId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Test Name</label>
+                                <input class="form-control" asp-for="TestName" maxlength="100" placeholder="e.g., Mid-Term Exam, Chapter 5 Quiz" />
+                                <span asp-validation-for="TestName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Test Date</label>
+                                <input class="form-control" asp-for="TestDate" type="date" value="@Model.TestDate.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="TestDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Marks &amp; Grading</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Total Marks</label>
+                                <input class="form-control" asp-for="TotalMarks" id="totalMarks" type="number" min="1" max="1000" />
+                                <span asp-validation-for="TotalMarks" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Marks Obtained</label>
+                                <input class="form-control" asp-for="ObtainedMarks" id="obtainedMarks" type="number" min="0" />
+                                <span asp-validation-for="ObtainedMarks" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Percentage</label>
+                                <input class="form-control" id="percentage" readonly value="0.00%" />
+                                <input type="hidden" asp-for="Percentage" id="percentageHidden" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Grade</label>
+                                <select class="form-select" asp-for="Grade" id="gradeSelect">
+                                    <option value="">Auto</option>
+                                    @foreach (var g in IGB.Web.ViewModels.TestReports.TestGradeCatalog.GradeOptions)
+                                    {
+                                        <option value="@g">@g</option>
+                                    }
+                                </select>
+                                <div class="text-muted small mt-1">Grade will be suggested automatically; you can override.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Topics Covered</h5>
+                        <div class="mb-2">
+                            <input class="form-control" id="topicSearch" placeholder="Search topics..." />
+                        </div>
+                        <div id="topicsBox" class="border rounded p-2" style="max-height: 320px; overflow:auto;">
+                            <div class="text-muted small">Select a course to load topics.</div>
+                        </div>
+                        <span asp-validation-for="TopicIds" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Performance Analysis</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Strengths</label>
+                            <textarea class="form-control" asp-for="Strengths" rows="4" maxlength="500" placeholder="What did the student do well?"></textarea>
+                            <div class="text-muted small"><span id="strengthsCount">0</span>/500</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Areas for Improvement</label>
+                            <textarea class="form-control" asp-for="AreasForImprovement" rows="4" maxlength="500" placeholder="What needs more practice?"></textarea>
+                            <div class="text-muted small"><span id="improveCount">0</span>/500</div>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label">Overall Comments</label>
+                            <textarea class="form-control" asp-for="TutorComments" rows="5" maxlength="1000" placeholder="General feedback about the test..."></textarea>
+                            <div class="text-muted small"><span id="commentsCount">0</span>/1000</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Test Paper Upload (optional)</h5>
+                        <div id="dropZone" class="border rounded p-4 text-center bg-light">
+                            <div class="fw-semibold">Drag &amp; drop file here</div>
+                            <div class="text-muted small">PDF, JPG, PNG — Max 10MB</div>
+                            <div class="mt-3">
+                                <input type="file" asp-for="TestFile" id="testFile" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" class="form-control" />
+                            </div>
+                            <div id="fileInfo" class="text-muted small mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Validation</h5>
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+      (function(){
+        // Prevent double-submit + show "loading" feedback
+        const form = document.querySelector('form');
+        form?.addEventListener('submit', () => {
+          form.querySelectorAll('button[type="submit"]').forEach(b => { b.disabled = true; });
+        });
+
+        const studentSelect = document.getElementById('studentSelect');
+        const courseSelect = document.getElementById('courseSelect');
+        const topicsBox = document.getElementById('topicsBox');
+        const topicSearch = document.getElementById('topicSearch');
+
+        const totalMarks = document.getElementById('totalMarks');
+        const obtainedMarks = document.getElementById('obtainedMarks');
+        const percentageEl = document.getElementById('percentage');
+        const percentageHidden = document.getElementById('percentageHidden');
+        const gradeSelect = document.getElementById('gradeSelect');
+
+        const testFile = document.getElementById('testFile');
+        const fileInfo = document.getElementById('fileInfo');
+        const dropZone = document.getElementById('dropZone');
+
+        function suggestGrade(pct){
+          if (pct >= 90) return 'A+';
+          if (pct >= 85) return 'A';
+          if (pct >= 80) return 'A-';
+          if (pct >= 75) return 'B+';
+          if (pct >= 70) return 'B';
+          if (pct >= 65) return 'B-';
+          if (pct >= 60) return 'C+';
+          if (pct >= 55) return 'C';
+          if (pct >= 50) return 'C-';
+          if (pct >= 40) return 'D';
+          return 'F';
+        }
+
+        function calcPct(){
+          const total = parseFloat(totalMarks.value || '0');
+          const obt = parseFloat(obtainedMarks.value || '0');
+          if (!total || total <= 0) return 0;
+          let pct = (obt / total) * 100;
+          pct = Math.max(0, Math.min(100, pct));
+          return Math.round(pct * 100) / 100;
+        }
+
+        function updatePct(){
+          const pct = calcPct();
+          percentageEl.value = pct.toFixed(2) + '%';
+          percentageHidden.value = pct.toFixed(2);
+          if (!gradeSelect.value) {
+            // auto-suggest only if not manually selected
+            const g = suggestGrade(pct);
+            gradeSelect.setAttribute('data-suggested', g);
+          }
+        }
+
+        totalMarks.addEventListener('input', updatePct);
+        obtainedMarks.addEventListener('input', updatePct);
+        updatePct();
+
+        function setCounter(id, max){
+          const el = document.querySelector(`[name="${id}"]`);
+          const out = document.getElementById(id === 'Strengths' ? 'strengthsCount' : (id === 'AreasForImprovement' ? 'improveCount' : 'commentsCount'));
+          function sync(){ out.textContent = String((el.value||'').length); }
+          el.addEventListener('input', sync);
+          sync();
+        }
+        setCounter('Strengths', 500);
+        setCounter('AreasForImprovement', 500);
+        setCounter('TutorComments', 1000);
+
+        async function loadCourses(studentId){
+          courseSelect.innerHTML = '<option value="">-- Select course --</option>';
+          topicsBox.innerHTML = '<div class="text-muted small">Select a course to load topics.</div>';
+          if (!studentId) return;
+          const res = await fetch(`/api/testreports/tutor/student/${studentId}/courses`, { credentials: 'include' });
+          const data = await res.json();
+          data.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.name;
+            courseSelect.appendChild(opt);
+          });
+          // preserve existing selection (edit support / back-post)
+          const desired = '@Model.CourseId';
+          if (desired && desired !== '0') courseSelect.value = desired;
+          if (courseSelect.value) await loadTopics(courseSelect.value);
+        }
+
+        function renderTopics(topics){
+          const byParent = {};
+          topics.forEach(t => {
+            const key = t.parentTopicId || 0;
+            byParent[key] = byParent[key] || [];
+            byParent[key].push(t);
+          });
+
+          function node(t, indent){
+            const div = document.createElement('div');
+            div.className = 'form-check';
+            div.style.marginLeft = `${indent}px`;
+            const id = `topic_${t.id}`;
+            div.innerHTML = `
+              <input class="form-check-input topic-check" type="checkbox" name="TopicIds" value="${t.id}" id="${id}">
+              <label class="form-check-label" for="${id}">${t.title}</label>
+            `;
+            div.dataset.title = (t.title || '').toLowerCase();
+            return div;
+          }
+
+          topicsBox.innerHTML = '';
+          (byParent[0] || []).forEach(parent => {
+            topicsBox.appendChild(node(parent, 0));
+            (byParent[parent.id] || []).forEach(child => topicsBox.appendChild(node(child, 18)));
+          });
+
+          // restore selected
+          const selected = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopicIds ?? new List<long>()));
+          selected.forEach(id => {
+            const el = topicsBox.querySelector(`input[value="${id}"]`);
+            if (el) el.checked = true;
+          });
+        }
+
+        async function loadTopics(courseId){
+          topicsBox.innerHTML = '<div class="text-muted small">Loading topics...</div>';
+          if (!courseId) return;
+          const res = await fetch(`/api/testreports/course/${courseId}/topics`, { credentials: 'include' });
+          const data = await res.json();
+          renderTopics(data);
+        }
+
+        studentSelect.addEventListener('change', () => loadCourses(studentSelect.value));
+        courseSelect.addEventListener('change', () => loadTopics(courseSelect.value));
+
+        topicSearch.addEventListener('input', () => {
+          const term = (topicSearch.value || '').toLowerCase().trim();
+          topicsBox.querySelectorAll('.form-check').forEach(div => {
+            if (!term) { div.style.display = ''; return; }
+            div.style.display = div.dataset.title.includes(term) ? '' : 'none';
+          });
+        });
+
+        // initial load
+        loadCourses(studentSelect.value);
+
+        // file preview
+        function showFileInfo(f){
+          if (!f) { fileInfo.textContent = ''; return; }
+          const sizeMb = (f.size / (1024*1024)).toFixed(2);
+          fileInfo.textContent = `${f.name} (${sizeMb} MB)`;
+        }
+        testFile.addEventListener('change', () => showFileInfo(testFile.files[0]));
+        ['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('border-primary'); }));
+        ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('border-primary'); }));
+        dropZone.addEventListener('drop', e => {
+          const f = e.dataTransfer.files && e.dataTransfer.files[0];
+          if (!f) return;
+          testFile.files = e.dataTransfer.files;
+          showFileInfo(f);
+        });
+      })();
+    </script>
+}
+
+

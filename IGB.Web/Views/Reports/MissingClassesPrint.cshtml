@@ -1,0 +1,60 @@
+@model IGB.Web.ViewModels.Reports.MissingClassesViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Missing Classes (PDF)";
+}
+
+<style>
+  @@media print {
+    .no-print { display:none !important; }
+    body { background: #fff !important; }
+  }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center no-print my-3">
+        <div class="text-muted small">Use your browser print dialog and choose “Save as PDF”.</div>
+        <button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <h4 class="mb-2">Missing Classes</h4>
+    <div class="text-muted small mb-3">
+        Range: @(Model.From?.ToString("yyyy-MM-dd") ?? "—") to @(Model.To?.ToString("yyyy-MM-dd") ?? "—") (UTC)
+    </div>
+
+    <table class="table table-sm table-bordered align-middle">
+        <thead>
+        <tr>
+            <th>Lesson</th>
+            <th>Course</th>
+            <th>Student</th>
+            <th>Tutor</th>
+            <th>When (UTC)</th>
+            <th>Student</th>
+            <th>Tutor</th>
+            <th>Note</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var r in Model.Rows)
+        {
+            <tr>
+                <td>#@r.LessonId</td>
+                <td>@r.CourseName</td>
+                <td>@r.StudentName</td>
+                <td>@r.TutorName</td>
+                <td>@r.ScheduledStartUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@(r.StudentAttended ? "Attended" : "Missed")</td>
+                <td>@(r.TutorAttended ? "Attended" : "Missed")</td>
+                <td>@r.Note</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<script>
+  window.addEventListener('load', () => setTimeout(() => window.print(), 250));
+</script>
+
+

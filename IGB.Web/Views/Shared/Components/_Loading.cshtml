@@ -1,0 +1,8 @@
+@model IGB.Web.ViewModels.Components.LoadingViewModel
+
+<div class="d-flex align-items-center gap-2 @(Model.FullWidth ? "w-100" : "") @(Model.CssClass ?? "")" role="status" aria-live="polite">
+    <div class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></div>
+    <span class="text-muted">@Model.Label</span>
+</div>
+
+

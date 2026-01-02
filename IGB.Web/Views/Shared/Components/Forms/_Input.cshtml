@@ -1,0 +1,32 @@
+@model IGB.Web.ViewModels.Components.InputFieldViewModel
+
+@{
+    var id = $"fld_{Model.Name}".Replace(".", "_");
+    var describedById = !string.IsNullOrWhiteSpace(Model.HelpText) ? $"{id}_help" : null;
+    var invalid = !string.IsNullOrWhiteSpace(Model.ErrorMessage);
+}
+
+<div class="mb-3 @(Model.CssClass ?? "")">
+    <label for="@id" class="form-label">@Model.Label @if (Model.Required) { <span class="text-danger">*</span> }</label>
+    <input id="@id"
+           name="@Model.Name"
+           type="@Model.Type"
+           value="@Model.Value"
+           placeholder="@Model.Placeholder"
+           class="form-control @(invalid ? "is-invalid" : "")"
+           autocomplete="@Model.Autocomplete"
+           aria-invalid="@(invalid ? "true" : "false")"
+           aria-describedby="@describedById"
+           @(Model.Required ? "required" : null)
+           @(Model.Disabled ? "disabled" : null) />
+    @if (!string.IsNullOrWhiteSpace(Model.HelpText))
+    {
+        <div id="@describedById" class="form-text">@Model.HelpText</div>
+    }
+    @if (invalid)
+    {
+        <div class="invalid-feedback">@Model.ErrorMessage</div>
+    }
+</div>
+
+

@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "My Ward Progress";
+    var msg = (string?)ViewBag.Message ?? "No ward linked.";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Ward Progress",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Ward"),
+        new("Progress")
+    }
+))
+
+<div class="container-fluid">
+    <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(msg, Variant: "warning", Dismissible: true))" />
+    <div class="text-muted">Ask an admin to link a ward to this guardian account.</div>
+</div>
+
+

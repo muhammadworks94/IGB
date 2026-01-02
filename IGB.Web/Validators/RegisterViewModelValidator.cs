@@ -1,5 +1,6 @@
 using FluentValidation;
 using IGB.Web.ViewModels;
+using IGB.Shared.Security;
 
 namespace IGB.Web.Validators;
 
@@ -21,11 +22,8 @@ public class RegisterViewModelValidator : AbstractValidator<RegisterViewModel>
         // Password policy: uppercase, lowercase, number, special, min 8
         RuleFor(x => x.Password)
             .NotEmpty()
-            .MinimumLength(8)
-            .Matches("[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
-            .Matches("[a-z]").WithMessage("Password must contain at least one lowercase letter.")
-            .Matches("[0-9]").WithMessage("Password must contain at least one number.")
-            .Matches("[^a-zA-Z0-9]").WithMessage("Password must contain at least one special character.");
+            .Must(p => PasswordPolicy.IsValid(p))
+            .WithMessage("Password does not meet requirements (min 8, upper, lower, number, special).");
 
         RuleFor(x => x.ConfirmPassword)
             .Equal(x => x.Password).WithMessage("Passwords do not match.");

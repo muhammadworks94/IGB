@@ -1,0 +1,95 @@
+@model IGB.Web.ViewModels.Credits.MyCreditsViewModel
+@{
+    ViewData["Title"] = "My Credits";
+    var low = Model.RemainingCredits < Model.LowCreditThreshold;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Credits",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Credits")
+    }
+))
+
+<div class="container-fluid">
+    @if (Model.RemainingCredits == 0)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel("You have 0 credits remaining. Please purchase more credits.", Variant: "danger", Dismissible: true))" />
+    }
+    else if (low)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel($"Low credits warning: {Model.RemainingCredits} remaining.", Variant: "warning", Dismissible: true))" />
+    }
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Total credits purchased</div>
+                    <div class="fs-3 fw-semibold">@Model.TotalCredits</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Used credits</div>
+                    <div class="fs-3 fw-semibold">@Model.UsedCredits</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Remaining credits</div>
+                    <div class="fs-3 fw-semibold">@Model.RemainingCredits</div>
+                    <a class="btn btn-sm btn-outline-primary mt-2" href="#" onclick="alert('Purchase flow not implemented yet.'); return false;">Purchase more credits</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="mb-3">Transaction History</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Balance</th>
+                        <th>Reason</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var t in Model.Transactions)
+                    {
+                        <tr>
+                            <td class="text-muted small">@t.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@t.Type</td>
+                            <td class="fw-semibold">@t.Amount</td>
+                            <td class="text-muted">@t.BalanceAfter</td>
+                            <td class="text-muted">@t.Reason</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            <partial name="Components/_Pagination" model="Model.Pagination" />
+        </div>
+    </div>
+</div>
+
+<script>
+  // Real-time balance updates via SignalR "CreditsUpdated"
+  // If your existing notifications JS is wired, this is optional; we keep it minimal.
+  if (window.signalR && window.signalR.HubConnectionBuilder) {
+    // If you already have a single shared connection, you can hook into it instead.
+  }
+</script>
+
+

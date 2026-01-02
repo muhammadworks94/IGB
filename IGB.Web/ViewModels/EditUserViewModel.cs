@@ -5,6 +5,7 @@ namespace IGB.Web.ViewModels;
 public class EditUserViewModel
 {
     public long Id { get; set; }
+    public string Role { get; set; } = string.Empty; // Student|Tutor
 
     [Required(ErrorMessage = "First Name is required")]
     [Display(Name = "First Name")]
@@ -22,5 +23,11 @@ public class EditUserViewModel
 
     [Display(Name = "Is Active")]
     public bool IsActive { get; set; } = true;
+
+    // Tutor-specific fields
+    public string? TimeZoneId { get; set; }
+    public Microsoft.AspNetCore.Http.IFormFile? ProfileImage { get; set; }
+    public List<long> CourseIds { get; set; } = new();
+    public string? CurrentProfileImagePath { get; set; }
 }
 

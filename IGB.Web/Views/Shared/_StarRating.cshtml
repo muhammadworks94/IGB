@@ -1,0 +1,70 @@
+@model IGB.Web.ViewModels.Components.StarRatingViewModel
+@{
+    var name = Model.Name ?? "";
+    var value = Model.Value;
+    var baseId = "sr_" + (name ?? "rating").Replace(".", "_").Replace("[", "_").Replace("]", "_");
+}
+
+<div class="star-rating-wrap">
+    <div class="d-flex justify-content-between align-items-end gap-2">
+        <label class="form-label mb-1" for="@baseId">@Model.Label</label>
+        <span class="small text-muted"><span class="fw-semibold" data-sr-value>@value</span>/5</span>
+    </div>
+
+    <input type="hidden" id="@baseId" name="@name" value="@value" />
+    <div class="star-rating" role="group" aria-label="@Model.Label" data-star-rating data-target="@baseId">
+        @for (var i = 1; i <= 5; i++)
+        {
+            var on = i <= value ? "is-on" : "";
+            <button type="button" class="star-btn @on" data-value="@i" aria-label="@i star@(i==1?"":"s")">★</button>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.HelpText))
+    {
+        <div class="form-text">@Model.HelpText</div>
+    }
+</div>
+
+<script>
+  (function(){
+    if (window.__igbStarRatingInit) return;
+    window.__igbStarRatingInit = true;
+
+    function refresh(container, val){
+      const buttons = container.querySelectorAll('.star-btn');
+      buttons.forEach(btn => {
+        const v = parseInt(btn.getAttribute('data-value') || '0', 10);
+        btn.classList.toggle('is-on', v <= val);
+      });
+      const wrap = container.closest('.star-rating-wrap');
+      const out = wrap ? wrap.querySelector('[data-sr-value]') : null;
+      if (out) out.textContent = String(val);
+    }
+
+    document.addEventListener('click', function(e){
+      const btn = e.target && e.target.closest ? e.target.closest('.star-btn') : null;
+      if (!btn) return;
+      const container = btn.closest('[data-star-rating]');
+      if (!container) return;
+      const targetId = container.getAttribute('data-target');
+      const input = targetId ? document.getElementById(targetId) : null;
+      if (!input) return;
+      const val = parseInt(btn.getAttribute('data-value') || '0', 10);
+      if (!(val >= 1 && val <= 5)) return;
+      input.value = String(val);
+      refresh(container, val);
+    });
+
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('[data-star-rating]').forEach(container => {
+        const targetId = container.getAttribute('data-target');
+        const input = targetId ? document.getElementById(targetId) : null;
+        const val = input ? parseInt(input.value || '0', 10) : 0;
+        refresh(container, val);
+      });
+    });
+  })();
+</script>
+
+

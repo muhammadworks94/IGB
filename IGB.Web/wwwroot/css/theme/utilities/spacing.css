@@ -1,0 +1,27 @@
+/* Spacing utilities built on theme tokens.
+   Bootstrap already provides m-*/p-*; these utilities complement that with
+   gap/stack patterns that Bootstrap lacks in some spots.
+*/
+
+.u-gap-1 { gap: var(--igb-space-1) !important; }
+.u-gap-2 { gap: var(--igb-space-2) !important; }
+.u-gap-3 { gap: var(--igb-space-3) !important; }
+.u-gap-4 { gap: var(--igb-space-4) !important; }
+.u-gap-6 { gap: var(--igb-space-6) !important; }
+.u-gap-8 { gap: var(--igb-space-8) !important; }
+
+/* Vertical stack helper */
+.u-stack { display: flex !important; flex-direction: column !important; }
+.u-stack.u-gap-2,
+.u-stack.u-gap-3,
+.u-stack.u-gap-4,
+.u-stack.u-gap-6,
+.u-stack.u-gap-8 { /* gap provided by the u-gap-* class */ }
+
+/* Quick padding helpers */
+.u-pad-2 { padding: var(--igb-space-2) !important; }
+.u-pad-3 { padding: var(--igb-space-3) !important; }
+.u-pad-4 { padding: var(--igb-space-4) !important; }
+.u-pad-6 { padding: var(--igb-space-6) !important; }
+
+

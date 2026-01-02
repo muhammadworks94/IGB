@@ -14,6 +14,8 @@ using Polly.Extensions.Http;
 using Serilog;
 using System.Text;
 using IGB.Web.Zoom;
+using IGB.Web.Security;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +102,11 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("StaffOnly", policy => policy.RequireRole("Tutor", "Admin", "SuperAdmin"));
 });
 
+// Permission-based RBAC (dynamic policies: "perm:<key>")
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
 // Response Compression
 builder.Services.AddResponseCompression(options =>
 {
@@ -111,6 +118,16 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IGB.Web.Services.INotificationService, IGB.Web.Services.NotificationService>();
 builder.Services.AddSingleton<IGB.Web.Notifications.INotificationStore, IGB.Web.Notifications.DistributedCacheNotificationStore>();
 builder.Services.AddScoped<IGB.Application.Services.IJwtTokenService, IGB.Web.Services.JwtTokenService>();
+builder.Services.AddSingleton<IGB.Web.Services.IEmailSender, IGB.Web.Services.LoggingEmailSender>();
+builder.Services.AddScoped<IGB.Web.Services.LessonPolicyService>();
+builder.Services.Configure<IGB.Web.Options.LessonPolicyOptions>(builder.Configuration.GetSection(IGB.Web.Options.LessonPolicyOptions.SectionName));
+builder.Services.Configure<IGB.Web.Options.CreditPolicyOptions>(builder.Configuration.GetSection(IGB.Web.Options.CreditPolicyOptions.SectionName));
+builder.Services.AddScoped<IGB.Web.Services.CreditService>();
+builder.Services.AddScoped<IGB.Web.Services.AdminDashboardDataService>();
+builder.Services.AddSingleton<IGB.Web.Services.AdminDashboardRealtimeBroadcaster>();
+builder.Services.AddScoped<IGB.Web.Services.StudentDashboardDataService>();
+builder.Services.AddScoped<IGB.Web.Services.TutorDashboardDataService>();
+builder.Services.AddSingleton<IGB.Web.Services.TutorDashboardRealtimeBroadcaster>();
 
 // Zoom integration
 builder.Services.Configure<ZoomOptions>(builder.Configuration.GetSection("Zoom"));
@@ -152,15 +169,27 @@ builder.Services.AddHttpClient("ExternalApi")
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // Public site should use an anonymous error endpoint (HomeController is [Authorize])
+    app.UseExceptionHandler("/Public/Error");
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+// NOTE: In Development (especially with IIS Express), response compression can cause
+// ERR_CONTENT_DECODING_FAILED if the response gets double-compressed or headers mismatch.
+// Keep compression for Production.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseResponseCompression();
+}
+
 app.UseStaticFiles();
-app.UseResponseCompression();
 
 // Request localization
 var supportedCultures = new[] { "en-US", "ar-SA" }
@@ -190,10 +219,7 @@ app.MapHub<IGB.Web.Hubs.NotificationHub>("/hubs/notifications");
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// Recurring jobs (example - heartbeat notification)
-RecurringJob.AddOrUpdate<IGB.Web.Jobs.SystemHeartbeatJob>("system-heartbeat", job => job.Run(), Cron.Minutely);
+    pattern: "{controller=Public}/{action=Index}/{id?}");
 
 try
 {
@@ -209,12 +235,32 @@ try
             var logger = services.GetRequiredService<ILogger<DbInitializer>>();
             var initializer = new DbInitializer(context, logger);
             await initializer.InitializeAsync();
+
+            // Seed in-app notifications (stored in distributed cache, not SQL)
+            try
+            {
+                var store = services.GetRequiredService<IGB.Web.Notifications.INotificationStore>();
+                await IGB.Web.Seed.NotificationSeeder.SeedAsync(store);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Notification seeding failed (non-fatal).");
+            }
+
+            // Recurring jobs (must be registered AFTER DB exists, otherwise Hangfire SQL storage will throw)
+            RecurringJob.AddOrUpdate<IGB.Web.Jobs.SystemHeartbeatJob>("system-heartbeat", job => job.Run(), Cron.Minutely);
+            RecurringJob.AddOrUpdate<IGB.Web.Jobs.CreditReminderJob>("credit-reminders", job => job.Run(default), Cron.Daily);
+            RecurringJob.AddOrUpdate<IGB.Web.Jobs.LessonStartingSoonJob>("lesson-starting-soon", job => job.Run(default), Cron.Minutely);
+
             Log.Information("Database initialized and seeded successfully");
         }
         catch (Exception ex)
         {
             var logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error occurred while seeding the database");
+            // Don't silently continue in development; this is the #1 reason people "don't see seeded data".
+            if (app.Environment.IsDevelopment())
+                throw;
         }
     }
 

@@ -1,0 +1,24 @@
+@model IGB.Web.ViewModels.Components.AvatarViewModel
+
+@{
+    var size = Math.Max(16, Model.SizePx);
+    var initials = (Model.Initials ?? "").Trim();
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+{
+    <img src="@Model.ImageUrl"
+         alt="@Model.Alt"
+         class="rounded-circle @(Model.CssClass ?? "")"
+         style="width:@(size)px;height:@(size)px;object-fit:cover;" />
+}
+else
+{
+    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light text-muted @(Model.CssClass ?? "")"
+         style="width:@(size)px;height:@(size)px; border: 1px solid var(--igb-color-border); font-size: @(Math.Max(10, size/3))px;"
+         aria-label="@Model.Alt">
+        @(!string.IsNullOrWhiteSpace(initials) ? initials : "U")
+    </div>
+}
+
+

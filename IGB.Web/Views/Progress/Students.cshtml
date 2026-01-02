@@ -1,0 +1,47 @@
+@model List<IGB.Domain.Entities.User>
+@{
+    ViewData["Title"] = "Students";
+    var q = (string?)ViewBag.Query;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Students",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Students")
+    }
+))
+
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" name="q" value="@q" placeholder="Name or email..." />
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="mb-3">My Students</h5>
+            <div class="list-group">
+                @foreach (var s in Model)
+                {
+                    <a class="list-group-item list-group-item-action" href="@Url.Action("Student", "Progress", new { studentUserId = s.Id })">
+                        <div class="fw-semibold">@s.FullName</div>
+                        <div class="text-muted small">@s.Email</div>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+

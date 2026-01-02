@@ -1,0 +1,421 @@
+@model IGB.Web.ViewModels.People.StudentProfileVm
+@{
+    ViewData["Title"] = "Student Profile";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Student Profile",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Portal")),
+        new("Schedules", Url.Action("Overview","Schedule")),
+        new("Student Profile")
+    }
+))
+
+<div class="container-fluid">
+    <partial name="_PersonHeader" model="Model.Header" />
+
+    <ul class="nav nav-tabs mt-3" id="studentTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-overview" data-bs-toggle="tab" data-bs-target="#pane-overview" type="button" role="tab">Overview</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-courses" data-bs-toggle="tab" data-bs-target="#pane-courses" type="button" role="tab">Courses <span class="badge bg-light text-dark ms-1">@Model.EnrolledCourses.Count</span></button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-schedule" data-bs-toggle="tab" data-bs-target="#pane-schedule" type="button" role="tab">Schedule</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-guardians" data-bs-toggle="tab" data-bs-target="#pane-guardians" type="button" role="tab">Guardians <span class="badge bg-light text-dark ms-1">@Model.Guardians.Count</span></button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-tests" data-bs-toggle="tab" data-bs-target="#pane-tests" type="button" role="tab">Tests</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-progress" data-bs-toggle="tab" data-bs-target="#pane-progress" type="button" role="tab">Progress</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-feedback" data-bs-toggle="tab" data-bs-target="#pane-feedback" type="button" role="tab">Ratings & Feedback</button>
+        </li>
+    </ul>
+
+    <div class="tab-content pt-3" id="studentTabsContent">
+        <div class="tab-pane fade show active" id="pane-overview" role="tabpanel" aria-labelledby="tab-overview">
+            <div class="row g-3">
+                <div class="col-12 col-xl-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Academic</h6>
+                            </div>
+                            <div class="row g-2 small">
+                                <div class="col-md-6">
+                                    <div class="text-muted">Curriculum</div>
+                                    <div class="fw-semibold">@((Model.Academic.Curriculum ?? "-"))</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-muted">Grade / Class</div>
+                                    <div class="fw-semibold">@((Model.Academic.Grade ?? "-"))</div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Enrolled Courses</h6>
+                                <span class="text-muted small">@Model.EnrolledCourses.Count</span>
+                            </div>
+                            @if (Model.EnrolledCourses.Count == 0)
+                            {
+                                <div class="text-muted">No course enrollments found.</div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                        <tr>
+                                            <th>Course</th>
+                                            <th>Tutor</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach (var c in Model.EnrolledCourses.Take(5))
+                                        {
+                                            <tr>
+                                                <td class="fw-semibold">@c.CourseName</td>
+                                                <td class="text-muted">@((c.TutorName ?? "-"))</td>
+                                                <td><span class="badge bg-light text-dark">@c.Status</span></td>
+                                            </tr>
+                                        }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                @if (Model.EnrolledCourses.Count > 5)
+                                {
+                                    <div class="text-muted small">Showing 5 of @Model.EnrolledCourses.Count. See the Courses tab for all.</div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-2">Lessons</h6>
+                            <div class="d-flex flex-column gap-2 small">
+                                <div class="d-flex justify-content-between"><span class="text-muted">Total</span><span class="fw-semibold">@Model.Lessons.Total</span></div>
+                                <div class="d-flex justify-content-between"><span class="text-muted">Upcoming</span><span class="fw-semibold">@Model.Lessons.Upcoming</span></div>
+                                <div class="d-flex justify-content-between"><span class="text-muted">Completed</span><span class="fw-semibold">@Model.Lessons.Completed</span></div>
+                                <div class="d-flex justify-content-between"><span class="text-muted">Cancelled</span><span class="fw-semibold">@Model.Lessons.Cancelled</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h6 class="mb-2">Rating</h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="text-muted small">Avg rating</div>
+                                <div class="fw-semibold">@Model.Feedback.Average.ToString("0.0") / 5</div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="text-muted small">Reviews</div>
+                                <div class="fw-semibold">@Model.Feedback.Count</div>
+                            </div>
+                            <div class="mt-2 text-muted small">See “Ratings & Feedback” tab for details.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pane-courses" role="tabpanel" aria-labelledby="tab-courses">
+            <div class="card">
+                <div class="card-body">
+                    @if (Model.EnrolledCourses.Count == 0)
+                    {
+                        <div class="text-muted">No course enrollments found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Tutor</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var c in Model.EnrolledCourses)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@c.CourseName</td>
+                                        <td class="text-muted">@((c.TutorName ?? "-"))</td>
+                                        <td><span class="badge bg-light text-dark">@c.Status</span></td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pane-schedule" role="tabpanel" aria-labelledby="tab-schedule">
+            <div class="row g-3">
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Upcoming Lessons</h6>
+                                <span class="text-muted small">@Model.UpcomingLessons.Count</span>
+                            </div>
+                            @if (Model.UpcomingLessons.Count == 0)
+                            {
+                                <div class="text-muted">No upcoming lessons.</div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                        <tr>
+                                            <th>When (UTC)</th>
+                                            <th>Course</th>
+                                            <th>Tutor</th>
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach (var l in Model.UpcomingLessons)
+                                        {
+                                            <tr>
+                                                <td class="text-muted small">@l.StartUtc.UtcDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                                <td class="fw-semibold">@l.CourseName</td>
+                                                <td class="text-muted">@l.TutorName</td>
+                                                <td class="text-end">
+                                                    @if (l.CanJoin && !string.IsNullOrWhiteSpace(l.JoinUrl))
+                                                    {
+                                                        <a class="btn btn-sm btn-success" target="_blank" href="@l.JoinUrl">Join</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted small">—</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Recent Lessons</h6>
+                            </div>
+                            @if (Model.RecentLessons.Count == 0)
+                            {
+                                <div class="text-muted">No lessons found.</div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                        <tr>
+                                            <th>When (UTC)</th>
+                                            <th>Course</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach (var l in Model.RecentLessons)
+                                        {
+                                            <tr>
+                                                <td class="text-muted small">@l.StartUtc.UtcDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                                <td class="fw-semibold">@l.CourseName</td>
+                                                <td><span class="badge bg-light text-dark">@l.Status</span></td>
+                                            </tr>
+                                        }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pane-guardians" role="tabpanel" aria-labelledby="tab-guardians">
+            <div class="card">
+                <div class="card-body">
+                    @if (Model.Guardians.Count == 0)
+                    {
+                        <div class="text-muted">No linked guardians found.</div>
+                    }
+                    else
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var g in Model.Guardians)
+                            {
+                                <li class="mb-1">
+                                    <a class="text-decoration-none" href="/People/Guardian/@g.GuardianUserId">@g.Name</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pane-tests" role="tabpanel" aria-labelledby="tab-tests">
+            <div class="card">
+                <div class="card-body">
+                    @if (Model.RecentTests.Count == 0)
+                    {
+                        <div class="text-muted">No submitted tests found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Test</th>
+                                    <th>Course</th>
+                                    <th>Tutor</th>
+                                    <th class="text-end">Score</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var t in Model.RecentTests)
+                                {
+                                    <tr>
+                                        <td class="text-muted">@t.TestDate.ToString("yyyy-MM-dd")</td>
+                                        <td class="fw-semibold">@t.TestName</td>
+                                        <td class="text-muted">@t.CourseName</td>
+                                        <td class="text-muted">@t.TutorName</td>
+                                        <td class="text-end fw-semibold">@t.Percentage.ToString("0.#")% <span class="text-muted">(@t.Grade)</span></td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pane-progress" role="tabpanel" aria-labelledby="tab-progress">
+            <div class="card">
+                <div class="card-body">
+                    @if (Model.RecentProgressNotes.Count == 0)
+                    {
+                        <div class="text-muted">No progress notes found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>When (UTC)</th>
+                                    <th>Course</th>
+                                    <th>Tutor</th>
+                                    <th>Note</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var n in Model.RecentProgressNotes)
+                                {
+                                    <tr>
+                                        <td class="text-muted small">@n.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                                        <td class="fw-semibold">@n.CourseName</td>
+                                        <td class="text-muted">@n.TutorName</td>
+                                        <td class="text-muted">@n.Note</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pane-feedback" role="tabpanel" aria-labelledby="tab-feedback">
+            <div class="row g-3">
+                <div class="col-12 col-xl-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-2">Summary</h6>
+                            <div class="d-flex justify-content-between"><span class="text-muted">Average</span><span class="fw-semibold">@Model.Feedback.Average.ToString("0.0") / 5</span></div>
+                            <div class="d-flex justify-content-between"><span class="text-muted">Reviews</span><span class="fw-semibold">@Model.Feedback.Count</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Recent Feedback</h6>
+                                <span class="text-muted small">@Model.RecentFeedback.Count</span>
+                            </div>
+                            @if (Model.RecentFeedback.Count == 0)
+                            {
+                                <div class="text-muted">No feedback found.</div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                        <tr>
+                                            <th>When (UTC)</th>
+                                            <th>Course</th>
+                                            <th>Tutor</th>
+                                            <th class="text-end">Rating</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach (var f in Model.RecentFeedback)
+                                        {
+                                            <tr title="@f.Comments">
+                                                <td class="text-muted small">@f.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                                                <td class="fw-semibold">@f.CourseName</td>
+                                                <td class="text-muted">@f.TutorName</td>
+                                                <td class="text-end fw-semibold">@f.Rating / 5</td>
+                                            </tr>
+                                            @if (!string.IsNullOrWhiteSpace(f.Comments))
+                                            {
+                                                <tr>
+                                                    <td></td>
+                                                    <td colspan="3" class="text-muted small">@f.Comments</td>
+                                                </tr>
+                                            }
+                                        }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

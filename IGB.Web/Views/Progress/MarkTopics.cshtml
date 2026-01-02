@@ -1,0 +1,59 @@
+@model IGB.Web.ViewModels.Progress.MarkTopicsViewModel
+@{
+    ViewData["Title"] = "Mark Topics Covered";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Mark Topics Covered",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Students", Url.Action("Students", "Progress")),
+        new(Model.StudentName, Url.Action("Student", "Progress", new { studentUserId = 0 })), // kept as placeholder (studentId not in VM)
+        new("Progress"),
+        new("Mark Topics")
+    },
+    Subtitle: $"{Model.CourseName} • Lesson #{Model.LessonId}"
+))
+
+<div class="container-fluid">
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <div class="text-muted small mb-2">Completed (UTC): @Model.CompletedAtUtc.ToString("yyyy-MM-dd HH:mm")</div>
+
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="LessonId" />
+                <input type="hidden" asp-for="CourseId" />
+
+                <div class="row g-2">
+                    @foreach (var t in Model.Topics)
+                    {
+                        var checkedVal = Model.SelectedTopicIds.Contains(t.Id);
+                        <div class="col-12">
+                            <div class="form-check ms-@(t.ParentId.HasValue ? 4 : 0)">
+                                <input class="form-check-input" type="checkbox" name="SelectedTopicIds" value="@t.Id" @(checkedVal ? "checked" : null) />
+                                <label class="form-check-label">@t.Title</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="mt-3 d-flex justify-content-end">
+                    <button class="btn btn-primary" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+

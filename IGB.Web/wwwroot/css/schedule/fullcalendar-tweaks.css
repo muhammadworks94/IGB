@@ -1,0 +1,66 @@
+:root{
+  --igb-fc-border: rgba(229,231,235,0.95);
+}
+
+/* Make FullCalendar match the app UI */
+.fc{
+  --fc-border-color: var(--igb-fc-border);
+  --fc-today-bg-color: rgba(14, 165, 233, 0.08);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgba(248,250,252,0.85);
+  font-family: var(--igb-font-sans);
+}
+
+.fc .fc-toolbar-title{
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.fc .fc-button{
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.fc .fc-timegrid-event,
+.fc .fc-daygrid-event{
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.10);
+}
+
+.fc .fc-event-title{
+  font-weight: 700;
+}
+
+.fc .fc-event-time{
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* Multi-line event content (course + teacher/student) */
+.fc .fc-event .igb-fc-event{
+  line-height: 1.15;
+  font-size: 0.78rem;
+}
+.fc .fc-event .igb-fc-title{
+  font-weight: 800;
+  white-space: normal;
+}
+.fc .fc-event .igb-fc-meta{
+  font-size: 0.72rem;
+  opacity: 0.95;
+  white-space: normal;
+}
+.fc .fc-timegrid-event .fc-event-main{
+  padding: 4px 6px;
+}
+
+.fc .fc-col-header-cell-cushion{
+  padding: 10px 8px;
+  color: var(--igb-color-text);
+}
+
+.fc .fc-timegrid-slot-label{
+  color: var(--igb-color-text-muted);
+}
+
+

@@ -1,0 +1,95 @@
+@model IGB.Domain.Entities.RbacRole
+@using IGB.Domain.Entities
+@{
+    ViewData["Title"] = "Edit Role";
+    var allPerms = ViewBag.AllPermissions as List<RbacPermission> ?? new();
+    var selected = ViewBag.SelectedPermissionIds as HashSet<long> ?? new();
+    var grouped = allPerms.GroupBy(p => p.Category).OrderBy(g => g.Key);
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: Model.Id == 0 ? "Create Role" : "Edit Role",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Home", Url.Action("Index", "Home")),
+        new("Roles", Url.Action("Index", "Roles")),
+        new(Model.Id == 0 ? "Create" : "Edit")
+    }
+))
+
+<div class="container-fluid">
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-3">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input class="form-control" name="name" value="@Model.Name" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3">@Model.Description</textarea>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="isSystem" value="true" checked="@(Model.IsSystem)" id="isSystem" />
+                            <label class="form-check-label" for="isSystem">System role</label>
+                            <div class="form-text">System roles are typically reserved for built-in roles.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Permissions</h5>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleAll(true)">Select all</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleAll(false)">Clear</button>
+                            </div>
+                        </div>
+
+                        @foreach (var grp in grouped)
+                        {
+                            <div class="border rounded-3 p-3 mb-3">
+                                <div class="fw-semibold mb-2">@grp.Key</div>
+                                <div class="row g-2">
+                                    @foreach (var p in grp)
+                                    {
+                                        var isChecked = selected.Contains(p.Id);
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input perm-check" type="checkbox" name="permissionIds" value="@p.Id" checked="@(isChecked)" id="perm_@p.Id" />
+                                                <label class="form-check-label" for="perm_@p.Id">
+                                                    <div class="fw-semibold">@p.Key</div>
+                                                    <div class="text-muted small">@p.Description</div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex justify-content-end gap-2">
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Role</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function toggleAll(on) {
+        document.querySelectorAll('.perm-check').forEach(cb => cb.checked = on);
+    }
+</script>
+
+

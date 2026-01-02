@@ -100,12 +100,19 @@ namespace IGB.Infrastructure.Migrations
                     b.Property<int>("CreditCost")
                         .HasColumnType("int");
 
+                    b.Property<long>("CurriculumId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
                     b.Property<long>("GradeId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("ImagePath")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -118,10 +125,17 @@ namespace IGB.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<long?>("TutorUserId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TutorUserId");
+
+                    b.HasIndex("CurriculumId", "IsDeleted");
 
                     b.HasIndex("GradeId", "IsDeleted");
 
@@ -181,6 +195,137 @@ namespace IGB.Infrastructure.Migrations
                     b.ToTable("CourseBookings");
                 });
 
+            modelBuilder.Entity("IGB.Domain.Entities.CourseCreditLedger", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreditsAllocated")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreditsRemaining")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreditsUsed")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentUserId", "CourseId", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("CourseCreditLedgers");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.CourseLedgerTransaction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<long>("CourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<long?>("ReferenceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentUserId", "CourseId", "CreatedAt", "IsDeleted");
+
+                    b.ToTable("CourseLedgerTransactions");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.CourseReview", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<long>("CourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentUserId");
+
+                    b.HasIndex("CourseId", "IsDeleted");
+
+                    b.HasIndex("CourseId", "StudentUserId", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("CourseReviews");
+                });
+
             modelBuilder.Entity("IGB.Domain.Entities.CourseTopic", b =>
                 {
                     b.Property<long>("Id")
@@ -221,6 +366,143 @@ namespace IGB.Infrastructure.Migrations
                     b.ToTable("CourseTopics");
                 });
 
+            modelBuilder.Entity("IGB.Domain.Entities.CreditLedgerEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DeltaCredits")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<long?>("ReferenceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ReferenceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "IsDeleted");
+
+                    b.ToTable("CreditLedgerEntries");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.CreditTransaction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BalanceAfter")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<long?>("ReferenceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ReferenceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "CreatedAt", "IsDeleted");
+
+                    b.ToTable("CreditTransactions");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.CreditsBalance", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("RemainingCredits")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalCredits")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UsedCredits")
+                        .HasColumnType("int");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("CreditsBalances");
+                });
+
             modelBuilder.Entity("IGB.Domain.Entities.Curriculum", b =>
                 {
                     b.Property<long>("Id")
@@ -255,6 +537,93 @@ namespace IGB.Infrastructure.Migrations
                     b.HasIndex("Name", "IsDeleted");
 
                     b.ToTable("Curricula");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.DashboardPreference", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Json")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Scope", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("DashboardPreferences");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.FeedbackAttachment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("StudentFeedbackId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentFeedbackId", "IsDeleted");
+
+                    b.ToTable("FeedbackAttachments");
                 });
 
             modelBuilder.Entity("IGB.Domain.Entities.Grade", b =>
@@ -346,6 +715,39 @@ namespace IGB.Infrastructure.Migrations
                     b.ToTable("Guardians");
                 });
 
+            modelBuilder.Entity("IGB.Domain.Entities.GuardianWard", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("GuardianUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentUserId");
+
+                    b.HasIndex("GuardianUserId", "StudentUserId", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("GuardianWards");
+                });
+
             modelBuilder.Entity("IGB.Domain.Entities.LessonBooking", b =>
                 {
                     b.Property<long>("Id")
@@ -353,6 +755,33 @@ namespace IGB.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AttendanceNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CancelReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CancellationNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("CancellationRequested")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("CancellationRequestedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("CancellationRequestedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("CancelledAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("CancelledByUserId")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("CourseBookingId")
                         .HasColumnType("bigint");
@@ -368,6 +797,16 @@ namespace IGB.Infrastructure.Migrations
 
                     b.Property<DateOnly>("DateTo")
                         .HasColumnType("date");
+
+                    b.Property<DateTimeOffset?>("DecisionAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("DecisionByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("DecisionNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
@@ -386,6 +825,9 @@ namespace IGB.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("Option3")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("RescheduleCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("RescheduleNote")
                         .HasMaxLength(500)
@@ -415,11 +857,17 @@ namespace IGB.Infrastructure.Migrations
                     b.Property<bool>("StudentAttended")
                         .HasColumnType("bit");
 
+                    b.Property<DateTimeOffset?>("StudentJoinedAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<long>("StudentUserId")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("TutorAttended")
                         .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("TutorJoinedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<long?>("TutorUserId")
                         .HasColumnType("bigint");
@@ -450,6 +898,744 @@ namespace IGB.Infrastructure.Migrations
                     b.HasIndex("CourseId", "StudentUserId", "IsDeleted");
 
                     b.ToTable("LessonBookings");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.LessonChangeLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long?>("ActorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("LessonBookingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("NewEndUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("NewStartUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("OldEndUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("OldStartUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LessonBookingId", "IsDeleted");
+
+                    b.ToTable("LessonChangeLogs");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.LessonTopicCoverage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CourseTopicId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("LessonBookingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TutorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("CourseTopicId");
+
+                    b.HasIndex("TutorUserId");
+
+                    b.HasIndex("LessonBookingId", "CourseTopicId", "IsDeleted")
+                        .IsUnique();
+
+                    b.HasIndex("StudentUserId", "CourseId", "CreatedAt", "IsDeleted");
+
+                    b.ToTable("LessonTopicCoverages");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.RbacPermission", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("RbacPermissions");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.RbacRole", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSystem")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("RbacRoles");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.RbacRolePermission", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("PermissionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RoleId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId", "PermissionId", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("RbacRolePermissions");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.StudentFeedback", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Attentiveness")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<long>("CourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FlagReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("FlaggedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("FlaggedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("HomeworkCompletion")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Improvement")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFlagged")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("LessonBookingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Participation")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TutorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("TutorUserId");
+
+                    b.HasIndex("LessonBookingId", "IsDeleted")
+                        .IsUnique();
+
+                    b.HasIndex("StudentUserId", "CreatedAt", "IsDeleted");
+
+                    b.ToTable("StudentFeedbacks");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.StudentProfile", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CurriculumId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("GradeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TimeZoneId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurriculumId");
+
+                    b.HasIndex("GradeId");
+
+                    b.HasIndex("UserId", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("StudentProfiles");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.StudentProgressNote", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TutorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("TutorUserId");
+
+                    b.HasIndex("StudentUserId", "CourseId", "CreatedAt", "IsDeleted");
+
+                    b.ToTable("StudentProgressNotes");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TestReport", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AreasForImprovement")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<long>("CourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Grade")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDraft")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ObtainedMarks")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Percentage")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("Strengths")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("SubmittedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateOnly>("TestDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("TestFileContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TestFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TestFileUrl")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("TestName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("TotalMarks")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TutorComments")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<long>("TutorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentUserId", "CourseId", "TestDate", "IsDeleted");
+
+                    b.HasIndex("TutorUserId", "CourseId", "TestDate", "IsDeleted");
+
+                    b.ToTable("TestReports");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TestReportTopic", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CourseTopicId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("TestReportId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseTopicId");
+
+                    b.HasIndex("TestReportId", "CourseTopicId", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("TestReportTopics");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorAvailabilityBlock", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTimeOffset>("EndUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset>("StartUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long>("TutorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TutorUserId", "StartUtc", "IsDeleted");
+
+                    b.ToTable("TutorAvailabilityBlocks");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorAvailabilityRule", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EndMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SlotMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StartMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TutorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TutorUserId", "DayOfWeek", "IsDeleted");
+
+                    b.ToTable("TutorAvailabilityRules");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorEarningTransaction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreditsEarned")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("LessonBookingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<long>("TutorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TutorUserId", "CreatedAt", "IsDeleted");
+
+                    b.ToTable("TutorEarningTransactions");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorFeedback", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("Communication")
+                        .HasColumnType("int");
+
+                    b.Property<long>("CourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FlagReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("FlaggedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("FlaggedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Friendliness")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFlagged")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("LessonBookingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Punctuality")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<long>("StudentUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("SubjectKnowledge")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeachingMethod")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TutorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentUserId");
+
+                    b.HasIndex("LessonBookingId", "IsDeleted")
+                        .IsUnique();
+
+                    b.HasIndex("TutorUserId", "CreatedAt", "IsDeleted");
+
+                    b.ToTable("TutorFeedbacks");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorProfile", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EducationHistoryJson")
+                        .HasMaxLength(12000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SpecialitiesJson")
+                        .HasMaxLength(8000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TimeZoneId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("WorkExperienceJson")
+                        .HasMaxLength(12000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("TutorProfiles");
                 });
 
             modelBuilder.Entity("IGB.Domain.Entities.User", b =>
@@ -520,9 +1706,27 @@ namespace IGB.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime?>("PasswordResetExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("PasswordResetSentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PasswordResetTokenHash")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ProfileImagePath")
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RefreshTokenHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenIssuedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -548,6 +1752,89 @@ namespace IGB.Infrastructure.Migrations
                     b.HasIndex("Role", "IsDeleted");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.UserDocument", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "IsDeleted");
+
+                    b.ToTable("UserDocuments");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.UserRbacRole", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("RoleId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId", "RoleId", "IsDeleted")
+                        .IsUnique();
+
+                    b.ToTable("UserRbacRoles");
                 });
 
             modelBuilder.Entity("IGB.Domain.Entities.Announcement", b =>
@@ -576,13 +1863,28 @@ namespace IGB.Infrastructure.Migrations
 
             modelBuilder.Entity("IGB.Domain.Entities.Course", b =>
                 {
+                    b.HasOne("IGB.Domain.Entities.Curriculum", "Curriculum")
+                        .WithMany()
+                        .HasForeignKey("CurriculumId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("IGB.Domain.Entities.Grade", "Grade")
                         .WithMany("Courses")
                         .HasForeignKey("GradeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("IGB.Domain.Entities.User", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Curriculum");
+
                     b.Navigation("Grade");
+
+                    b.Navigation("TutorUser");
                 });
 
             modelBuilder.Entity("IGB.Domain.Entities.CourseBooking", b =>
@@ -611,6 +1913,63 @@ namespace IGB.Infrastructure.Migrations
                     b.Navigation("TutorUser");
                 });
 
+            modelBuilder.Entity("IGB.Domain.Entities.CourseCreditLedger", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("StudentUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.CourseLedgerTransaction", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("StudentUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.CourseReview", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("StudentUser");
+                });
+
             modelBuilder.Entity("IGB.Domain.Entities.CourseTopic", b =>
                 {
                     b.HasOne("IGB.Domain.Entities.Course", "Course")
@@ -627,6 +1986,61 @@ namespace IGB.Infrastructure.Migrations
                     b.Navigation("Course");
 
                     b.Navigation("ParentTopic");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.CreditLedgerEntry", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.CreditTransaction", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.CreditsBalance", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.DashboardPreference", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.FeedbackAttachment", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.StudentFeedback", "StudentFeedback")
+                        .WithMany("Attachments")
+                        .HasForeignKey("StudentFeedbackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StudentFeedback");
                 });
 
             modelBuilder.Entity("IGB.Domain.Entities.Grade", b =>
@@ -647,6 +2061,25 @@ namespace IGB.Infrastructure.Migrations
                         .HasForeignKey("StudentUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("StudentUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.GuardianWard", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "GuardianUser")
+                        .WithMany()
+                        .HasForeignKey("GuardianUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GuardianUser");
 
                     b.Navigation("StudentUser");
                 });
@@ -684,6 +2117,321 @@ namespace IGB.Infrastructure.Migrations
                     b.Navigation("TutorUser");
                 });
 
+            modelBuilder.Entity("IGB.Domain.Entities.LessonChangeLog", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.LessonBooking", "LessonBooking")
+                        .WithMany()
+                        .HasForeignKey("LessonBookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LessonBooking");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.LessonTopicCoverage", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.CourseTopic", "CourseTopic")
+                        .WithMany()
+                        .HasForeignKey("CourseTopicId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.LessonBooking", "LessonBooking")
+                        .WithMany()
+                        .HasForeignKey("LessonBookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("CourseTopic");
+
+                    b.Navigation("LessonBooking");
+
+                    b.Navigation("StudentUser");
+
+                    b.Navigation("TutorUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.RbacRolePermission", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.RbacPermission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.RbacRole", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.StudentFeedback", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.LessonBooking", "LessonBooking")
+                        .WithMany()
+                        .HasForeignKey("LessonBookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("LessonBooking");
+
+                    b.Navigation("StudentUser");
+
+                    b.Navigation("TutorUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.StudentProfile", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.Curriculum", "Curriculum")
+                        .WithMany()
+                        .HasForeignKey("CurriculumId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("IGB.Domain.Entities.Grade", "Grade")
+                        .WithMany()
+                        .HasForeignKey("GradeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("IGB.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Curriculum");
+
+                    b.Navigation("Grade");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.StudentProgressNote", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("StudentUser");
+
+                    b.Navigation("TutorUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TestReport", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("StudentUser");
+
+                    b.Navigation("TutorUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TestReportTopic", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.CourseTopic", "CourseTopic")
+                        .WithMany()
+                        .HasForeignKey("CourseTopicId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.TestReport", "TestReport")
+                        .WithMany("Topics")
+                        .HasForeignKey("TestReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CourseTopic");
+
+                    b.Navigation("TestReport");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorAvailabilityBlock", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TutorUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorAvailabilityRule", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TutorUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorEarningTransaction", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TutorUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorFeedback", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.LessonBooking", "LessonBooking")
+                        .WithMany()
+                        .HasForeignKey("LessonBookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("LessonBooking");
+
+                    b.Navigation("StudentUser");
+
+                    b.Navigation("TutorUser");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TutorProfile", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.UserDocument", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.UserRbacRole", b =>
+                {
+                    b.HasOne("IGB.Domain.Entities.RbacRole", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IGB.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("IGB.Domain.Entities.Course", b =>
                 {
                     b.Navigation("Bookings");
@@ -704,6 +2452,28 @@ namespace IGB.Infrastructure.Migrations
             modelBuilder.Entity("IGB.Domain.Entities.Grade", b =>
                 {
                     b.Navigation("Courses");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.RbacPermission", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.RbacRole", b =>
+                {
+                    b.Navigation("RolePermissions");
+
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.StudentFeedback", b =>
+                {
+                    b.Navigation("Attachments");
+                });
+
+            modelBuilder.Entity("IGB.Domain.Entities.TestReport", b =>
+                {
+                    b.Navigation("Topics");
                 });
 
             modelBuilder.Entity("IGB.Domain.Entities.User", b =>

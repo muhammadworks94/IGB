@@ -1,0 +1,91 @@
+@model IGB.Web.ViewModels.Tutor.TutorMyCoursesViewModel
+@{
+    ViewData["Title"] = "My Courses";
+    var q = (string?)ViewBag.Query;
+    bool? active = (bool?)ViewBag.Active;
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Courses",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Portal")),
+        new("My Courses")
+    },
+    Subtitle: "Courses assigned to you (tutor)."
+))
+
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-12 col-md-6 col-xl-5">
+                    <label class="form-label">Search</label>
+                    <input class="form-control" name="q" value="@q" placeholder="Search by course name…" />
+                </div>
+                <div class="col-12 col-md-4 col-xl-3">
+                    <label class="form-label">Active</label>
+                    <select class="form-select" name="active">
+                        <option value="" selected="@(active == null)">All</option>
+                        <option value="true" selected="@(active == true)">Active</option>
+                        <option value="false" selected="@(active == false)">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-2 col-xl-4 d-flex gap-2">
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-filter me-1"></i>Filter</button>
+                    <a class="btn btn-outline-secondary" href="@Url.Action("My","Courses")"><i class="fas fa-rotate-left me-1"></i>Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">Assigned courses</h5>
+                <span class="text-muted small">@Model.Items.Count</span>
+            </div>
+
+            @if (Model.Items.Count == 0)
+            {
+                <div class="text-muted">No courses assigned yet.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Curriculum</th>
+                            <th>Grade</th>
+                            <th class="text-end">Credits</th>
+                            <th class="text-end">Students</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var c in Model.Items)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@c.Name</td>
+                                <td class="text-muted">@((c.Curriculum ?? "-"))</td>
+                                <td class="text-muted">@((c.Grade ?? "-"))</td>
+                                <td class="text-end">@c.CreditCost</td>
+                                <td class="text-end">@c.Students</td>
+                                <td><span class="badge @(c.IsActive ? "bg-success" : "bg-secondary")">@(c.IsActive ? "Active" : "Inactive")</span></td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary" href="/Schedule/Tutor?courseId=@c.CourseId">Schedule</a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+

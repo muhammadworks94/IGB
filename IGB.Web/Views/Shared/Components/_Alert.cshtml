@@ -1,0 +1,25 @@
+@model IGB.Web.ViewModels.Components.AlertViewModel
+
+@{
+    var bsVariant = Model.Variant switch
+    {
+        "success" => "success",
+        "danger" => "danger",
+        "warning" => "warning",
+        _ => "info"
+    };
+}
+
+<div class="alert alert-@bsVariant @(Model.Dismissible ? "alert-dismissible fade show" : "") @(Model.CssClass ?? "")" role="alert">
+    @if (!string.IsNullOrWhiteSpace(Model.Title))
+    {
+        <div class="fw-semibold mb-1">@Model.Title</div>
+    }
+    <div>@Model.Message</div>
+    @if (Model.Dismissible)
+    {
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    }
+</div>
+
+

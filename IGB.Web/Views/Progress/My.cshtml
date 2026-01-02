@@ -1,0 +1,133 @@
+@model IGB.Web.ViewModels.Progress.StudentProgressDashboardViewModel
+@{
+    ViewData["Title"] = "My Progress";
+    string riskClass(int p) => p >= 70 ? "bg-success" : (p >= 40 ? "bg-warning" : "bg-danger");
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "My Progress",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Progress")
+    }
+))
+
+<div class="container-fluid">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Overall progress</div>
+                    <div class="d-flex align-items-end justify-content-between">
+                        <div class="fs-2 fw-semibold">@Model.OverallPercent%</div>
+                        <div class="text-muted">@Model.CompletedTopics / @Model.TotalTopics topics</div>
+                    </div>
+                    <div class="progress mt-2" style="height:10px;">
+                        <div class="progress-bar @riskClass(Model.OverallPercent)" style="width:@Model.OverallPercent%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Performance (from tutor feedback)</div>
+                    <div class="fs-2 fw-semibold">@((Model.PerformanceAvgRating ?? 0).ToString("F1")) / 5</div>
+                    <div class="text-muted small">@Model.PerformanceCount feedback entries</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-muted small">Trend (last 14 days)</div>
+                    <canvas id="progressTrend" height="90"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="mb-3">My Courses</h5>
+            <div class="row g-3">
+                @foreach (var c in Model.Courses)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card border h-100">
+                            <div class="card-body">
+                                <div class="fw-semibold">@c.CourseName</div>
+                                <div class="text-muted small">Tutor: @(c.TutorName ?? "TBD")</div>
+                                <div class="text-muted small mt-2">@c.CompletedTopics / @c.TotalTopics topics</div>
+                                <div class="progress mt-1" style="height:10px;">
+                                    <div class="progress-bar @riskClass(c.Percent)" style="width:@c.Percent%"></div>
+                                </div>
+                                <div class="text-muted small mt-1">@c.Percent%</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Recent lessons</h5>
+                    <div class="list-group">
+                        @foreach (var l in Model.RecentLessons)
+                        {
+                            <div class="list-group-item d-flex justify-content-between">
+                                <div>
+                                    <div class="fw-semibold">@l.CourseName</div>
+                                    <div class="text-muted small">@l.WhenUtc.ToString("yyyy-MM-dd HH:mm") (UTC) • @l.Status</div>
+                                </div>
+                                <div class="text-muted small">
+                                    @(l.StudentAttended == true ? "Attended" : l.StudentAttended == false ? "Missed" : "")
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Upcoming lessons</h5>
+                    <div class="list-group">
+                        @foreach (var l in Model.UpcomingLessons)
+                        {
+                            <div class="list-group-item">
+                                <div class="fw-semibold">@l.CourseName</div>
+                                <div class="text-muted small">@l.WhenUtc.ToString("yyyy-MM-dd HH:mm") (UTC) • @l.Status</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/nobleui/vendors/chartjs/Chart.min.js"></script>
+    <script>
+      (function(){
+        const ctx = document.getElementById('progressTrend');
+        if (!ctx || typeof Chart === 'undefined') return;
+        const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Trend.Select(t => t.Day)));
+        const data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Trend.Select(t => t.Percent)));
+        new Chart(ctx, {
+          type: 'line',
+          data: { labels, datasets: [{ label: 'Progress %', data, borderColor: '#0d6efd', tension: 0.3, fill: false }] },
+          options: { plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } }
+        });
+      })();
+    </script>
+}
+
+

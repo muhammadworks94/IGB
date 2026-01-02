@@ -1,0 +1,46 @@
+@model List<IGB.Web.ViewModels.Student.MyCoursesViewModel.MyCourseItem>
+
+<div class="card">
+    <div class="card-body">
+        @if (Model.Count == 0)
+        {
+            <div class="text-muted text-center py-4">No courses in this tab.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Curriculum</th>
+                        <th>Grade</th>
+                        <th>Credits</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@c.CourseName</td>
+                            <td>@c.Curriculum</td>
+                            <td>@c.Grade</td>
+                            <td>@c.CreditCost</td>
+                            <td><span class="badge bg-secondary">@c.Status</span></td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details","CourseCatalog", new { id = c.CourseId })">View</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="@Url.Action("Index","Profile")">View Schedule</a>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" disabled>View Progress</button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+

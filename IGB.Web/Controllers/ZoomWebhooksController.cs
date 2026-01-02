@@ -4,6 +4,7 @@ using System.Text.Json;
 using IGB.Domain.Enums;
 using IGB.Infrastructure.Data;
 using IGB.Web.Zoom;
+using IGB.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,12 +20,18 @@ public sealed class ZoomWebhooksController : ControllerBase
     private readonly ApplicationDbContext _db;
     private readonly IOptionsMonitor<ZoomOptions> _options;
     private readonly ILogger<ZoomWebhooksController> _logger;
+    private readonly CreditService _credits;
+    private readonly AdminDashboardRealtimeBroadcaster _rt;
+    private readonly TutorDashboardRealtimeBroadcaster _tutorRt;
 
-    public ZoomWebhooksController(ApplicationDbContext db, IOptionsMonitor<ZoomOptions> options, ILogger<ZoomWebhooksController> logger)
+    public ZoomWebhooksController(ApplicationDbContext db, IOptionsMonitor<ZoomOptions> options, ILogger<ZoomWebhooksController> logger, CreditService credits, AdminDashboardRealtimeBroadcaster rt, TutorDashboardRealtimeBroadcaster tutorRt)
     {
         _db = db;
         _options = options;
         _logger = logger;
+        _credits = credits;
+        _rt = rt;
+        _tutorRt = tutorRt;
     }
 
     [HttpPost]
@@ -123,21 +130,92 @@ public sealed class ZoomWebhooksController : ControllerBase
 
     private async Task SetSessionStartAsync(string meetingId, CancellationToken cancellationToken)
     {
-        var lesson = await _db.LessonBookings.FirstOrDefaultAsync(l => !l.IsDeleted && l.ZoomMeetingId == meetingId, cancellationToken);
+        var lesson = await _db.LessonBookings
+            .Include(l => l.Course)
+            .Include(l => l.StudentUser)
+            .Include(l => l.TutorUser)
+            .FirstOrDefaultAsync(l => !l.IsDeleted && l.ZoomMeetingId == meetingId, cancellationToken);
         if (lesson == null) return;
+        var wasNull = !lesson.SessionStartedAt.HasValue;
         lesson.SessionStartedAt ??= DateTimeOffset.UtcNow;
         lesson.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
+
+        if (wasNull)
+        {
+            var payload = new
+            {
+                lessonId = lesson.Id,
+                startedAtUtc = lesson.SessionStartedAt?.ToString("O"),
+                courseName = lesson.Course?.Name,
+                studentName = lesson.StudentUser?.FullName,
+                tutorName = lesson.TutorUser?.FullName
+            };
+            await _rt.SendToAdminsAsync("lesson:started", payload, cancellationToken);
+            if (lesson.TutorUserId.HasValue)
+                await _tutorRt.SendToTutorAsync(lesson.TutorUserId.Value, "lesson:started", payload, cancellationToken);
+            await _rt.SendToAdminsAsync("activity:new", new
+            {
+                timeUtc = DateTimeOffset.UtcNow.ToString("O"),
+                relative = "Just now",
+                type = "Lesson",
+                badge = "green",
+                text = $"Lesson started: {lesson.StudentUser?.FullName ?? lesson.StudentUserId.ToString()} • {lesson.Course?.Name ?? "Course"}",
+                url = $"/LessonBookings/Details?id={lesson.Id}"
+            }, cancellationToken);
+        }
     }
 
     private async Task SetSessionEndAsync(string meetingId, CancellationToken cancellationToken)
     {
-        var lesson = await _db.LessonBookings.FirstOrDefaultAsync(l => !l.IsDeleted && l.ZoomMeetingId == meetingId, cancellationToken);
+        var lesson = await _db.LessonBookings
+            .Include(l => l.Course)
+            .Include(l => l.StudentUser)
+            .Include(l => l.TutorUser)
+            .FirstOrDefaultAsync(l => !l.IsDeleted && l.ZoomMeetingId == meetingId, cancellationToken);
         if (lesson == null) return;
+        var wasNull = !lesson.SessionEndedAt.HasValue;
         lesson.SessionEndedAt ??= DateTimeOffset.UtcNow;
-        if (lesson.Status == LessonStatus.Scheduled) lesson.Status = LessonStatus.Completed;
+        if (lesson.Status is LessonStatus.Scheduled or LessonStatus.Rescheduled) lesson.Status = LessonStatus.Completed;
         lesson.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
+
+        if (wasNull)
+        {
+            var payload = new
+            {
+                lessonId = lesson.Id,
+                endedAtUtc = lesson.SessionEndedAt?.ToString("O"),
+                courseName = lesson.Course?.Name,
+                studentName = lesson.StudentUser?.FullName,
+                tutorName = lesson.TutorUser?.FullName
+            };
+            await _rt.SendToAdminsAsync("lesson:ended", payload, cancellationToken);
+            if (lesson.TutorUserId.HasValue)
+                await _tutorRt.SendToTutorAsync(lesson.TutorUserId.Value, "lesson:ended", payload, cancellationToken);
+            await _rt.SendToAdminsAsync("activity:new", new
+            {
+                timeUtc = DateTimeOffset.UtcNow.ToString("O"),
+                relative = "Just now",
+                type = "Lesson",
+                badge = "green",
+                text = $"Lesson ended: {lesson.StudentUser?.FullName ?? lesson.StudentUserId.ToString()} • {lesson.Course?.Name ?? "Course"}",
+                url = $"/LessonBookings/Details?id={lesson.Id}"
+            }, cancellationToken);
+        }
+
+        // Tutor earnings on completion
+        if (lesson.TutorUserId.HasValue)
+        {
+            try
+            {
+                await _credits.AddTutorEarningAsync(lesson.TutorUserId.Value, lesson.Id, _credits.Policy.TutorEarningPerLessonCredits, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to add tutor earning for lesson {LessonId}", lesson.Id);
+            }
+        }
     }
 
     private async Task MarkAttendanceAsync(string meetingId, JsonDocument doc, CancellationToken cancellationToken)
@@ -155,9 +233,15 @@ public sealed class ZoomWebhooksController : ControllerBase
         if (!string.IsNullOrWhiteSpace(email))
         {
             if (string.Equals(email, lesson.StudentUser?.Email, StringComparison.OrdinalIgnoreCase))
+            {
                 lesson.StudentAttended = true;
+                lesson.StudentJoinedAt ??= DateTimeOffset.UtcNow;
+            }
             if (string.Equals(email, lesson.TutorUser?.Email, StringComparison.OrdinalIgnoreCase))
+            {
                 lesson.TutorAttended = true;
+                lesson.TutorJoinedAt ??= DateTimeOffset.UtcNow;
+            }
         }
 
         lesson.UpdatedAt = DateTime.UtcNow;

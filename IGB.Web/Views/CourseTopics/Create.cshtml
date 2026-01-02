@@ -5,15 +5,14 @@
     ViewData["Title"] = "Create Topic";
 }
 
-<div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item"><a asp-action="Index" asp-route-courseId="@course.Id">Topics</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Create</li>
-        </ol>
-    </nav>
-    <h1 class="breadcrumb-title">Create @(parentTopicId.HasValue ? "Sub Topic" : "Main Topic")</h1>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: $"Create {(parentTopicId.HasValue ? "Sub Topic" : "Main Topic")}",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Topics", Url.Action("Index", "CourseTopics", new { courseId = course.Id })),
+        new("Create")
+    }
+))
 
 <div class="container-fluid">
     <div class="card">

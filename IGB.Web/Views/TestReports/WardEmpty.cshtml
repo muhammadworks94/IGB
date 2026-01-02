@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Ward Test Reports";
+    var msg = (string?)ViewBag.Message ?? "No ward is linked yet.";
+}
+
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Ward Test Reports",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("My Ward"),
+        new("Test Reports")
+    }
+))
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <div class="fs-5 fw-semibold">@msg</div>
+            <div class="text-muted">Ask admin to link a ward to this guardian account.</div>
+        </div>
+    </div>
+</div>
+
+

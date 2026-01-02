@@ -45,12 +45,17 @@ public class RegistrationService : IRegistrationService
             var token = GenerateToken();
             var tokenHash = Sha256Hex(token);
 
+            var normalizedRole = string.IsNullOrWhiteSpace(dto.Role) ? "Student" : dto.Role.Trim();
+            var approvalStatus = string.Equals(normalizedRole, "Tutor", StringComparison.OrdinalIgnoreCase)
+                ? UserApprovalStatus.Pending
+                : UserApprovalStatus.Approved;
+
             var user = new User
             {
                 Email = dto.Email.Trim(),
                 FirstName = dto.FirstName.Trim(),
                 LastName = dto.LastName.Trim(),
-                Role = string.IsNullOrWhiteSpace(dto.Role) ? "Student" : dto.Role.Trim(),
+                Role = normalizedRole,
                 LocalNumber = dto.LocalNumber,
                 WhatsappNumber = dto.WhatsappNumber,
                 CountryCode = dto.CountryCode,
@@ -60,7 +65,9 @@ public class RegistrationService : IRegistrationService
                 EmailConfirmed = false,
                 EmailConfirmationTokenHash = tokenHash,
                 EmailConfirmationSentAt = DateTime.UtcNow,
-                ApprovalStatus = UserApprovalStatus.Pending,
+                ApprovalStatus = approvalStatus,
+                ApprovedAt = approvalStatus == UserApprovalStatus.Approved ? DateTime.UtcNow : null,
+                ApprovalNote = approvalStatus == UserApprovalStatus.Approved ? "Auto-approved (non-tutor registration)" : null,
                 CreatedAt = DateTime.UtcNow
             };
 

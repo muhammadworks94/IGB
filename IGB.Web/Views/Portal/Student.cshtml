@@ -1,27 +1,579 @@
 @{
-    ViewData["Title"] = "Student Portal";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="breadcrumb-header">
-    <h1 class="breadcrumb-title">Student Portal</h1>
-    <p class="breadcrumb-subtitle">Browse courses, manage bookings, and track lessons.</p>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Dashboard",
+    Breadcrumbs: new List<BreadcrumbItem> { new("Dashboard", Url.Action("Index", "Portal")) }
+))
 
 <div class="container-fluid">
-    <div class="row g-3">
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="Courses" asp-action="Browse">Browse Courses</a>
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h3 class="mb-1">Welcome back, <span id="studentName">Student</span>!</h3>
+            <div class="text-muted small">
+                <span id="tipOfDay">—</span>
+                <span class="mx-2">•</span>
+                <span id="studentClock">—</span>
+            </div>
         </div>
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="CourseBookings" asp-action="My">My Course Bookings</a>
+        <div class="d-flex align-items-center gap-2">
+            <a class="btn btn-outline-secondary" href="/Profile/Index"><i class="fas fa-user-circle me-2"></i>Profile</a>
         </div>
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="LessonBookings" asp-action="My">My Lessons</a>
+    </div>
+
+    <style>
+        .skeleton {
+            background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%);
+            background-size: 400% 100%;
+            animation: shimmer 1.2s ease-in-out infinite;
+            border-radius: 10px;
+        }
+        @@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+        /* Overview cards: solid colorful tiles (like modern dashboards) */
+        .overview-card {
+            border: 0;
+            overflow: hidden;
+            box-shadow: 0 14px 28px rgba(16,24,40,.14);
+        }
+        /* Only switch text to white when the gradient class is applied (prevents "blank" cards if CSS is overridden) */
+        .overview-card[class*="card-grad-"] { color: #fff; }
+        .overview-card[class*="card-grad-"] .text-muted { color: rgba(255,255,255,.72) !important; }
+        .overview-card[class*="card-grad-"] .small.text-muted { color: rgba(255,255,255,.72) !important; }
+        .overview-card[class*="card-grad-"] a { color: rgba(255,255,255,.88) !important; }
+        .overview-card[class*="card-grad-"] a:hover { color: #fff !important; text-decoration: underline; }
+
+        .overview-icon {
+            width: 44px; height: 44px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.20);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+        }
+        .overview-icon i { font-size: 16px; color: #fff; opacity: .95; }
+
+        /* Bold gradients */
+        /* Use !important to beat theme/default card background rules */
+        .overview-card.card-grad-primary { background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #4f46e5 100%) !important; }
+        .overview-card.card-grad-success { background: linear-gradient(135deg, #16a34a 0%, #22c55e 55%, #059669 100%) !important; }
+        .overview-card.card-grad-info { background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 55%, #2563eb 100%) !important; }
+        .overview-card.card-grad-secondary { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 55%, #6366f1 100%) !important; }
+        /* Used when credits are low */
+        .overview-card.card-grad-warning { background: linear-gradient(135deg, #f59e0b 0%, #facc15 55%, #ef4444 100%) !important; }
+
+        /* White progress bar on colored tiles */
+        .overview-card .progress { background: rgba(255,255,255,.22) !important; }
+        .overview-card .progress-bar { background: rgba(255,255,255,.92) !important; }
+        .lesson-border-upcoming { border-left: 4px solid #0dcaf0; }
+        .lesson-border-ongoing { border-left: 4px solid #198754; }
+        .lesson-border-completed { border-left: 4px solid #6c757d; }
+        .lesson-border-cancelled { border-left: 4px solid #dc3545; }
+        .pulse {
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        @@keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(25,135,84,0.25); }
+            70% { box-shadow: 0 0 0 10px rgba(25,135,84,0); }
+            100% { box-shadow: 0 0 0 0 rgba(25,135,84,0); }
+        }
+    </style>
+
+    <div id="errorBox" class="alert alert-danger d-none">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">Dashboard failed to load</div>
+                <div class="small text-muted">Please retry.</div>
+            </div>
+            <button class="btn btn-sm btn-light" id="retryBtn">Retry</button>
         </div>
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="Profile" asp-action="Index">My Profile</a>
+    </div>
+
+    <div id="profileBanner" class="alert alert-warning d-none">
+        <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+            <div>
+                <div class="fw-semibold"><i class="fas fa-exclamation-triangle me-2"></i>Profile incomplete</div>
+                <div class="small text-muted">Your profile is <span class="fw-semibold" id="profilePct">0%</span> complete. Missing: <span id="profileMissing">—</span></div>
+                <div class="progress mt-2" style="height:8px;max-width:520px;">
+                    <div class="progress-bar bg-warning" id="profileBar" style="width:0%"></div>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a class="btn btn-sm btn-outline-dark" href="/Profile/Index">Complete Profile</a>
+                <button class="btn btn-sm btn-outline-secondary" id="dismissProfile" type="button">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview cards -->
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card overview-card card-grad-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="overview-icon"><i class="fas fa-book"></i></div>
+                        <a class="small text-decoration-none" href="/CourseBookings/My">My Courses</a>
+                    </div>
+                    <div class="fs-2 fw-semibold mt-2" id="cardCourses">—</div>
+                    <div class="text-muted">Enrolled Courses</div>
+                    <div class="small text-muted mt-1"><span id="cardCoursesCompleted">0</span> completed</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card overview-card card-grad-success" id="creditsCard">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="overview-icon"><i class="fas fa-coins"></i></div>
+                        <a class="small text-decoration-none" href="/Credits/My">Credits</a>
+                    </div>
+                    <div class="fs-2 fw-semibold mt-2" id="cardCredits">—</div>
+                    <div class="text-muted">Available Credits</div>
+                    <div class="small mt-1" id="creditWarning"></div>
+                    <div class="progress mt-2" style="height:8px;">
+                        <div class="progress-bar" id="creditsBar" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card overview-card card-grad-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="overview-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <a class="small text-decoration-none" href="/Schedule/My">My Schedule</a>
+                    </div>
+                    <div class="fs-2 fw-semibold mt-2" id="cardWeekLessons">—</div>
+                    <div class="text-muted">Lessons This Week</div>
+                    <div class="small text-muted mt-1" id="nextLesson">Next: —</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card overview-card card-grad-secondary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="overview-icon"><i class="fas fa-chart-pie"></i></div>
+                        <a class="small text-decoration-none" href="/Progress/My">Progress</a>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 mt-2">
+                        <div style="width:54px;height:54px;">
+                            <canvas id="overallProgressChart"></canvas>
+                        </div>
+                        <div>
+                            <div class="fw-semibold" id="overallPct">—</div>
+                            <div class="text-muted small">Overall Progress</div>
+                            <div class="text-muted small">Across all courses</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Schedule -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                <h6 class="mb-0">My Schedule</h6>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="btn-group" role="group" aria-label="Schedule tabs">
+                        <button class="btn btn-sm btn-outline-secondary active" data-tab="today" type="button">Today</button>
+                        <button class="btn btn-sm btn-outline-secondary" data-tab="tomorrow" type="button">Tomorrow</button>
+                        <button class="btn btn-sm btn-outline-secondary" data-tab="week" type="button">This Week</button>
+                    </div>
+                    <div class="btn-group" role="group" aria-label="View toggle">
+                        <button class="btn btn-sm btn-outline-secondary active" id="listViewBtn" type="button">List</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="timelineViewBtn" type="button">Timeline</button>
+                    </div>
+                    <a class="btn btn-sm btn-outline-primary" href="/Schedule/My">View Full Schedule</a>
+                </div>
+            </div>
+            <div class="text-muted small mb-2" id="scheduleDateLabel">—</div>
+
+            <div id="scheduleEmpty" class="text-muted d-none">
+                <div class="py-3">No classes for this range.</div>
+            </div>
+
+            <div id="scheduleList"></div>
+            <div id="scheduleTimeline" class="d-none"></div>
+        </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="mb-2">Quick actions</h6>
+            <div class="row g-2">
+                <div class="col-12 col-md-6 col-xl-4">
+                    <a class="btn btn-primary w-100 py-3" href="/LessonBookings/Create"><i class="fas fa-book-open me-2"></i>Book a Lesson</a>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4">
+                    <a class="btn btn-outline-secondary w-100 py-3" href="/Courses/Browse"><i class="fas fa-search me-2"></i>Browse Courses</a>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4">
+                    <a class="btn btn-outline-secondary w-100 py-3" href="/Schedule/My"><i class="fas fa-calendar-alt me-2"></i>View My Schedule</a>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4">
+                    <a class="btn btn-outline-secondary w-100 py-3" href="/Credits/My" id="purchaseCreditsBtn"><i class="fas fa-credit-card me-2"></i>Credits <span class="badge bg-danger ms-1 d-none" id="lowCreditBadge">Low!</span></a>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4">
+                    <a class="btn btn-outline-secondary w-100 py-3" href="/Progress/My"><i class="fas fa-chart-line me-2"></i>View My Progress</a>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4">
+                    <a class="btn btn-outline-secondary w-100 py-3" href="/Feedback/My"><i class="fas fa-star me-2"></i>Give Feedback <span class="badge bg-primary ms-1 d-none" id="pendingFeedbackBadge">0</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course progress -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                <h6 class="mb-0">My Courses</h6>
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="btn-group" role="group" aria-label="Course tabs">
+                        <button class="btn btn-sm btn-outline-secondary active" data-course-tab="active" type="button">Active</button>
+                        <button class="btn btn-sm btn-outline-secondary" data-course-tab="completed" type="button">Completed</button>
+                        <button class="btn btn-sm btn-outline-secondary" data-course-tab="all" type="button">All</button>
+                    </div>
+                    <select class="form-select form-select-sm" id="courseSort" style="width:190px;">
+                        <option value="progress_desc">Sort: Progress</option>
+                        <option value="name_asc">Sort: Course Name</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row g-3" id="courseGrid">
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="card"><div class="card-body"><div class="skeleton" style="height:140px;"></div></div></div>
+                </div>
+            </div>
+            <div class="text-muted d-none" id="coursesEmpty">No courses to show.</div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="/nobleui/vendors/chartjs/Chart.min.js"></script>
+    <script>
+        (function(){
+            const state = { data: null, scheduleTab: 'today', scheduleView: 'list', courseTab: 'active' };
+
+            function tickClock(){
+                document.getElementById('studentClock').textContent = new Date().toLocaleString();
+            }
+            setInterval(tickClock, 1000);
+            tickClock();
+
+            const errorBox = document.getElementById('errorBox');
+            const retryBtn = document.getElementById('retryBtn');
+
+            function showError(on){
+                errorBox.classList.toggle('d-none', !on);
+            }
+
+            function fmtLocal(iso){
+                if (!iso) return '—';
+                return new Date(iso).toLocaleString([], { weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+            }
+
+            function fmtTime(iso){
+                if (!iso) return '—';
+                return new Date(iso).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+            }
+
+            function relStart(iso){
+                const start = new Date(iso).getTime();
+                const mins = Math.round((start - Date.now())/60000);
+                if (mins < 0) return 'Started';
+                if (mins === 0) return 'Starts now';
+                if (mins < 60) return `Starts in ${mins} mins`;
+                const hrs = Math.floor(mins/60);
+                return `Starts in ${hrs} hours`;
+            }
+
+            function statusBadge(status, canJoin){
+                const s = status || '';
+                if (canJoin) return '<span class="badge bg-success pulse">In Progress</span>';
+                if (s === 'Completed') return '<span class="badge bg-secondary">Completed</span>';
+                if (s === 'Cancelled') return '<span class="badge bg-danger">Cancelled</span>';
+                if (s === 'Scheduled' || s === 'Rescheduled') return '<span class="badge bg-info text-dark">Upcoming</span>';
+                return `<span class="badge bg-light text-dark">${s}</span>`;
+            }
+
+            function leftBorder(status, canJoin){
+                if (canJoin) return 'lesson-border-ongoing';
+                if (status === 'Completed') return 'lesson-border-completed';
+                if (status === 'Cancelled') return 'lesson-border-cancelled';
+                return 'lesson-border-upcoming';
+            }
+
+            function renderProfileBanner(){
+                const banner = document.getElementById('profileBanner');
+                if (!state.data) return;
+                const p = state.data.profile;
+                const dismissed = sessionStorage.getItem('igb:studentDash:profileDismissed:v1') === 'true';
+                if (p.isComplete || dismissed) { banner.classList.add('d-none'); return; }
+                document.getElementById('profilePct').textContent = `${p.percent}%`;
+                document.getElementById('profileMissing').textContent = (p.missing || []).join(', ') || '—';
+                document.getElementById('profileBar').style.width = `${p.percent}%`;
+                banner.classList.remove('d-none');
+            }
+
+            document.getElementById('dismissProfile').addEventListener('click', () => {
+                sessionStorage.setItem('igb:studentDash:profileDismissed:v1', 'true');
+                renderProfileBanner();
+            });
+
+            function renderOverview(){
+                const d = state.data;
+                document.getElementById('studentName').textContent = d.studentName || 'Student';
+                document.getElementById('tipOfDay').textContent = d.tipOfTheDay?.text || '—';
+
+                document.getElementById('cardCourses').textContent = d.overview?.courses?.enrolledCount ?? 0;
+                document.getElementById('cardCoursesCompleted').textContent = d.overview?.courses?.completedCount ?? 0;
+
+                const credits = d.overview?.credits;
+                const remaining = credits?.remaining ?? 0;
+                const total = credits?.total ?? Math.max(remaining + (credits?.used ?? 0), 0);
+                const used = credits?.used ?? 0;
+                document.getElementById('cardCredits').textContent = remaining;
+
+                // low credit styling
+                const creditsCard = document.getElementById('creditsCard');
+                creditsCard.classList.toggle('card-grad-success', !(credits?.isLow));
+                creditsCard.classList.toggle('card-grad-warning', !!(credits?.isLow));
+                document.getElementById('lowCreditBadge').classList.toggle('d-none', !(credits?.isLow));
+                document.getElementById('creditWarning').innerHTML = (credits?.isLow) ? '<span class="text-danger">Low balance!</span>' : '<span class="text-muted">Healthy balance</span>';
+
+                const denom = (used + remaining) || 1;
+                const usedPct = Math.round((used * 100) / denom);
+                document.getElementById('creditsBar').style.width = `${Math.max(0, Math.min(100, 100 - usedPct))}%`;
+
+                document.getElementById('cardWeekLessons').textContent = d.overview?.lessonsThisWeek?.count ?? 0;
+                document.getElementById('nextLesson').textContent = d.overview?.lessonsThisWeek?.nextLessonStartUtc ? `Next: ${fmtLocal(d.overview.lessonsThisWeek.nextLessonStartUtc)}` : 'Next: —';
+
+                // pending feedback badge
+                const pending = d.quick?.pendingFeedbackCount ?? 0;
+                const pb = document.getElementById('pendingFeedbackBadge');
+                pb.textContent = pending;
+                pb.classList.toggle('d-none', pending <= 0);
+
+                // overall progress chart
+                const pct = d.overview?.overallProgress?.percent ?? 0;
+                document.getElementById('overallPct').textContent = `${pct}%`;
+                if (typeof Chart !== 'undefined') {
+                    const ctx = document.getElementById('overallProgressChart');
+                    if (ctx) {
+                        if (state._progressChart) { try { state._progressChart.destroy(); } catch {} }
+                        state._progressChart = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: { labels: ['Done','Remaining'], datasets: [{ data: [pct, 100-pct], backgroundColor: ['#0d6efd', '#e9ecef'], borderWidth: 0 }] },
+                            options: { responsive:true, maintainAspectRatio:false, cutout:'70%', plugins: { legend: { display:false }, tooltip: { enabled:false } } }
+                        });
+                    }
+                }
+            }
+
+            function getScheduleItems(){
+                const s = state.data?.schedule;
+                if (!s) return [];
+                if (state.scheduleTab === 'today') return s.today || [];
+                if (state.scheduleTab === 'tomorrow') return s.tomorrow || [];
+                return s.thisWeek || [];
+            }
+
+            function renderSchedule(){
+                const items = getScheduleItems();
+                const list = document.getElementById('scheduleList');
+                const tl = document.getElementById('scheduleTimeline');
+                const empty = document.getElementById('scheduleEmpty');
+                const label = document.getElementById('scheduleDateLabel');
+
+                const now = new Date();
+                if (state.scheduleTab === 'today') label.textContent = now.toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' });
+                else if (state.scheduleTab === 'tomorrow') {
+                    const d = new Date(now.getTime() + 86400000);
+                    label.textContent = d.toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' });
+                } else {
+                    label.textContent = 'Next 7 days';
+                }
+
+                empty.classList.toggle('d-none', items.length !== 0);
+                list.classList.toggle('d-none', state.scheduleView !== 'list');
+                tl.classList.toggle('d-none', state.scheduleView !== 'timeline');
+
+                if (!items.length) { list.innerHTML = ''; tl.innerHTML = ''; return; }
+
+                // list view
+                list.innerHTML = items.map(l => {
+                    const start = new Date(l.startUtc).getTime();
+                    const minsToStart = (start - Date.now()) / 60000;
+                    const startingSoon = minsToStart > 0 && minsToStart <= 15;
+                    const canJoinSoon = startingSoon && l.joinUrl;
+                    const canReschedule = minsToStart > 24*60;
+
+                    const timeRemaining = relStart(l.startUtc);
+                    const timeClass = minsToStart <= 60 ? 'text-danger' : (minsToStart <= 180 ? 'text-warning' : 'text-muted');
+
+                    const joinBtn = canJoinSoon
+                        ? `<a class="btn btn-sm btn-primary pulse" target="_blank" href="${l.joinUrl}">Join Class</a>`
+                        : (l.canJoin && l.joinUrl ? `<a class="btn btn-sm btn-primary pulse" target="_blank" href="${l.joinUrl}">Join Now</a>` : `<a class="btn btn-sm btn-outline-secondary" href="/LessonBookings/Details?id=${l.id}">View Details</a>`);
+
+                    const reschedBtn = canReschedule ? `<a class="btn btn-sm btn-outline-warning" title="Reschedule" href="/LessonBookings/Reschedule?id=${l.id}"><i class="fas fa-exchange-alt"></i></a>` : '';
+                    const day = new Date(l.startUtc);
+                    const from = day.toISOString().slice(0,10);
+                    const to = from;
+                    const icalBtn = `<a class="btn btn-sm btn-outline-secondary" title="Add to Calendar" href="/Schedule/ExportIcal?from=${from}&to=${to}"><i class="fas fa-calendar-plus"></i></a>`;
+
+                    const status = statusBadge(l.status, l.canJoin);
+                    const border = leftBorder(l.status, l.canJoin);
+                    const highlight = startingSoon ? 'shadow-sm' : '';
+
+                    return `
+                      <div class="card mb-2 ${border} ${highlight}">
+                        <div class="card-body">
+                          <div class="row g-2 align-items-center">
+                            <div class="col-12 col-md-3">
+                              <div class="fw-semibold fs-5">${fmtTime(l.startUtc)}</div>
+                              <div class="text-muted small">${fmtTime(l.endUtc)}</div>
+                              <div class="text-muted small">${Math.round(l.durationMinutes/60)} hour</div>
+                              <div class="small ${timeClass}">${timeRemaining}</div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                              <div class="fw-semibold"><i class="fas fa-book me-2 text-muted"></i>${l.courseName}</div>
+                              <div class="text-muted small d-flex align-items-center gap-2 mt-1">
+                                <i class="fas fa-user me-1"></i>${l.tutorName}
+                              </div>
+                              <div class="text-muted small mt-1">Topic: <span class="text-muted">Not set</span></div>
+                            </div>
+                            <div class="col-12 col-md-3 d-flex flex-column align-items-md-end gap-2">
+                              <div>${status}</div>
+                              <div class="d-flex gap-2 flex-wrap justify-content-md-end">
+                                ${joinBtn}
+                                ${reschedBtn}
+                                ${icalBtn}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>`;
+                }).join('');
+
+                // timeline view (simple)
+                const sorted = [...items].sort((a,b) => new Date(a.startUtc) - new Date(b.startUtc));
+                tl.innerHTML = `
+                  <div class="position-relative ps-3">
+                    <div style="position:absolute;left:10px;top:0;bottom:0;width:2px;background:#e9ecef;"></div>
+                    ${sorted.map(l => `
+                      <div class="d-flex gap-3 mb-3">
+                        <div style="width:90px" class="text-muted small">${fmtTime(l.startUtc)}</div>
+                        <div class="flex-grow-1">
+                          <div class="fw-semibold">${l.courseName}</div>
+                          <div class="text-muted small">${l.tutorName} • ${fmtTime(l.startUtc)} - ${fmtTime(l.endUtc)}</div>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>`;
+            }
+
+            function renderCourses(){
+                const grid = document.getElementById('courseGrid');
+                const empty = document.getElementById('coursesEmpty');
+                const items = (state.data?.courses?.items || []).map(x => ({...x}));
+
+                function isCompleted(c){ return (c.totalTopics || 0) > 0 && (c.coveredTopics || 0) >= (c.totalTopics || 0); }
+                let filtered = items;
+                if (state.courseTab === 'active') filtered = items.filter(c => !isCompleted(c));
+                if (state.courseTab === 'completed') filtered = items.filter(c => isCompleted(c));
+
+                const sort = document.getElementById('courseSort').value;
+                if (sort === 'progress_desc') filtered.sort((a,b) => (b.progressPercent||0) - (a.progressPercent||0));
+                if (sort === 'name_asc') filtered.sort((a,b) => (a.courseName||'').localeCompare(b.courseName||''));
+
+                empty.classList.toggle('d-none', filtered.length !== 0);
+                if (!filtered.length) { grid.innerHTML = ''; return; }
+
+                grid.innerHTML = filtered.map(c => {
+                    const img = c.imageUrl ? `<div style="height:120px;background:#f8f9fa url('${c.imageUrl}') center/cover no-repeat;border-radius:10px;"></div>` : `<div style="height:120px;background:#f8f9fa;border-radius:10px;"></div>`;
+                    const pct = c.progressPercent || 0;
+                    const barClass = pct >= 70 ? 'bg-success' : (pct >= 40 ? 'bg-warning' : 'bg-danger');
+                    return `
+                      <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card h-100">
+                          <div class="card-body">
+                            ${img}
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                              <span class="badge bg-light text-dark">${c.curriculum} • ${c.grade}</span>
+                              <a class="small text-decoration-none" href="/Courses/Edit?id=${c.courseId}">Open</a>
+                            </div>
+                            <div class="fw-semibold mt-2 fs-5">${c.courseName}</div>
+                            <div class="text-muted small mt-1"><i class="fas fa-chalkboard-teacher me-1"></i>${c.tutorName}</div>
+                            <div class="mt-2">
+                              <div class="d-flex justify-content-between small">
+                                <span class="text-muted">${pct}% Complete</span>
+                                <span class="text-muted">${c.coveredTopics} of ${c.totalTopics} topics</span>
+                              </div>
+                              <div class="progress mt-1" style="height:8px;">
+                                <div class="progress-bar ${barClass}" style="width:${pct}%"></div>
+                              </div>
+                            </div>
+                            <div class="d-flex gap-2 mt-3 flex-wrap">
+                              <a class="btn btn-sm btn-outline-primary" href="/Schedule/My?courseId=${c.courseId}">Schedule</a>
+                              <a class="btn btn-sm btn-outline-secondary" href="/TestReports/My?courseId=${c.courseId}">Tests</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>`;
+                }).join('');
+            }
+
+            async function load(){
+                showError(false);
+                try{
+                    const res = await fetch('/api/student/dashboard', { credentials: 'include' });
+                    if (!res.ok) throw new Error('bad response');
+                    state.data = await res.json();
+                    renderOverview();
+                    renderProfileBanner();
+                    renderSchedule();
+                    renderCourses();
+                }catch(e){
+                    console.error(e);
+                    showError(true);
+                }
+            }
+
+            retryBtn.addEventListener('click', () => load());
+
+            // schedule tabs
+            document.querySelectorAll('button[data-tab]').forEach(b => b.addEventListener('click', () => {
+                document.querySelectorAll('button[data-tab]').forEach(x => x.classList.remove('active'));
+                b.classList.add('active');
+                state.scheduleTab = b.getAttribute('data-tab');
+                renderSchedule();
+            }));
+            document.getElementById('listViewBtn').addEventListener('click', () => { state.scheduleView = 'list'; document.getElementById('listViewBtn').classList.add('active'); document.getElementById('timelineViewBtn').classList.remove('active'); renderSchedule(); });
+            document.getElementById('timelineViewBtn').addEventListener('click', () => { state.scheduleView = 'timeline'; document.getElementById('timelineViewBtn').classList.add('active'); document.getElementById('listViewBtn').classList.remove('active'); renderSchedule(); });
+
+            // course tabs + sort
+            document.querySelectorAll('button[data-course-tab]').forEach(b => b.addEventListener('click', () => {
+                document.querySelectorAll('button[data-course-tab]').forEach(x => x.classList.remove('active'));
+                b.classList.add('active');
+                state.courseTab = b.getAttribute('data-course-tab');
+                renderCourses();
+            }));
+            document.getElementById('courseSort').addEventListener('change', () => renderCourses());
+
+            // notification hook (refresh dashboard after relevant events)
+            window.igbStudentDashboard = {
+                onNotify: () => { load(); }
+            };
+
+            load();
+        })();
+    </script>
+}
 
 

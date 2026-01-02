@@ -1,0 +1,855 @@
+@model IGB.Web.ViewModels.Admin.AdminUserListViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var isTutor = string.Equals(Model.Role, "Tutor", StringComparison.OrdinalIgnoreCase);
+}
+
+<div class="breadcrumb-header">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </nav>
+    
+    <!-- Title, Search, and Action Buttons in one row -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
+        <h1 class="breadcrumb-title mb-0">@Model.Title</h1>
+        
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <!-- Search Form -->
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <div style="width: 250px;">
+                    <input class="form-control form-control-sm" name="q" value="@Model.Query" placeholder="Search by name or email..." />
+                </div>
+                <button class="btn btn-primary btn-sm" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a class="btn btn-outline-secondary btn-sm" href="@Url.Action(isTutor ? "Tutors" : "Students", "AdminUsers")">
+                    <i class="fas fa-times"></i>
+                </a>
+            </form>
+            
+            <!-- Action Buttons -->
+            @if (isTutor && Model.PendingApprovals > 0)
+            {
+                <a class="btn btn-outline-secondary btn-sm position-relative" href="/Approvals">
+                    Approvals
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.7rem;">
+                        @Model.PendingApprovals
+                    </span>
+                </a>
+            }
+            @if (isTutor)
+            {
+                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addTutorModal">
+                    <i class="fas fa-plus me-2"></i>Add Tutor
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                    <i class="fas fa-plus me-2"></i>Add Student
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    @if (isTutor)
+    {
+        <!-- Add Tutor Modal -->
+        <div class="modal fade" id="addTutorModal" tabindex="-1" aria-labelledby="addTutorModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-semibold" id="addTutorModalLabel">
+                            <i class="fas fa-user-plus me-2"></i>Add Tutor
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" asp-controller="AdminUsers" asp-action="Create" enctype="multipart/form-data" id="addTutorForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Role" value="Tutor" />
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" name="FirstName" required maxlength="100" />
+                                    <div class="invalid-feedback">First name is required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" name="LastName" required maxlength="100" />
+                                    <div class="invalid-feedback">Last name is required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input class="form-control" name="Email" type="email" required maxlength="255" />
+                                    <div class="invalid-feedback">Valid email is required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone (optional)</label>
+                                    <input class="form-control" name="PhoneNumber" type="tel" maxlength="20" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Temporary Password <span class="text-danger">*</span></label>
+                                    <input class="form-control" name="Password" type="password" minlength="8" required />
+                                    <div class="text-muted small mt-1">Minimum 8 characters.</div>
+                                    <div class="invalid-feedback">Password must be at least 8 characters.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Time Zone (optional)</label>
+                                    <select class="form-select" name="TimeZoneId">
+                                        <option value="">-- Select Time Zone --</option>
+                                        <optgroup label="UTC">
+                                            <option value="UTC">UTC (Coordinated Universal Time)</option>
+                                        </optgroup>
+                                        <optgroup label="Americas">
+                                            <option value="America/New_York">Eastern Time (US & Canada)</option>
+                                            <option value="America/Chicago">Central Time (US & Canada)</option>
+                                            <option value="America/Denver">Mountain Time (US & Canada)</option>
+                                            <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
+                                            <option value="America/Toronto">Toronto</option>
+                                            <option value="America/Mexico_City">Mexico City</option>
+                                            <option value="America/Sao_Paulo">São Paulo</option>
+                                        </optgroup>
+                                        <optgroup label="Europe">
+                                            <option value="Europe/London">London</option>
+                                            <option value="Europe/Paris">Paris</option>
+                                            <option value="Europe/Berlin">Berlin</option>
+                                            <option value="Europe/Rome">Rome</option>
+                                            <option value="Europe/Madrid">Madrid</option>
+                                            <option value="Europe/Amsterdam">Amsterdam</option>
+                                            <option value="Europe/Athens">Athens</option>
+                                            <option value="Europe/Moscow">Moscow</option>
+                                        </optgroup>
+                                        <optgroup label="Asia">
+                                            <option value="Asia/Dubai">Dubai</option>
+                                            <option value="Asia/Karachi">Karachi</option>
+                                            <option value="Asia/Kolkata">Kolkata</option>
+                                            <option value="Asia/Dhaka">Dhaka</option>
+                                            <option value="Asia/Bangkok">Bangkok</option>
+                                            <option value="Asia/Singapore">Singapore</option>
+                                            <option value="Asia/Hong_Kong">Hong Kong</option>
+                                            <option value="Asia/Shanghai">Shanghai</option>
+                                            <option value="Asia/Tokyo">Tokyo</option>
+                                            <option value="Asia/Seoul">Seoul</option>
+                                        </optgroup>
+                                        <optgroup label="Australia & Pacific">
+                                            <option value="Australia/Sydney">Sydney</option>
+                                            <option value="Australia/Melbourne">Melbourne</option>
+                                            <option value="Australia/Perth">Perth</option>
+                                            <option value="Pacific/Auckland">Auckland</option>
+                                        </optgroup>
+                                        <optgroup label="Africa & Middle East">
+                                            <option value="Africa/Cairo">Cairo</option>
+                                            <option value="Africa/Johannesburg">Johannesburg</option>
+                                            <option value="Asia/Riyadh">Riyadh</option>
+                                            <option value="Asia/Tehran">Tehran</option>
+                                        </optgroup>
+                                    </select>
+                                    <div class="text-muted small mt-1">Leave empty for default timezone.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Profile Photo (optional)</label>
+                                    <input class="form-control" name="ProfileImage" type="file" accept=".jpg,.jpeg,.png" />
+                                    <div class="text-muted small mt-1">JPG/PNG up to 5MB.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Assign Courses (optional)</label>
+                                    <select class="form-select" name="CourseIds" multiple size="6" style="min-height: 150px;">
+                                        @foreach (var c in (IEnumerable<dynamic>)(ViewBag.CourseOptions ?? Array.Empty<dynamic>()))
+                                        {
+                                            <option value="@c.Id">@c.Name</option>
+                                        }
+                                    </select>
+                                    <div class="text-muted small mt-1">Hold Ctrl/Command to select multiple courses.</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="GoToAvailabilityAfterCreate" value="true" id="goAvail" />
+                                        <label class="form-check-label" for="goAvail">Open availability setup after create</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" form="addTutorForm" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Tutor
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            (function() {
+                const form = document.getElementById('addTutorForm');
+                const modal = document.getElementById('addTutorModal');
+                if (!form || !modal) return;
+
+                form.addEventListener('submit', function(e) {
+                    if (!form.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+
+                // Clear validation and reset form on modal close
+                modal.addEventListener('hidden.bs.modal', function() {
+                    form.classList.remove('was-validated');
+                    form.reset();
+                });
+            })();
+        </script>
+    }
+    else
+    {
+        <!-- Add Student Modal -->
+        <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-semibold" id="addStudentModalLabel">
+                            <i class="fas fa-user-plus me-2"></i>Add Student
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" asp-controller="AdminUsers" asp-action="Create" enctype="multipart/form-data" id="addStudentForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Role" value="Student" />
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" name="FirstName" required maxlength="100" />
+                                    <div class="invalid-feedback">First name is required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" name="LastName" required maxlength="100" />
+                                    <div class="invalid-feedback">Last name is required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input class="form-control" name="Email" type="email" required maxlength="255" />
+                                    <div class="invalid-feedback">Valid email is required.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone (optional)</label>
+                                    <input class="form-control" name="PhoneNumber" type="tel" maxlength="20" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Temporary Password <span class="text-danger">*</span></label>
+                                    <input class="form-control" name="Password" type="password" minlength="8" required />
+                                    <div class="text-muted small mt-1">Minimum 8 characters.</div>
+                                    <div class="invalid-feedback">Password must be at least 8 characters.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Time Zone (optional)</label>
+                                    <select class="form-select" name="TimeZoneId">
+                                        <option value="">-- Select Time Zone --</option>
+                                        <optgroup label="UTC">
+                                            <option value="UTC">UTC (Coordinated Universal Time)</option>
+                                        </optgroup>
+                                        <optgroup label="Americas">
+                                            <option value="America/New_York">Eastern Time (US & Canada)</option>
+                                            <option value="America/Chicago">Central Time (US & Canada)</option>
+                                            <option value="America/Denver">Mountain Time (US & Canada)</option>
+                                            <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
+                                            <option value="America/Toronto">Toronto</option>
+                                            <option value="America/Mexico_City">Mexico City</option>
+                                            <option value="America/Sao_Paulo">São Paulo</option>
+                                        </optgroup>
+                                        <optgroup label="Europe">
+                                            <option value="Europe/London">London</option>
+                                            <option value="Europe/Paris">Paris</option>
+                                            <option value="Europe/Berlin">Berlin</option>
+                                            <option value="Europe/Rome">Rome</option>
+                                            <option value="Europe/Madrid">Madrid</option>
+                                            <option value="Europe/Amsterdam">Amsterdam</option>
+                                            <option value="Europe/Athens">Athens</option>
+                                            <option value="Europe/Moscow">Moscow</option>
+                                        </optgroup>
+                                        <optgroup label="Asia">
+                                            <option value="Asia/Dubai">Dubai</option>
+                                            <option value="Asia/Karachi">Karachi</option>
+                                            <option value="Asia/Kolkata">Kolkata</option>
+                                            <option value="Asia/Dhaka">Dhaka</option>
+                                            <option value="Asia/Bangkok">Bangkok</option>
+                                            <option value="Asia/Singapore">Singapore</option>
+                                            <option value="Asia/Hong_Kong">Hong Kong</option>
+                                            <option value="Asia/Shanghai">Shanghai</option>
+                                            <option value="Asia/Tokyo">Tokyo</option>
+                                            <option value="Asia/Seoul">Seoul</option>
+                                        </optgroup>
+                                        <optgroup label="Australia & Pacific">
+                                            <option value="Australia/Sydney">Sydney</option>
+                                            <option value="Australia/Melbourne">Melbourne</option>
+                                            <option value="Australia/Perth">Perth</option>
+                                            <option value="Pacific/Auckland">Auckland</option>
+                                        </optgroup>
+                                        <optgroup label="Africa & Middle East">
+                                            <option value="Africa/Cairo">Cairo</option>
+                                            <option value="Africa/Johannesburg">Johannesburg</option>
+                                            <option value="Asia/Riyadh">Riyadh</option>
+                                            <option value="Asia/Tehran">Tehran</option>
+                                        </optgroup>
+                                    </select>
+                                    <div class="text-muted small mt-1">Leave empty for default timezone.</div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" form="addStudentForm" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Student
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            (function() {
+                const form = document.getElementById('addStudentForm');
+                const modal = document.getElementById('addStudentModal');
+                if (!form || !modal) return;
+
+                form.addEventListener('submit', function(e) {
+                    if (!form.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+
+                // Clear validation and reset form on modal close
+                modal.addEventListener('hidden.bs.modal', function() {
+                    form.classList.remove('was-validated');
+                    form.reset();
+                });
+            })();
+        </script>
+    }
+
+    <!-- Edit User Modal Container -->
+    <div id="editUserModalContainer"></div>
+
+    <!-- Tutor Ratings Modal Container -->
+    <div id="tutorRatingsModalContainer"></div>
+
+    <script>
+        function loadEditModal(userId, returnTo) {
+            const container = document.getElementById('editUserModalContainer');
+            if (!container) return;
+
+            // Clean up any existing modals/backdrops first
+            const existingModal = document.getElementById('editUserModal');
+            if (existingModal) {
+                const existingBsModal = bootstrap.Modal.getInstance(existingModal);
+                if (existingBsModal) {
+                    existingBsModal.hide();
+                    existingBsModal.dispose();
+                }
+            }
+            const existingBackdrops = document.querySelectorAll('.modal-backdrop');
+            existingBackdrops.forEach(b => b.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+
+            // Show loading state
+            container.innerHTML = '<div class="modal fade" id="editUserModalLoading" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-body text-center p-4"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div></div></div></div>';
+            const loadingModalElement = document.getElementById('editUserModalLoading');
+            if (loadingModalElement) {
+                const loadingModal = new bootstrap.Modal(loadingModalElement);
+                loadingModal.show();
+
+                // Load edit form via AJAX
+                fetch('@Url.Action("Edit", "AdminUsers")?id=' + userId + '&returnTo=' + returnTo, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // Hide and clean up loading modal
+                    const loadingModalElement = document.getElementById('editUserModalLoading');
+                    if (loadingModalElement) {
+                        const loadingBsModal = bootstrap.Modal.getInstance(loadingModalElement);
+                        if (loadingBsModal) {
+                            loadingBsModal.hide();
+                            loadingBsModal.dispose();
+                        }
+                        loadingModalElement.remove();
+                    }
+
+                    // Clean up any existing edit modal/backdrop
+                    const existingModal = document.getElementById('editUserModal');
+                    if (existingModal) {
+                        const existingBsModal = bootstrap.Modal.getInstance(existingModal);
+                        if (existingBsModal) {
+                            existingBsModal.hide();
+                            existingBsModal.dispose();
+                        }
+                        existingModal.remove();
+                    }
+                    const existingBackdrops = document.querySelectorAll('.modal-backdrop');
+                    existingBackdrops.forEach(b => b.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+
+                    container.innerHTML = html;
+                    const modalElement = document.getElementById('editUserModal');
+                    if (modalElement) {
+                        // Set returnTo in form
+                        const form = modalElement.querySelector('form');
+                        if (form) {
+                            const returnToInput = form.querySelector('input[name="returnTo"]');
+                            if (!returnToInput) {
+                                const hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.name = 'returnTo';
+                                hiddenInput.value = returnTo;
+                                form.appendChild(hiddenInput);
+                            }
+                        }
+                        const modal = new bootstrap.Modal(modalElement, {
+                            backdrop: true,
+                            keyboard: true,
+                            focus: true
+                        });
+                        modal.show();
+                        
+                        // Ensure cleanup on close
+                        modalElement.addEventListener('hidden.bs.modal', function() {
+                            setTimeout(function() {
+                                // Remove all backdrops
+                                const backdrops = document.querySelectorAll('.modal-backdrop');
+                                backdrops.forEach(b => b.remove());
+                                // Clean up body
+                                document.body.classList.remove('modal-open');
+                                document.body.style.overflow = '';
+                                document.body.style.paddingRight = '';
+                                // Clear container after a brief delay to allow Bootstrap cleanup
+                                setTimeout(function() {
+                                    container.innerHTML = '';
+                                }, 150);
+                            }, 100);
+                        }, { once: true });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading edit form:', error);
+                    alert('Error loading edit form. Please try again.');
+                    const loadingModalElement = document.getElementById('editUserModalLoading');
+                    if (loadingModalElement) {
+                        const loadingBsModal = bootstrap.Modal.getInstance(loadingModalElement);
+                        if (loadingBsModal) {
+                            loadingBsModal.hide();
+                            loadingBsModal.dispose();
+                        }
+                        loadingModalElement.remove();
+                    }
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(b => b.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                    container.innerHTML = '';
+                });
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        function loadTutorRatings(tutorId) {
+            const container = document.getElementById('tutorRatingsModalContainer');
+            if (!container) return;
+
+            // Show loading state
+            container.innerHTML = '<div class="modal fade" id="tutorRatingsModalLoading" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-body text-center p-4"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div></div></div></div>';
+            const loadingModalElement = document.getElementById('tutorRatingsModalLoading');
+            if (!loadingModalElement) return;
+            
+            const loadingModal = new bootstrap.Modal(loadingModalElement);
+            loadingModal.show();
+            
+            // Fallback timeout to ensure loading modal is always hidden (10 seconds max)
+            const loadingTimeout = setTimeout(function() {
+                const loadingEl = document.getElementById('tutorRatingsModalLoading');
+                if (loadingEl) {
+                    const loadingBsModal = bootstrap.Modal.getInstance(loadingEl);
+                    if (loadingBsModal) {
+                        loadingBsModal.hide();
+                        loadingBsModal.dispose();
+                    }
+                    loadingEl.remove();
+                }
+            }, 10000);
+
+            // Fetch ratings
+            fetch('@Url.Action("TutorRatings", "AdminUsers")?tutorId=' + tutorId)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Clear the timeout
+                    clearTimeout(loadingTimeout);
+                    
+                    // Hide and remove loading modal
+                    const loadingModalElement = document.getElementById('tutorRatingsModalLoading');
+                    if (loadingModalElement) {
+                        const loadingBsModal = bootstrap.Modal.getInstance(loadingModalElement);
+                        if (loadingBsModal) {
+                            loadingBsModal.hide();
+                            loadingBsModal.dispose();
+                        }
+                        loadingModalElement.remove();
+                    }
+
+                    // Build modal HTML
+                    let ratingsHtml = '';
+                    if (data.ratings && data.ratings.length > 0) {
+                        ratingsHtml = data.ratings.map(function(r) {
+                            // ASP.NET Core JSON serializer converts PascalCase to camelCase
+                            // So Rating becomes rating, SubjectKnowledge becomes subjectKnowledge, etc.
+                            var rating = r.rating || 0;
+                            var subjectKnowledge = r.subjectKnowledge || 0;
+                            var communication = r.communication || 0;
+                            var punctuality = r.punctuality || 0;
+                            var teachingMethod = r.teachingMethod || 0;
+                            var friendliness = r.friendliness || 0;
+                            var studentName = r.studentName || 'Student';
+                            var studentEmail = r.studentEmail || null;
+                            var courseName = r.courseName || 'Course';
+                            var lessonDate = r.lessonDate || null;
+                            var comments = r.comments || null;
+                            var createdAt = r.createdAt || '';
+
+                            const stars = Array.from({ length: 5 }, function(_, i) {
+                                if (rating >= i + 1) return '<i class="fas fa-star text-warning"></i>';
+                                if (rating >= i + 0.5) return '<i class="fas fa-star-half-alt text-warning"></i>';
+                                return '<i class="far fa-star text-muted"></i>';
+                            }).join('');
+
+                            const detailRatings = [
+                                { label: 'Subject Knowledge', value: subjectKnowledge },
+                                { label: 'Communication', value: communication },
+                                { label: 'Punctuality', value: punctuality },
+                                { label: 'Teaching Method', value: teachingMethod },
+                                { label: 'Friendliness', value: friendliness }
+                            ].map(function(d) {
+                                return '<div class="d-flex justify-content-between align-items-center mb-1">' +
+                                    '<span class="small text-muted">' + d.label + ':</span>' +
+                                    '<span class="small">' + d.value + '/5</span>' +
+                                    '</div>';
+                            }).join('');
+
+                            var emailHtml = studentEmail ? '<small class="text-muted">' + escapeHtml(studentEmail) + '</small>' : '';
+                            var lessonDateHtml = lessonDate ? '<div class="small text-muted mb-2"><i class="fas fa-calendar me-1"></i>Lesson: ' + escapeHtml(lessonDate) + '</div>' : '';
+                            var commentsHtml = comments ? '<div class="mt-2 p-2 bg-light rounded"><small>' + escapeHtml(comments) + '</small></div>' : '';
+                            
+                            return '<div class="card mb-3">' +
+                                '<div class="card-body">' +
+                                '<div class="d-flex justify-content-between align-items-start mb-2">' +
+                                '<div>' +
+                                '<h6 class="mb-1">' + escapeHtml(studentName) + '</h6>' +
+                                emailHtml +
+                                '<div class="small text-muted mt-1">' + escapeHtml(courseName) + '</div>' +
+                                '</div>' +
+                                '<div class="text-end">' +
+                                '<div class="fw-semibold">' + rating + '/5</div>' +
+                                '<div class="text-warning">' + stars + '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                lessonDateHtml +
+                                '<div class="small text-muted mb-2"><i class="fas fa-clock me-1"></i>Rated: ' + escapeHtml(createdAt) + '</div>' +
+                                '<div class="border-top pt-2 mt-2">' +
+                                detailRatings +
+                                '</div>' +
+                                commentsHtml +
+                                '</div>' +
+                                '</div>';
+                        }).join('');
+                    } else {
+                        ratingsHtml = '<div class="text-center text-muted p-4">No ratings available yet.</div>';
+                    }
+
+                    const modalHtml = '<div class="modal fade" id="tutorRatingsModal" tabindex="-1" aria-labelledby="tutorRatingsModalLabel" aria-hidden="true">' +
+                        '<div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        '<h5 class="modal-title fw-semibold" id="tutorRatingsModalLabel">' +
+                        '<i class="fas fa-star me-2"></i>Ratings for ' + escapeHtml(data.tutorName) +
+                        '</h5>' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                        '</div>' +
+                        '<div class="modal-body">' +
+                        '<div class="mb-3 p-3 bg-light rounded">' +
+                        '<div class="d-flex justify-content-between align-items-center">' +
+                        '<div>' +
+                        '<div class="fw-semibold">Average Rating</div>' +
+                        '<div class="h4 mb-0">' + data.averageRating.toFixed(1) + '/5</div>' +
+                        '</div>' +
+                        '<div class="text-end">' +
+                        '<div class="fw-semibold">Total Ratings</div>' +
+                        '<div class="h4 mb-0">' + data.totalRatings + '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="mt-3">' +
+                        '<h6 class="mb-3">All Ratings</h6>' +
+                        ratingsHtml +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="modal-footer">' +
+                        '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+
+                    container.innerHTML = modalHtml;
+                    const modal = new bootstrap.Modal(document.getElementById('tutorRatingsModal'));
+                    modal.show();
+
+                    // Cleanup on close
+                    document.getElementById('tutorRatingsModal').addEventListener('hidden.bs.modal', function() {
+                        setTimeout(function() {
+                            const backdrops = document.querySelectorAll('.modal-backdrop');
+                            backdrops.forEach(b => b.remove());
+                            document.body.classList.remove('modal-open');
+                            document.body.style.overflow = '';
+                            document.body.style.paddingRight = '';
+                            container.innerHTML = '';
+                        }, 100);
+                    }, { once: true });
+                })
+                .catch(error => {
+                    console.error('Error loading ratings:', error);
+                    
+                    // Clear the timeout
+                    clearTimeout(loadingTimeout);
+                    
+                    // Ensure loading modal is hidden and removed
+                    const loadingModalElement = document.getElementById('tutorRatingsModalLoading');
+                    if (loadingModalElement) {
+                        const loadingBsModal = bootstrap.Modal.getInstance(loadingModalElement);
+                        if (loadingBsModal) {
+                            loadingBsModal.hide();
+                            loadingBsModal.dispose();
+                        }
+                        loadingModalElement.remove();
+                    }
+                    
+                    // Clean up any backdrops
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(b => b.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                    container.innerHTML = '';
+                    
+                    alert('Error loading ratings. Please try again.');
+                });
+        }
+    </script>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>User</th>
+                        @if (isTutor) { <th>Courses</th> }
+                        @if (isTutor) { <th>Rating</th> }
+                        @if (!isTutor) { <th>Courses</th> }
+                        @if (!isTutor) { <th>Rating</th> }
+                        @if (!isTutor) { <th>Guardians</th> }
+                        <th>Status</th>
+                        @if (isTutor) { <th>Approval</th> }
+                        <th>Created</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model.Rows)
+                    {
+                        var initials = (r.FullName ?? "U").Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        var init = initials.Length >= 2 ? $"{initials[0][0]}{initials[1][0]}" : initials[0][0].ToString();
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (!string.IsNullOrWhiteSpace(r.AvatarUrl))
+                                    {
+                                        <img src="@r.AvatarUrl" alt="@(r.FullName ?? "User")" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-semibold" style="width: 40px; height: 40px; background-color: #6c757d; font-size: 14px;">
+                                            @init
+                                        </div>
+                                    }
+                                    <div>
+                                        <div class="fw-semibold">
+                                            <a class="text-decoration-none" href="@(isTutor ? $"/People/Tutor/{r.Id}" : $"/People/Student/{r.Id}")">@r.FullName</a>
+                                        </div>
+                                        <div class="text-muted small">@r.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            @if (isTutor)
+                            {
+                                <td class="text-muted">
+                                    <span class="fw-semibold">@r.AssignedCoursesCount</span>
+                                    @if (!string.IsNullOrWhiteSpace(r.AssignedCoursesPreview))
+                                    {
+                                        <div class="small text-muted text-truncate" style="max-width:240px;" title="@r.AssignedCoursesPreview">@r.AssignedCoursesPreview</div>
+                                    }
+                                </td>
+                                <td class="text-nowrap">
+                                    <a href="javascript:void(0);" class="text-decoration-none text-dark" onclick="loadTutorRatings(@r.Id)" style="cursor: pointer;">
+                                        <span class="fw-semibold">@r.AverageRating.ToString("0.0")/5</span>
+                                        <span class="ms-1 text-warning">
+                                            @{
+                                                var avg = r.AverageRating;
+                                                for (var i = 1; i <= 5; i++)
+                                                {
+                                                    if (avg >= i)
+                                                    {
+                                                        @:<i class="fas fa-star"></i>
+                                                    }
+                                                    else if (avg >= (i - 0.5))
+                                                    {
+                                                        @:<i class="fas fa-star-half-alt"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        @:<i class="far fa-star"></i>
+                                                    }
+                                                }
+                                            }
+                                        </span>
+                                        <span class="text-muted small ms-1">(@r.RatingCount)</span>
+                                    </a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td class="text-muted">
+                                    <span class="fw-semibold">@r.EnrolledCoursesCount</span>
+                                    @if (!string.IsNullOrWhiteSpace(r.EnrolledCoursesPreview))
+                                    {
+                                        <div class="small text-muted text-truncate" style="max-width:240px;" title="@r.EnrolledCoursesPreview">@r.EnrolledCoursesPreview</div>
+                                    }
+                                </td>
+                                <td class="text-nowrap">
+                                    @if (r.AverageRating > 0)
+                                    {
+                                        <span class="fw-semibold">@r.AverageRating.ToString("0.0")/5</span>
+                                        <span class="ms-1 text-warning">
+                                            @{
+                                                var avg = r.AverageRating;
+                                                for (var i = 1; i <= 5; i++)
+                                                {
+                                                    if (avg >= i)
+                                                    {
+                                                        @:<i class="fas fa-star"></i>
+                                                    }
+                                                    else if (avg >= (i - 0.5))
+                                                    {
+                                                        @:<i class="fas fa-star-half-alt"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        @:<i class="far fa-star"></i>
+                                                    }
+                                                }
+                                            }
+                                        </span>
+                                        <span class="text-muted small ms-1">(@r.RatingCount)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">No ratings</span>
+                                    }
+                                </td>
+                                <td class="text-muted">
+                                    <span class="fw-semibold">@r.GuardianCount</span>
+                                    @if (!string.IsNullOrWhiteSpace(r.GuardianNamesPreview))
+                                    {
+                                        <div class="small text-muted text-truncate" style="max-width:200px;" title="@r.GuardianNamesPreview">@r.GuardianNamesPreview</div>
+                                    }
+                                </td>
+                            }
+                            <td>
+                                <span class="badge @(r.IsActive ? "bg-success" : "bg-secondary")">@(r.IsActive ? "Active" : "Inactive")</span>
+                            </td>
+                            @if (isTutor)
+                            {
+                                <td><span class="badge bg-info">@r.ApprovalStatus</span></td>
+                            }
+                            <td class="text-muted">@r.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                            <td class="text-end text-nowrap">
+                                <button class="btn btn-sm btn-outline-warning" type="button" onclick="loadEditModal(@r.Id, '@(isTutor ? "Tutors" : "Students")')">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <form method="post" asp-controller="AdminUsers" asp-action="Delete" class="d-inline" onsubmit="return confirm('Delete this user?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <input type="hidden" name="returnTo" value="@(isTutor ? "Tutors" : "Students")" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.Pagination != null)
+            {
+                <partial name="Components/_Pagination" model="Model.Pagination" />
+            }
+        </div>
+    </div>
+</div>
+
+

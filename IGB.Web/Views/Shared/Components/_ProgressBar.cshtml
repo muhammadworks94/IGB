@@ -1,0 +1,25 @@
+@model IGB.Web.ViewModels.Components.ProgressBarViewModel
+
+@{
+    var value = Math.Clamp(Model.Value, 0, 100);
+    var variant = Model.Variant switch
+    {
+        "success" => "success",
+        "warning" => "warning",
+        "danger" => "danger",
+        "info" => "info",
+        _ => "primary"
+    };
+    var label = Model.Label ?? $"{value}%";
+}
+
+<div class="progress @(Model.CssClass ?? "")" role="progressbar" aria-valuenow="@value" aria-valuemin="0" aria-valuemax="100" aria-label="Progress">
+    <div class="progress-bar bg-@variant" style="width: @(value)%;">
+        @if (Model.ShowLabel)
+        {
+            @label
+        }
+    </div>
+</div>
+
+

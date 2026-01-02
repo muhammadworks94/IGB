@@ -1,0 +1,348 @@
+@model IGB.Web.ViewModels.Schedule.SchedulePageViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "Schedules Overview";
+    var tutors = (IEnumerable<IGB.Domain.Entities.User>)ViewBag.Tutors;
+    var students = (IEnumerable<IGB.Domain.Entities.User>)ViewBag.Students;
+    var guardians = (IEnumerable<IGB.Domain.Entities.User>)ViewBag.Guardians;
+    var courses = (IEnumerable<IGB.Domain.Entities.Course>)ViewBag.Courses;
+    long? tutorId = (long?)ViewBag.TutorId;
+    long? studentId = (long?)ViewBag.StudentId;
+    long? guardianId = (long?)ViewBag.GuardianId;
+    long? courseId = (long?)ViewBag.CourseId;
+    string? status = (string?)ViewBag.Status;
+    DateTime? from = (DateTime?)ViewBag.From;
+    DateTime? to = (DateTime?)ViewBag.To;
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+    var dashUrl = User.IsInRole("Admin") ? Url.Action("Admin", "Portal") : Url.Action("SuperAdmin", "Portal");
+}
+
+<div class="breadcrumb-header">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@dashUrl">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Overview", "Schedule")">Schedules</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Overview</li>
+        </ol>
+    </nav>
+    
+    <!-- Title and Action Buttons in one row -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
+        <h1 class="breadcrumb-title mb-0">Schedules Overview</h1>
+        
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <button class="btn btn-primary btn-sm" type="button" onclick="document.getElementById('scheduleFilterForm').submit()">
+                <i class="fas fa-filter me-1"></i>Filter
+            </button>
+            <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Overview","Schedule")">
+                <i class="fas fa-rotate-left me-1"></i>Reset
+            </a>
+            <a class="btn btn-outline-secondary btn-sm" target="_blank" id="pdfExportLink" href="@Url.Action("ExportPdf","Schedule", new { scope="admin", tutorId = tutorId, studentId = studentId, guardianId = guardianId, courseId = courseId, status = status, from = from?.ToString("yyyy-MM-dd"), to = to?.ToString("yyyy-MM-dd") })">
+                <i class="fas fa-file-pdf me-1"></i>PDF
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" id="scheduleFilterForm" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small">Teacher / Tutor</label>
+                    <select class="form-select form-select-sm" name="tutorId">
+                        <option value="">All</option>
+                        @foreach (var t in tutors)
+                        {
+                            <option value="@t.Id" selected="@(tutorId == t.Id)">@t.FullName</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Student</label>
+                    <select class="form-select form-select-sm" name="studentId">
+                        <option value="">All</option>
+                        @foreach (var s in students)
+                        {
+                            <option value="@s.Id" selected="@(studentId == s.Id)">@s.FullName</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Parent / Guardian</label>
+                    <select class="form-select form-select-sm" name="guardianId">
+                        <option value="">All</option>
+                        @foreach (var g in guardians)
+                        {
+                            <option value="@g.Id" selected="@(guardianId == g.Id)">@g.FullName</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Course</label>
+                    <select class="form-select form-select-sm" name="courseId">
+                        <option value="">All</option>
+                        @foreach (var c in courses)
+                        {
+                            <option value="@c.Id" selected="@(courseId == c.Id)">@c.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Status</label>
+                    <select class="form-select form-select-sm" name="status">
+                        <option value="" selected="@(string.IsNullOrWhiteSpace(status))">All</option>
+                        <option value="Scheduled" selected="@(string.Equals(status,"Scheduled",StringComparison.OrdinalIgnoreCase))">Scheduled</option>
+                        <option value="Rescheduled" selected="@(string.Equals(status,"Rescheduled",StringComparison.OrdinalIgnoreCase))">Rescheduled</option>
+                        <option value="Completed" selected="@(string.Equals(status,"Completed",StringComparison.OrdinalIgnoreCase))">Completed</option>
+                        <option value="Cancelled" selected="@(string.Equals(status,"Cancelled",StringComparison.OrdinalIgnoreCase))">Cancelled</option>
+                        <option value="NoShow" selected="@(string.Equals(status,"NoShow",StringComparison.OrdinalIgnoreCase))">No Show</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">From</label>
+                    <input class="form-control form-control-sm" name="from" type="date" value="@(from?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">To</label>
+                    <input class="form-control form-control-sm" name="to" type="date" value="@(to?.ToString("yyyy-MM-dd") ?? "")" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">Master Calendar</h5>
+                <div class="text-muted small">Click a lesson to view details and quick actions.</div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-2 small">
+                <span class="badge bg-primary">Scheduled</span>
+                <span class="badge bg-info text-dark">Rescheduled</span>
+                <span class="badge bg-success">Completed</span>
+                <span class="badge bg-secondary">Cancelled</span>
+                <span class="badge bg-warning text-dark">Pending</span>
+            </div>
+            <div id="adminCalendar"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="lessonModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Lesson</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="lessonDetails" class="text-muted small"></div>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-secondary d-none" id="tutorProfileLink" href="#" target="_blank" rel="noopener"><i class="fas fa-chalkboard-teacher me-1"></i>Tutor profile</a>
+        <a class="btn btn-outline-secondary d-none" id="studentProfileLink" href="#" target="_blank" rel="noopener"><i class="fas fa-user-graduate me-1"></i>Student profile</a>
+        <div class="dropdown d-none" id="guardianProfilesDrop">
+            <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" type="button"><i class="fas fa-user-friends me-1"></i>Guardian</button>
+            <ul class="dropdown-menu dropdown-menu-end" id="guardianProfilesMenu"></ul>
+        </div>
+        <a class="btn btn-outline-primary" id="detailsLink" href="#">View details</a>
+        <a class="btn btn-outline-warning" id="rescheduleLink" href="#">Reschedule</a>
+        <form method="post" asp-controller="LessonBookings" asp-action="CancelByStaff" class="d-inline" onsubmit="return confirm('Cancel this lesson?');">
+            <input type="hidden" name="__RequestVerificationToken" value="@csrf" />
+            <input type="hidden" name="id" id="cancelLessonId" value="" />
+            <input type="hidden" name="reason" value="Cancelled by admin" />
+            <button type="submit" class="btn btn-outline-danger">Cancel</button>
+        </form>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="/nobleui/vendors/fullcalendar/main.min.css" />
+    <script src="/nobleui/vendors/fullcalendar/main.min.js"></script>
+    <script>
+      // Update PDF export link when filters change
+      function updatePdfLink() {
+        const form = document.getElementById('scheduleFilterForm');
+        if (!form) return;
+        
+        const tutorId = form.querySelector('[name="tutorId"]')?.value || '';
+        const studentId = form.querySelector('[name="studentId"]')?.value || '';
+        const guardianId = form.querySelector('[name="guardianId"]')?.value || '';
+        const courseId = form.querySelector('[name="courseId"]')?.value || '';
+        const status = form.querySelector('[name="status"]')?.value || '';
+        const from = form.querySelector('[name="from"]')?.value || '';
+        const to = form.querySelector('[name="to"]')?.value || '';
+        
+        const pdfLink = document.getElementById('pdfExportLink');
+        if (pdfLink) {
+          const baseUrl = '@Url.Action("ExportPdf","Schedule")';
+          const params = new URLSearchParams({
+            scope: 'admin',
+            tutorId: tutorId,
+            studentId: studentId,
+            guardianId: guardianId,
+            courseId: courseId,
+            status: status,
+            from: from,
+            to: to
+          });
+          pdfLink.href = baseUrl + '?' + params.toString();
+        }
+      }
+      
+      // Initialize on page load and attach event listeners
+      document.addEventListener('DOMContentLoaded', function() {
+        updatePdfLink();
+        
+        // Attach change listeners to all filter inputs
+        const form = document.getElementById('scheduleFilterForm');
+        if (form) {
+          form.addEventListener('change', updatePdfLink);
+          form.addEventListener('input', updatePdfLink);
+        }
+      });
+    </script>
+    <script>
+      (function(){
+        const el = document.getElementById('adminCalendar');
+        if (!el || typeof FullCalendar === 'undefined') return;
+
+        const url = '@Url.Action("Events","Schedule")' +
+          '?scope=admin' +
+          '&tutorId=@(tutorId?.ToString() ?? "")' +
+          '&studentId=@(studentId?.ToString() ?? "")' +
+          '&guardianId=@(guardianId?.ToString() ?? "")' +
+          '&courseId=@(courseId?.ToString() ?? "")' +
+          '&status=@(status ?? "")' +
+          '&from=@(from?.ToString("yyyy-MM-dd") ?? "")' +
+          '&to=@(to?.ToString("yyyy-MM-dd") ?? "")';
+
+        const modalEl = document.getElementById('lessonModal');
+        const detailsEl = document.getElementById('lessonDetails');
+        const detailsLink = document.getElementById('detailsLink');
+        const rescheduleLink = document.getElementById('rescheduleLink');
+        const cancelLessonId = document.getElementById('cancelLessonId');
+        const tutorProfileLink = document.getElementById('tutorProfileLink');
+        const studentProfileLink = document.getElementById('studentProfileLink');
+        const guardianProfilesDrop = document.getElementById('guardianProfilesDrop');
+        const guardianProfilesMenu = document.getElementById('guardianProfilesMenu');
+
+        function fmtUtc(iso) {
+          try { return new Date(iso).toISOString().replace('T',' ').slice(0,16) + ' UTC'; } catch { return iso; }
+        }
+        function esc(s){ return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+        function personLink(role, id, name){
+          if (!id) return esc(name||'');
+          const href = `/People/${role}/${id}`;
+          return `<a href="${href}" target="_blank" rel="noopener" class="text-decoration-none">${esc(name||(''+id))}</a>`;
+        }
+
+        function applyRichTitle(info){
+          const el = info?.el;
+          const ev = info?.event;
+          if (!el || !ev) return;
+          const p = ev.extendedProps || {};
+          const course = p.courseName || ev.title || '';
+          const student = p.studentName || '';
+          const tutor = p.tutorName || '';
+          const titleEl = el.querySelector('.fc-event-title, .fc-title');
+          if (!titleEl) return;
+          const parts = [`<div class="igb-fc-title">${esc(course)}</div>`];
+          const who = [student && `S: ${student}`, tutor && `T: ${tutor}`].filter(Boolean).join(' • ');
+          if (who) parts.push(`<div class="igb-fc-meta">${esc(who)}</div>`);
+          titleEl.innerHTML = parts.join('');
+        }
+
+        const cal = new FullCalendar.Calendar(el, {
+          initialView: 'timeGridWeek',
+          headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+          height: 'auto',
+          expandRows: true,
+          nowIndicator: true,
+          timeZone: 'UTC',
+          eventDidMount: applyRichTitle,
+          eventRender: applyRichTitle, // v4 fallback
+          events: async (info, success) => {
+            const res = await fetch(url, { credentials: 'include' });
+            const data = await res.json();
+            success(data.map(e => ({
+              id: e.id,
+              title: e.title,
+              start: e.start,
+              end: e.end,
+              color: e.color,
+              extendedProps: { status: e.status, courseName: e.courseName, studentName: e.studentName, tutorName: e.tutorName }
+            })));
+          },
+          eventClick: (info) => {
+            const id = info.event.id;
+            fetch('@Url.Action("LessonDetails","Schedule")' + `?id=${id}`, { credentials: 'include' })
+              .then(r => r.ok ? r.json() : null)
+              .then(d => {
+                if (!d) {
+                  detailsEl.textContent = `Lesson #${id}`;
+                } else {
+                  const parts = [];
+                  parts.push(`<div><strong>Lesson:</strong> #${d.id}</div>`);
+                  parts.push(`<div><strong>Course:</strong> ${d.courseName || ''}</div>`);
+                  parts.push(`<div><strong>Student:</strong> ${personLink('Student', d.studentUserId, d.studentName)}</div>`);
+                  parts.push(`<div><strong>Teacher:</strong> ${personLink('Tutor', d.tutorUserId, d.tutorName)}</div>`);
+                  if (Array.isArray(d.guardians) && d.guardians.length){
+                    const gs = d.guardians.map(g => personLink('Guardian', g.guardianUserId, g.guardianName)).join(', ');
+                    parts.push(`<div><strong>Parent/Guardian:</strong> ${gs}</div>`);
+                  }
+                  parts.push(`<div><strong>When:</strong> ${fmtUtc(d.scheduledStartUtc)} - ${fmtUtc(d.scheduledEndUtc).slice(11)}</div>`);
+                  parts.push(`<div><strong>Status:</strong> ${d.status}</div>`);
+                  if (d.zoomMeetingId) parts.push(`<div><strong>Zoom ID:</strong> ${d.zoomMeetingId}</div>`);
+                  if (d.zoomPassword) parts.push(`<div><strong>Zoom Pass:</strong> ${d.zoomPassword}</div>`);
+                  if (d.zoomJoinUrl) parts.push(`<div><strong>Join:</strong> <a target="_blank" href="${d.zoomJoinUrl}">Open link</a></div>`);
+                  detailsEl.innerHTML = parts.join('');
+                }
+
+                // footer profile actions
+                if (d?.tutorUserId) {
+                  tutorProfileLink.href = `/People/Tutor/${d.tutorUserId}`;
+                  tutorProfileLink.classList.remove('d-none');
+                } else tutorProfileLink.classList.add('d-none');
+
+                if (d?.studentUserId) {
+                  studentProfileLink.href = `/People/Student/${d.studentUserId}`;
+                  studentProfileLink.classList.remove('d-none');
+                } else studentProfileLink.classList.add('d-none');
+
+                guardianProfilesMenu.innerHTML = '';
+                if (Array.isArray(d?.guardians) && d.guardians.length) {
+                  d.guardians.forEach(g => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a class="dropdown-item" target="_blank" rel="noopener" href="/People/Guardian/${g.guardianUserId}">${esc(g.guardianName || 'Guardian')}</a>`;
+                    guardianProfilesMenu.appendChild(li);
+                  });
+                  guardianProfilesDrop.classList.remove('d-none');
+                } else {
+                  guardianProfilesDrop.classList.add('d-none');
+                }
+              })
+              .catch(() => {
+                detailsEl.textContent = `Lesson #${id}`;
+                tutorProfileLink.classList.add('d-none');
+                studentProfileLink.classList.add('d-none');
+                guardianProfilesDrop.classList.add('d-none');
+              });
+
+            detailsLink.href = '@Url.Action("Details","LessonBookings")' + `?id=${id}`;
+            rescheduleLink.href = '@Url.Action("Schedule","LessonBookings")' + `?id=${id}`;
+            cancelLessonId.value = id;
+            new bootstrap.Modal(modalEl).show();
+          }
+        });
+        cal.render();
+      })();
+    </script>
+}
+
+

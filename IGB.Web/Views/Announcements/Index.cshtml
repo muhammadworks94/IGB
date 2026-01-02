@@ -4,10 +4,10 @@
     ViewData["Title"] = "Announcements";
 }
 
-<div class="breadcrumb-header">
-    <h1 class="breadcrumb-title">Announcements</h1>
-    <p class="breadcrumb-subtitle">Latest updates relevant to you.</p>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Announcements",
+    Subtitle: "Latest updates relevant to you."
+))
 
 <div class="container-fluid">
     @if (Model.Count == 0)

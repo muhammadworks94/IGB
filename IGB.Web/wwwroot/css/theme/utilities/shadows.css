@@ -1,0 +1,9 @@
+/* Shadow / elevation utilities */
+
+.elevation-0 { box-shadow: var(--igb-shadow-0) !important; }
+.elevation-1 { box-shadow: var(--igb-shadow-1) !important; }
+.elevation-2 { box-shadow: var(--igb-shadow-2) !important; }
+.elevation-3 { box-shadow: var(--igb-shadow-3) !important; }
+.elevation-4 { box-shadow: var(--igb-shadow-4) !important; }
+
+

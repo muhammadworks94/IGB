@@ -1,17 +1,58 @@
 @model IGB.Web.ViewModels.PendingUsersViewModel
 @{
     ViewData["Title"] = "Pending Approvals";
+    var q = Model.Query ?? "";
+    var currentPage = Model.Pagination.Page;
+    var pageSize = Model.Pagination.PageSize;
 }
 
 <div class="breadcrumb-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-1">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
             <li class="breadcrumb-item active" aria-current="page">Pending Approvals</li>
         </ol>
     </nav>
-    <h1 class="breadcrumb-title">Pending User Approvals</h1>
-    <p class="breadcrumb-subtitle">Approve or reject newly registered users.</p>
+    
+    <!-- Title, Search, and Page Size Controls in one row -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
+        <h1 class="breadcrumb-title mb-0">Pending User Approvals</h1>
+        
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <!-- Search Form -->
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <input type="hidden" name="pageSize" value="@pageSize" />
+                <input type="hidden" name="page" value="1" />
+                <div style="width: 250px;">
+                    <input class="form-control form-control-sm" name="q" value="@q" placeholder="Name / email / role" />
+                </div>
+                <button class="btn btn-primary btn-sm" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+                @if (!string.IsNullOrWhiteSpace(q))
+                {
+                    <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index","Approvals", new { page = 1, pageSize })">
+                        <i class="fas fa-times"></i>
+                    </a>
+                }
+            </form>
+            
+            <!-- Page Size Control -->
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <input type="hidden" name="q" value="@q" />
+                <input type="hidden" name="page" value="1" />
+                <label class="text-muted small mb-0" for="pageSize">Show</label>
+                <select id="pageSize" name="pageSize" class="form-select form-select-sm" style="width:110px" onchange="this.form.submit()">
+                    <option value="10" selected="@(pageSize == 10)">10</option>
+                    <option value="25" selected="@(pageSize == 25)">25</option>
+                    <option value="50" selected="@(pageSize == 50)">50</option>
+                    <option value="100" selected="@(pageSize == 100)">100</option>
+                </select>
+                <span class="text-muted small">entries</span>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="container-fluid">
@@ -32,6 +73,7 @@
 
     <div class="card">
         <div class="card-body">
+
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
@@ -66,6 +108,9 @@
                                         <form asp-action="Approve" method="post" class="d-flex gap-2">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@u.Id" />
+                                            <input type="hidden" name="q" value="@q" />
+                                            <input type="hidden" name="page" value="@currentPage" />
+                                            <input type="hidden" name="pageSize" value="@pageSize" />
                                             <input type="text" name="note" class="form-control form-control-sm" placeholder="Note (optional)" />
                                             <button type="submit" class="btn btn-sm btn-success">
                                                 <i class="fas fa-check me-1"></i>Approve
@@ -75,6 +120,9 @@
                                         <form asp-action="Reject" method="post" class="d-flex gap-2">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@u.Id" />
+                                            <input type="hidden" name="q" value="@q" />
+                                            <input type="hidden" name="page" value="@currentPage" />
+                                            <input type="hidden" name="pageSize" value="@pageSize" />
                                             <input type="hidden" name="note" value="Rejected by admin" />
                                             <button type="submit" class="btn btn-sm btn-danger">
                                                 <i class="fas fa-times me-1"></i>Reject
@@ -88,6 +136,8 @@
                     </tbody>
                 </table>
             </div>
+
+            <partial name="Components/_Pagination" model="Model.Pagination" />
         </div>
     </div>
 </div>

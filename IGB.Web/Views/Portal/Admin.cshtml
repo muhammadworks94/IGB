@@ -1,24 +1,943 @@
 @{
-    ViewData["Title"] = "Admin Portal";
+    ViewData["Title"] = "Dashboard";
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
 
-<div class="breadcrumb-header">
-    <h1 class="breadcrumb-title">Admin Portal</h1>
-    <p class="breadcrumb-subtitle">Approve bookings/users, manage courses and schedules.</p>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Dashboard",
+    Breadcrumbs: new List<BreadcrumbItem> { new("Dashboard", Url.Action("Index", "Portal")) }
+))
 
 <div class="container-fluid">
-    <div class="row g-3">
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="Approvals" asp-action="Index">Approvals</a>
+    <div id="offlineBanner" class="alert alert-warning d-none">
+        <div class="d-flex justify-content-between align-items-center">
+            <div><strong>Offline:</strong> Some dashboard data may be stale.</div>
+            <button class="btn btn-sm btn-outline-secondary" type="button" onclick="location.reload()">Reload</button>
         </div>
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="CourseBookings" asp-action="Pending">Pending Course Bookings</a>
+    </div>
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h3 class="mb-1">Welcome back, <span id="adminName">Admin</span>!</h3>
+            <div class="text-muted small">Current time: <span id="liveClock">—</span></div>
         </div>
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="LessonBookings" asp-action="Pending">Pending Lesson Bookings</a>
+        <div class="text-muted small">
+            <span id="lastLoaded"></span>
+        </div>
+    </div>
+
+    <style>
+        .skeleton {
+            background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%);
+            background-size: 400% 100%;
+            animation: shimmer 1.2s ease-in-out infinite;
+            border-radius: 8px;
+        }
+        @@keyframes shimmer {
+            0% { background-position: 100% 0; }
+            100% { background-position: 0 0; }
+        }
+        .stat-card {
+            color: #0f172a;
+            border: 0;
+        }
+        .stat-card .icon {
+            width: 38px; height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.45);
+        }
+        .bg-grad-primary { background: linear-gradient(135deg, rgba(13,110,253,0.18), rgba(13,110,253,0.04)); }
+        .bg-grad-secondary { background: linear-gradient(135deg, rgba(108,117,125,0.18), rgba(108,117,125,0.04)); }
+        .bg-grad-success { background: linear-gradient(135deg, rgba(25,135,84,0.18), rgba(25,135,84,0.04)); }
+        .bg-grad-info { background: linear-gradient(135deg, rgba(13,202,240,0.18), rgba(13,202,240,0.04)); }
+        .bg-grad-danger { background: linear-gradient(135deg, rgba(220,53,69,0.18), rgba(220,53,69,0.04)); }
+        .bg-grad-warning { background: linear-gradient(135deg, rgba(255,193,7,0.22), rgba(255,193,7,0.04)); }
+        .pulse {
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        @@keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220,53,69,0.35); }
+            70% { box-shadow: 0 0 0 10px rgba(220,53,69,0); }
+            100% { box-shadow: 0 0 0 0 rgba(220,53,69,0); }
+        }
+        .widget-handle { cursor: grab; }
+    </style>
+
+    <div id="errorBox" class="alert alert-danger d-none">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">Dashboard failed to load</div>
+                <div class="small text-muted">Please check your connection and retry.</div>
+            </div>
+            <button class="btn btn-sm btn-light" id="retryBtn">Retry</button>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Quick actions</h6>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">More</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/Reports/Progress">Generate Report</a></li>
+                        <li><a class="dropdown-item" href="/api/test-reports/export">Export Data</a></li>
+                        <li><a class="dropdown-item" href="/hangfire">View Logs</a></li>
+                        <li><a class="dropdown-item" href="/Roles">System Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item" type="button" id="resetLayout">Reset dashboard layout</button></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-primary" href="/AdminUsers/CreateStudent"><i class="fas fa-user-plus me-2"></i>Add New Student</a>
+                <a class="btn btn-primary" href="/AdminUsers/CreateTutor"><i class="fas fa-chalkboard-teacher me-2"></i>Add New Tutor</a>
+                <a class="btn btn-primary" href="/Courses/Create"><i class="fas fa-book me-2"></i>Add New Course</a>
+                <a class="btn btn-outline-secondary" href="/Approvals"><i class="fas fa-user-check me-2"></i>View Pending Approvals <span class="badge bg-danger ms-1" id="pendingBadge">0</span></a>
+                <a class="btn btn-outline-secondary" href="/Announcements/Manage"><i class="fas fa-bullhorn me-2"></i>Send Announcement</a>
+                <a class="btn btn-outline-secondary" href="/Finance/Allocate"><i class="fas fa-coins me-2"></i>Allocate Credits</a>
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#customizeModal">
+                    <i class="fas fa-sliders-h me-2"></i>Customize
+                </button>
+                <div class="form-check ms-2 d-flex align-items-center">
+                    <input class="form-check-input" type="checkbox" id="soundToggle">
+                    <label class="form-check-label ms-1 small" for="soundToggle">Sound</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customize widgets -->
+    <div class="modal fade" id="customizeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Customize dashboard</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-muted small mb-2">Show/hide widgets:</div>
+                    <div class="form-check">
+                        <input class="form-check-input widget-toggle" type="checkbox" data-widget="stats" id="w_stats" checked>
+                        <label class="form-check-label" for="w_stats">Stats</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input widget-toggle" type="checkbox" data-widget="charts" id="w_charts" checked>
+                        <label class="form-check-label" for="w_charts">Charts</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input widget-toggle" type="checkbox" data-widget="activities" id="w_activities" checked>
+                        <label class="form-check-label" for="w_activities">Recent activities</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input widget-toggle" type="checkbox" data-widget="alerts" id="w_alerts" checked>
+                        <label class="form-check-label" for="w_alerts">Alerts & system health</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input widget-toggle" type="checkbox" data-widget="todaySchedule" id="w_today" checked>
+                        <label class="form-check-label" for="w_today">Today's schedule</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="widgets" class="row g-3">
+        <!-- Stat cards -->
+        <div class="col-12" data-widget="stats">
+            <div class="row g-3">
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card stat-card bg-grad-primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon"><i class="fas fa-users"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="totalStudents">—</div>
+                            <div class="text-muted">Total Students</div>
+                            <div class="small text-success mt-1"><i class="fas fa-arrow-up"></i> <span id="studentsGrowth">0</span> this month</div>
+                            <a class="stretched-link" href="/AdminUsers/Students"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card stat-card bg-grad-secondary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="totalTutors">—</div>
+                            <div class="text-muted">Total Tutors</div>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <div class="small text-success"><i class="fas fa-arrow-up"></i> <span id="tutorsGrowth">0</span> this month</div>
+                                <span class="badge bg-warning text-dark" id="pendingTutorsBadge">0 pending</span>
+                            </div>
+                            <a class="stretched-link" href="/AdminUsers/Tutors"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card stat-card bg-grad-success">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon"><i class="fas fa-book"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="activeCourses">—</div>
+                            <div class="text-muted">Active Courses</div>
+                            <div class="small text-muted mt-1"><span id="totalCourses">0</span> total courses</div>
+                            <a class="stretched-link" href="/Courses"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card stat-card bg-grad-info">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon"><i class="fas fa-graduation-cap"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="lessonsToday">0</div>
+                            <div class="text-muted">Lessons Today</div>
+                            <div class="small text-muted mt-1"><span id="lessonsTodayBreakdown">0 completed, 0 ongoing, 0 upcoming</span></div>
+                            <a class="stretched-link" href="/Schedule/Overview"></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-xl-6">
+                    <div class="card stat-card bg-grad-danger" id="pendingCard">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="pendingTotal">—</div>
+                            <div class="text-muted">Pending Approvals</div>
+                            <div class="row g-2 mt-2 small">
+                                <div class="col-6">Tutor approvals: <span class="fw-semibold" id="pendingTutorApprovals">0</span></div>
+                                <div class="col-6">Enrollment requests: <span class="fw-semibold" id="pendingEnrollments">0</span></div>
+                                <div class="col-6">Booking requests: <span class="fw-semibold" id="pendingBookings">0</span></div>
+                                <div class="col-6">Reschedule requests: <span class="fw-semibold" id="pendingReschedules">0</span></div>
+                            </div>
+                            <a class="stretched-link" href="/Approvals"></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-xl-6">
+                    <div class="card stat-card bg-grad-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon"><i class="fas fa-coins"></i></div>
+                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
+                            </div>
+                            <div class="fs-2 fw-semibold mt-2" id="revenueMonth">—</div>
+                            <div class="text-muted">Revenue This Month (credits)</div>
+                            <div class="small mt-1" id="revenueChange"></div>
+                            <a class="stretched-link" href="/Finance/Allocate"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="col-12" data-widget="charts">
+            <div class="row g-3">
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Student Enrollments - Last 6 Months</h6>
+                                <button class="btn btn-sm btn-outline-secondary" id="downloadEnrollments">Download CSV</button>
+                            </div>
+                            <div style="height:260px;">
+                                <canvas id="enrollmentsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Lesson Distribution by Course</h6>
+                                <span class="text-muted small">Top 10</span>
+                            </div>
+                            <div style="height:260px;">
+                                <canvas id="lessonsByCourseChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-2">Lesson Status Overview (Last 7 days)</h6>
+                            <div style="height:260px;">
+                                <canvas id="lessonStatusChart7d"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-2">Credit Activity - Last 30 Days</h6>
+                            <div style="height:260px;">
+                                <canvas id="creditChart30d"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent activities -->
+        <div class="col-12 col-xl-6" data-widget="activities">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Recent Platform Activities</h6>
+                        <div class="text-muted small">Auto-refresh: <span id="activityRefresh">30s</span></div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Activity</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="activityBody">
+                            <tr><td colspan="4"><div class="skeleton" style="height:18px;"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end">
+                        <a href="/hangfire" class="small">View All Activities</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts & system health -->
+        <div class="col-12 col-xl-6" data-widget="alerts">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-2">Alerts & Notifications</h6>
+                    <div id="alertsList" class="d-flex flex-column gap-2">
+                        <div class="skeleton" style="height:42px;"></div>
+                        <div class="skeleton" style="height:42px;"></div>
+                        <div class="skeleton" style="height:42px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">System Health</h6>
+                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#healthBody">Toggle</button>
+                    </div>
+                    <div class="collapse show mt-2" id="healthBody">
+                        <div class="row g-2 small" id="healthGrid">
+                            <div class="col-6">API: <span class="badge bg-success" id="healthApi">Operational</span></div>
+                            <div class="col-6">Database: <span class="badge bg-success" id="healthDb">Healthy</span></div>
+                            <div class="col-6">Zoom: <span class="badge bg-secondary" id="healthZoom">—</span></div>
+                            <div class="col-6">Email: <span class="badge bg-success" id="healthEmail">Operational</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's schedule -->
+        <div class="col-12" data-widget="todaySchedule">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <h6 class="mb-0">Today's Schedule</h6>
+                            <div class="text-muted small">Last updated: <span id="scheduleUpdated">—</span></div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary" id="refreshSchedule">Refresh</button>
+                    </div>
+
+                    <ul class="nav nav-tabs mb-2" id="scheduleTabs">
+                        <li class="nav-item"><button class="nav-link active" data-status="all" type="button">All</button></li>
+                        <li class="nav-item"><button class="nav-link" data-status="upcoming" type="button">Upcoming</button></li>
+                        <li class="nav-item"><button class="nav-link" data-status="ongoing" type="button">Ongoing</button></li>
+                        <li class="nav-item"><button class="nav-link" data-status="completed" type="button">Completed</button></li>
+                        <li class="nav-item"><button class="nav-link" data-status="cancelled" type="button">Cancelled</button></li>
+                    </ul>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Student</th>
+                                <th>Tutor</th>
+                                <th>Course</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="scheduleBody">
+                            <tr><td colspan="6"><div class="skeleton" style="height:18px;"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small" id="schedulePaging">—</div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary" id="schedulePrev">Prev</button>
+                            <button class="btn btn-sm btn-outline-secondary" id="scheduleNext">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+@section Scripts {
+    <script src="/nobleui/vendors/chartjs/Chart.min.js"></script>
+    <script src="/nobleui/vendors/sortablejs/Sortable.min.js"></script>
+    <script>
+      (function(){
+        const csrf = '@csrf';
+
+        // offline indicator
+        const offlineBanner = document.getElementById('offlineBanner');
+        function syncOnline(){
+          const online = navigator.onLine;
+          offlineBanner.classList.toggle('d-none', online);
+        }
+        window.addEventListener('online', syncOnline);
+        window.addEventListener('offline', syncOnline);
+        syncOnline();
+
+        // Live clock
+        const clockEl = document.getElementById('liveClock');
+        function tick(){
+          const d = new Date();
+          clockEl.textContent = d.toLocaleString();
+        }
+        setInterval(tick, 1000);
+        tick();
+
+        const errorBox = document.getElementById('errorBox');
+        const retryBtn = document.getElementById('retryBtn');
+        const lastLoaded = document.getElementById('lastLoaded');
+        const adminNameEl = document.getElementById('adminName');
+
+        let dashboard = null;
+        let scheduleStatus = 'all';
+        let schedulePage = 1;
+
+        function setText(id, v){ const el = document.getElementById(id); if (el) el.textContent = v; }
+        function setHtml(id, v){ const el = document.getElementById(id); if (el) el.innerHTML = v; }
+
+        function badge(variant, text){ return `<span class="badge bg-${variant}">${text}</span>`; }
+
+        function renderActivities(items){
+          const tbody = document.getElementById('activityBody');
+          if (!tbody) return;
+          if (!items || items.length === 0){
+            tbody.innerHTML = `<tr><td colspan="4" class="text-muted">No data available</td></tr>`;
+            return;
+          }
+          tbody.innerHTML = items.map(a => {
+            const b = a.badge || 'secondary';
+            const link = a.url ? `<a class="btn btn-sm btn-outline-primary" href="${a.url}">Open</a>` : '';
+            return `<tr>
+              <td class="text-muted">${a.relative || ''}</td>
+              <td>${badge(b, a.type || 'System')}</td>
+              <td>${a.text || ''}</td>
+              <td class="text-end">${link}</td>
+            </tr>`;
+          }).join('');
+        }
+
+        function renderAlerts(alerts){
+          const el = document.getElementById('alertsList');
+          if (!el) return;
+          const critical = (alerts && alerts.critical) ? alerts.critical : [];
+          const warnings = (alerts && alerts.warnings) ? alerts.warnings : [];
+          const dismissed = new Set(JSON.parse(localStorage.getItem('igb:adminDashboard:dismissedAlerts:v1') || '[]'));
+          const rows = [...critical, ...warnings].filter(x => (x.count || 0) > 0 && !dismissed.has(x.key));
+          if (rows.length === 0) {
+            el.innerHTML = `<div class="text-muted small">No alerts right now.</div>`;
+            return;
+          }
+          el.innerHTML = rows.map(a => {
+            const sev = a.severity === 'critical' ? 'danger' : 'warning';
+            const url = a.url || '#';
+            return `<div class="d-flex justify-content-between align-items-center border rounded p-2">
+              <div>
+                <a class="fw-semibold text-decoration-none" href="${url}">${a.text}</a>
+                <div class="text-muted small">Click to view details</div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-${sev}">${a.count}</span>
+                <button class="btn btn-sm btn-outline-secondary alert-dismiss" data-key="${a.key}" type="button">Dismiss</button>
+              </div>
+            </div>`;
+          }).join('');
+
+          el.querySelectorAll('.alert-dismiss').forEach(btn => {
+            btn.addEventListener('click', () => {
+              if (!confirm('Dismiss this alert?')) return;
+              const key = btn.getAttribute('data-key');
+              const set = new Set(JSON.parse(localStorage.getItem('igb:adminDashboard:dismissedAlerts:v1') || '[]'));
+              set.add(key);
+              localStorage.setItem('igb:adminDashboard:dismissedAlerts:v1', JSON.stringify(Array.from(set)));
+              btn.closest('div.border')?.remove();
+            });
+          });
+        }
+
+        function renderSchedule(s){
+          const tbody = document.getElementById('scheduleBody');
+          if (!tbody) return;
+          const items = (s && s.items) ? s.items : [];
+          const total = s ? (s.total || 0) : 0;
+          const pageSize = s ? (s.pageSize || 10) : 10;
+          const page = s ? (s.page || 1) : 1;
+          const from = total === 0 ? 0 : ((page - 1) * pageSize) + 1;
+          const to = Math.min(page * pageSize, total);
+          document.getElementById('schedulePaging').textContent = `Showing ${from} to ${to} of ${total} lessons`;
+
+          if (!items.length){
+            tbody.innerHTML = `<tr><td colspan="6" class="text-muted">No lessons for this filter.</td></tr>`;
+            return;
+          }
+          function fmtRange(a,b){
+            const s = new Date(a);
+            const e = new Date(b);
+            return `${s.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${e.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+          }
+          function statusDot(st, isOngoing){
+            const map = { Completed: 'success', Scheduled: 'secondary', Rescheduled: 'secondary', Cancelled: 'danger', Pending: 'warning' };
+            const v = map[st] || 'secondary';
+            const pulse = isOngoing ? 'style="animation:pulseDot 1.2s ease-in-out infinite;"' : '';
+            return `<span class="me-2" ${pulse} style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bs-${v});"></span>`;
+          }
+          tbody.innerHTML = items.map(l => {
+            const now = Date.now();
+            const start = new Date(l.startUtc).getTime();
+            const minsToStart = (start - now) / 60000;
+            const isOngoing = l.canJoin;
+            const trClass = isOngoing ? 'table-info' : (minsToStart > 0 && minsToStart < 15 ? 'table-warning' : (l.status === 'Completed' ? 'table-success' : ''));
+            const joinBtn = l.joinUrl && l.canJoin ? `<a class="btn btn-sm btn-success" target="_blank" href="${l.joinUrl}">Join</a>` : '';
+            const details = `<a class="btn btn-sm btn-outline-primary" href="/LessonBookings/Details?id=${l.id}">View</a>`;
+            const resched = `<a class="btn btn-sm btn-outline-warning" href="/LessonBookings/Schedule?id=${l.id}">Reschedule</a>`;
+            const cancel = `<button class="btn btn-sm btn-outline-danger js-cancel" data-id="${l.id}" type="button">Cancel</button>`;
+            const endBtn = isOngoing ? `<button class="btn btn-sm btn-outline-danger js-end" data-id="${l.id}" type="button">End</button>` : '';
+            return `<tr class="${trClass}">
+              <td class="text-muted">${fmtRange(l.startUtc, l.endUtc)}</td>
+              <td>${statusDot(l.status, isOngoing)}<span class="text-muted small">${l.status}</span></td>
+              <td>${l.studentName || ''}</td>
+              <td>${l.tutorName || ''}</td>
+              <td>${l.courseName || ''}</td>
+              <td class="text-end d-flex justify-content-end gap-1 flex-wrap">${details}${joinBtn}${endBtn}${resched}${cancel}</td>
+            </tr>`;
+          }).join('');
+
+          // wire actions (cancel + end)
+          tbody.querySelectorAll('.js-cancel').forEach(btn => btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            if (!confirm('Cancel this lesson?')) return;
+            const body = new URLSearchParams();
+            body.append('__RequestVerificationToken', csrf);
+            body.append('id', id);
+            body.append('reason', 'Cancelled by admin (dashboard)');
+            const res = await fetch('/LessonBookings/CancelByStaff', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+            if (res.ok) load(); else alert('Cancel failed.');
+          }));
+          tbody.querySelectorAll('.js-end').forEach(btn => btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            if (!confirm('End this class now?')) return;
+            const body = new URLSearchParams();
+            body.append('__RequestVerificationToken', csrf);
+            body.append('id', id);
+            body.append('note', 'Ended by admin from dashboard');
+            const res = await fetch('/LessonBookings/EndByAdmin', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+            if (res.ok) load(); else alert('End failed.');
+          }));
+        }
+
+        let charts = {};
+        function renderCharts(c){
+          if (typeof Chart === 'undefined') return;
+          // destroy
+          Object.values(charts).forEach(ch => { try { ch.destroy(); } catch {} });
+          charts = {};
+
+          // Enrollments line
+          const el1 = document.getElementById('enrollmentsChart');
+          if (el1) charts.enroll = new Chart(el1, {
+            type: 'line',
+            data: { labels: c.enrollments6m.labels, datasets: [{ data: c.enrollments6m.counts, borderColor:'#0d6efd', tension:0.25 }] },
+            options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+          });
+
+          // Lessons by course doughnut
+          const el2 = document.getElementById('lessonsByCourseChart');
+          const centerText = {
+            id: 'centerText',
+            afterDraw(chart, args, pluginOptions) {
+              const { ctx } = chart;
+              const txt = pluginOptions?.text || '';
+              if (!txt) return;
+              const meta = chart.getDatasetMeta(0);
+              if (!meta || !meta.data || !meta.data[0]) return;
+              const x = meta.data[0].x;
+              const y = meta.data[0].y;
+              ctx.save();
+              ctx.font = '600 14px system-ui, -apple-system, Segoe UI, Roboto';
+              ctx.fillStyle = '#334155';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText(txt, x, y);
+              ctx.restore();
+            }
+          };
+          if (el2) charts.course = new Chart(el2, {
+            type: 'doughnut',
+            data: { labels: c.lessonsByCourse.labels, datasets: [{ data: c.lessonsByCourse.counts }] },
+            options: {
+              responsive:true,
+              maintainAspectRatio:false,
+              plugins:{ legend:{ position:'right' }, centerText: { text: `Total ${c.lessonsByCourse.total || 0}` } },
+              onClick: (evt, elements) => {
+                if (!elements || !elements.length) return;
+                const idx = elements[0].index;
+                const id = (c.lessonsByCourse.courseIds || [])[idx];
+                if (id) window.location.href = `/Courses/Edit?id=${id}`;
+              }
+            },
+            plugins: [centerText]
+          });
+
+          // Status stacked bar
+          const el3 = document.getElementById('lessonStatusChart7d');
+          if (el3) charts.status = new Chart(el3, {
+            type: 'bar',
+            data: {
+              labels: c.lessonStatus7d.labels,
+              datasets: [
+                { label:'Completed', data: c.lessonStatus7d.completed, backgroundColor:'#198754', stack:'s' },
+                { label:'Active', data: c.lessonStatus7d.active, backgroundColor:'#0d6efd', stack:'s' },
+                { label:'Cancelled', data: c.lessonStatus7d.cancelled, backgroundColor:'#dc3545', stack:'s' },
+                { label:'Pending', data: c.lessonStatus7d.pending, backgroundColor:'#ffc107', stack:'s' },
+              ]
+            },
+            options: { responsive:true, maintainAspectRatio:false, scales:{ x:{ stacked:true }, y:{ stacked:true, beginAtZero:true, ticks:{ precision:0 } } } }
+          });
+
+          // Credit area (line w/ fill)
+          const el4 = document.getElementById('creditChart30d');
+          if (el4) charts.credit = new Chart(el4, {
+            type: 'line',
+            data: {
+              labels: c.credit30d.labels,
+              datasets: [
+                { label:'Allocated', data: c.credit30d.allocated, borderColor:'#0d6efd', backgroundColor:'rgba(13,110,253,0.18)', fill:true, tension:0.25 },
+                { label:'Used', data: c.credit30d.used, borderColor:'#198754', backgroundColor:'rgba(25,135,84,0.18)', fill:true, tension:0.25 },
+              ]
+            },
+            options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } }, scales:{ y:{ beginAtZero:true } } }
+          });
+        }
+
+        function animateCount(el, to){
+          if (!el) return;
+          const from = parseInt(el.textContent || '0', 10) || 0;
+          const start = performance.now();
+          const dur = 600;
+          function step(t){
+            const p = Math.min(1, (t - start)/dur);
+            const v = Math.round(from + (to - from)*p);
+            el.textContent = String(v);
+            if (p < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        }
+
+        async function load(){
+          errorBox.classList.add('d-none');
+          const url = `/api/admin/dashboard?todayStatus=${encodeURIComponent(scheduleStatus)}&todayPage=${schedulePage}&todayPageSize=10`;
+          try {
+            const res = await fetch(url, { credentials: 'include' });
+            if (!res.ok) throw new Error('bad response');
+            dashboard = await res.json();
+
+            adminNameEl.textContent = dashboard.adminName || 'Admin';
+            lastLoaded.textContent = `Loaded: ${new Date().toLocaleTimeString()}`;
+
+            // Stats
+            setText('totalStudents', dashboard.stats.totalStudents);
+            setText('studentsGrowth', dashboard.stats.newStudentsThisMonth);
+            setText('totalTutors', dashboard.stats.totalTutors);
+            setText('tutorsGrowth', dashboard.stats.newTutorsThisMonth);
+            setText('pendingTutorsBadge', `${dashboard.stats.pendingTutorApprovals} pending`);
+            setText('activeCourses', dashboard.stats.activeCourses);
+            setText('totalCourses', dashboard.stats.totalCourses);
+
+            const lessonsTodayEl = document.getElementById('lessonsToday');
+            animateCount(lessonsTodayEl, dashboard.stats.lessonsToday.total || 0);
+            setText('lessonsTodayBreakdown', `${dashboard.stats.lessonsToday.completed} completed, ${dashboard.stats.lessonsToday.ongoing} ongoing, ${dashboard.stats.lessonsToday.upcoming} upcoming`);
+
+            setText('pendingTotal', dashboard.stats.pendingApprovals.total);
+            setText('pendingTutorApprovals', dashboard.stats.pendingApprovals.tutorApprovals);
+            setText('pendingEnrollments', dashboard.stats.pendingApprovals.enrollmentRequests);
+            setText('pendingBookings', dashboard.stats.pendingApprovals.bookingRequests);
+            setText('pendingReschedules', dashboard.stats.pendingApprovals.rescheduleRequests);
+            setText('pendingBadge', dashboard.stats.pendingApprovals.total);
+
+            const pendingCard = document.getElementById('pendingCard');
+            if ((dashboard.stats.pendingApprovals.total || 0) > 0) pendingCard.classList.add('pulse');
+            else pendingCard.classList.remove('pulse');
+
+            setText('revenueMonth', dashboard.stats.revenueThisMonth.amount);
+            const pct = dashboard.stats.revenueThisMonth.changePct || 0;
+            setHtml('revenueChange', pct >= 0 ? `<span class="text-success"><i class="fas fa-arrow-up"></i> ${pct}% vs last month</span>` : `<span class="text-danger"><i class="fas fa-arrow-down"></i> ${Math.abs(pct)}% vs last month</span>`);
+
+            // Charts
+            renderCharts(dashboard.charts);
+
+            // Activities
+            renderActivities(dashboard.activities || []);
+
+            // Alerts
+            renderAlerts(dashboard.alerts || {});
+
+            // Schedule
+            setText('scheduleUpdated', 'just now');
+            renderSchedule(dashboard.todaySchedule);
+
+            // Health
+            setText('healthZoom', dashboard.systemHealth.zoom.status);
+
+          } catch (e) {
+            errorBox.classList.remove('d-none');
+            console.error(e);
+          }
+        }
+
+        retryBtn.addEventListener('click', () => load());
+
+        // Schedule tabs + pagination
+        document.querySelectorAll('#scheduleTabs button').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('#scheduleTabs button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            scheduleStatus = btn.getAttribute('data-status');
+            schedulePage = 1;
+            load();
+          });
+        });
+        document.getElementById('refreshSchedule').addEventListener('click', () => load());
+        document.getElementById('schedulePrev').addEventListener('click', () => { schedulePage = Math.max(1, schedulePage - 1); load(); });
+        document.getElementById('scheduleNext').addEventListener('click', () => { schedulePage = schedulePage + 1; load(); });
+
+        // Download enrollments data
+        document.getElementById('downloadEnrollments').addEventListener('click', () => {
+          if (!dashboard) return;
+          const labels = dashboard.charts.enrollments6m.labels || [];
+          const counts = dashboard.charts.enrollments6m.counts || [];
+          let csv = 'Month,Enrollments\\n';
+          for (let i=0;i<labels.length;i++) csv += `${labels[i]},${counts[i]}\\n`;
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'enrollments_last_6_months.csv';
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+
+        // Widget customization: drag to reorder + hide
+        const widgets = document.getElementById('widgets');
+        const prefKey = 'igb:adminDashboard:prefs:v1';
+        function loadPrefs(){
+          try { return JSON.parse(localStorage.getItem(prefKey) || '{}'); } catch { return {}; }
+        }
+        function savePrefs(p){ localStorage.setItem(prefKey, JSON.stringify(p)); }
+        function applyPrefs(){
+          const p = loadPrefs();
+          const order = p.order || [];
+          const hidden = new Set(p.hidden || []);
+          // apply hidden
+          widgets.querySelectorAll('[data-widget]').forEach(el => {
+            el.classList.toggle('d-none', hidden.has(el.getAttribute('data-widget')));
+          });
+          // sync toggles
+          document.querySelectorAll('.widget-toggle').forEach(cb => {
+            const id = cb.getAttribute('data-widget');
+            cb.checked = !hidden.has(id);
+          });
+          // apply order
+          order.forEach(id => {
+            const el = widgets.querySelector(`[data-widget="${id}"]`);
+            if (el) widgets.appendChild(el);
+          });
+        }
+        applyPrefs();
+        if (typeof Sortable !== 'undefined') {
+          Sortable.create(widgets, {
+            handle: '.widget-handle',
+            animation: 150,
+            onEnd: () => {
+              const ids = Array.from(widgets.querySelectorAll('[data-widget]')).map(x => x.getAttribute('data-widget'));
+              const p = loadPrefs();
+              p.order = ids;
+              savePrefs(p);
+            }
+          });
+        }
+
+        // show/hide widgets
+        document.querySelectorAll('.widget-toggle').forEach(cb => {
+          cb.addEventListener('change', () => {
+            const p = loadPrefs();
+            const hidden = new Set(p.hidden || []);
+            const id = cb.getAttribute('data-widget');
+            if (!cb.checked) hidden.add(id); else hidden.delete(id);
+            p.hidden = Array.from(hidden);
+            savePrefs(p);
+            applyPrefs();
+          });
+        });
+
+        // reset layout
+        document.getElementById('resetLayout').addEventListener('click', () => {
+          if (!confirm('Reset dashboard layout to default?')) return;
+          localStorage.removeItem(prefKey);
+          localStorage.removeItem('igb:adminDashboard:dismissedAlerts:v1');
+          applyPrefs();
+          load();
+        });
+
+        // sound toggle
+        const soundKey = 'igb:adminDashboard:sound:v1';
+        const soundToggle = document.getElementById('soundToggle');
+        soundToggle.checked = (localStorage.getItem(soundKey) ?? 'false') === 'true';
+        soundToggle.addEventListener('change', () => localStorage.setItem(soundKey, soundToggle.checked ? 'true' : 'false'));
+
+        function beep(){
+          try{
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = 'sine';
+            o.frequency.value = 880;
+            g.gain.value = 0.05;
+            o.connect(g); g.connect(ctx.destination);
+            o.start();
+            setTimeout(() => { o.stop(); ctx.close(); }, 140);
+          }catch{}
+        }
+
+        // Real-time updates (from SignalR Notify via _Layout hook)
+        window.igbAdminDashboard = {
+          onNotify: (payload) => {
+            // optional sound
+            if ((localStorage.getItem(soundKey) ?? 'false') === 'true') beep();
+
+            // Insert new activity row (slide/highlight)
+            const tbody = document.getElementById('activityBody');
+            if (!tbody) return;
+            const title = payload?.title || 'System';
+            const msg = payload?.message || '';
+            const row = document.createElement('tr');
+            row.classList.add('table-warning');
+            row.style.transition = 'background-color 1.2s ease';
+            row.innerHTML = `<td class="text-muted">Just now</td><td>${badge('secondary', 'System')}</td><td><strong>${title}:</strong> ${msg}</td><td class="text-end"></td>`;
+            tbody.prepend(row);
+            // keep max 10
+            while (tbody.children.length > 10) tbody.removeChild(tbody.lastElementChild);
+            setTimeout(() => row.classList.remove('table-warning'), 1200);
+          }
+        };
+
+        // Typed SignalR events (requested)
+        // - activity:new, lesson:started, lesson:ended, alert:new, user:registered, approval:pending
+        function ensureRealtime(){
+          if (!window.igbRealtime || typeof window.igbRealtime.on !== 'function') return false;
+          return true;
+        }
+
+        function upsertActivity(payload){
+          const tbody = document.getElementById('activityBody');
+          if (!tbody) return;
+          const row = document.createElement('tr');
+          row.classList.add('table-warning');
+          row.style.transition = 'background-color 1.2s ease';
+
+          const badgeColor = payload?.badge || 'secondary';
+          const type = payload?.type || 'System';
+          const rel = payload?.relative || 'Just now';
+          const text = payload?.text || '';
+          const url = payload?.url;
+          const action = url ? `<a class="btn btn-sm btn-outline-primary" href="${url}">Open</a>` : '';
+          row.innerHTML = `<td class="text-muted">${rel}</td><td>${badge(badgeColor, type)}</td><td>${text}</td><td class="text-end">${action}</td>`;
+          tbody.prepend(row);
+          while (tbody.children.length > 10) tbody.removeChild(tbody.lastElementChild);
+          setTimeout(() => row.classList.remove('table-warning'), 1200);
+        }
+
+        function debounce(fn, ms){
+          let t = null;
+          return function(){
+            clearTimeout(t);
+            t = setTimeout(() => fn(), ms);
+          }
+        }
+        const softReload = debounce(() => load(), 800);
+
+        (function wireRealtime(){
+          if (!ensureRealtime()) return;
+          window.igbRealtime.on('activity:new', (p) => { upsertActivity(p); });
+          window.igbRealtime.on('user:registered', (p) => { upsertActivity(p); softReload(); });
+          window.igbRealtime.on('approval:pending', (p) => { upsertActivity(p); softReload(); });
+          window.igbRealtime.on('alert:new', () => { softReload(); });
+          window.igbRealtime.on('lesson:started', () => { softReload(); });
+          window.igbRealtime.on('lesson:ended', () => { softReload(); });
+        })();
+
+        // Refresh loop: activities every 30s, schedule every 2m
+        let actCountdown = 30;
+        setInterval(() => {
+          actCountdown--;
+          document.getElementById('activityRefresh').textContent = actCountdown + 's';
+          if (actCountdown <= 0) { actCountdown = 30; load(); }
+        }, 1000);
+        setInterval(() => load(), 120000);
+
+        load();
+      })();
+    </script>
+
+    <style>
+      @@keyframes pulseDot { 0%{transform:scale(1);} 50%{transform:scale(1.35);} 100%{transform:scale(1);} }
+    </style>
+}
 

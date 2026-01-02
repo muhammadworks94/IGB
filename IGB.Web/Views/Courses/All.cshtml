@@ -1,0 +1,199 @@
+@model IGB.Web.ViewModels.Admin.CourseListViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "All Courses";
+    var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+<div class="breadcrumb-header">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="#">Courses</a></li>
+            <li class="breadcrumb-item active" aria-current="page">All Courses</li>
+        </ol>
+    </nav>
+    
+    <!-- Title, Search, Filters, and Action Buttons -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
+        <h1 class="breadcrumb-title mb-0">All Courses</h1>
+        
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <!-- Search and Filters Form -->
+            <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+                <div style="width: 200px;">
+                    <input class="form-control form-control-sm" name="q" value="@Model.Query" placeholder="Search courses..." />
+                </div>
+                <select class="form-select form-select-sm" name="curriculumId" id="filterCurriculum" style="width: 150px;">
+                    <option value="">All Curricula</option>
+                    @foreach (var c in Model.Curricula)
+                    {
+                        <option value="@c.Id" selected="@(Model.CurriculumId == c.Id)">@c.Name</option>
+                    }
+                </select>
+                <select class="form-select form-select-sm" name="gradeId" id="filterGrade" style="width: 150px;">
+                    <option value="">All Grades</option>
+                    @foreach (var g in Model.Grades)
+                    {
+                        <option value="@g.Id" selected="@(Model.GradeId == g.Id)">@g.Name</option>
+                    }
+                </select>
+                <select class="form-select form-select-sm" name="active" style="width: 120px;">
+                    <option value="">All Status</option>
+                    <option value="true" selected="@(Model.IsActive == true)">Active</option>
+                    <option value="false" selected="@(Model.IsActive == false)">Inactive</option>
+                </select>
+                <button class="btn btn-primary btn-sm" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("All", "Courses")">
+                    <i class="fas fa-times"></i>
+                </a>
+            </form>
+            
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("ExportCsv", "Courses", new { curriculumId = Model.CurriculumId, gradeId = Model.GradeId, active = Model.IsActive })">
+                    <i class="fas fa-file-csv me-1"></i>Export CSV
+                </a>
+                <a class="btn btn-outline-primary btn-sm" href="@Url.Action("Create", "Courses", new { curriculumId = Model.CurriculumId, gradeId = Model.GradeId })">
+                    <i class="fas fa-plus me-1"></i>Add Course
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    @if (TempData["Error"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
+    }
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Curriculum</th>
+                        <th>Grade</th>
+                        <th>Credits</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var c in Model.Items)
+                    {
+                        var statusBadge = c.IsActive ? "<span class='badge bg-success'>Active</span>" : "<span class='badge bg-secondary'>Inactive</span>";
+                        var topicsUrl = Url.Action("Index", "CourseTopics", new { courseId = c.Id }) ?? "#";
+                        var editUrl = Url.Action("Edit", "Courses", new { id = c.Id }) ?? "#";
+                        var delUrl = Url.Action("Delete", "Courses", new { id = c.Id }) ?? "#";
+                        var dupUrl = Url.Action("Duplicate", "Courses", new { id = c.Id }) ?? "#";
+                        var toggleActiveUrl = Url.Action("BulkSetActive", "Courses") ?? "#";
+
+                        <tr>
+                            <td>@c.Name</td>
+                            <td>@c.Curriculum</td>
+                            <td>@c.Grade</td>
+                            <td>@c.CreditCost</td>
+                            <td>@Html.Raw(statusBadge)</td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" href="@topicsUrl"><i class="fas fa-list me-1"></i>Topics</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="@editUrl"><i class="fas fa-edit me-1"></i>Edit</a>
+                                @if (c.IsActive)
+                                {
+                                    <form method="post" action="@toggleActiveUrl" class="d-inline">
+                                        <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                                        <input type="hidden" name="ids" value="@c.Id" />
+                                        <input type="hidden" name="active" value="false" />
+                                        @if (!string.IsNullOrWhiteSpace(Model.Query))
+                                        {
+                                            <input type="hidden" name="q" value="@Model.Query" />
+                                        }
+                                        @if (Model.CurriculumId.HasValue)
+                                        {
+                                            <input type="hidden" name="curriculumId" value="@Model.CurriculumId.Value" />
+                                        }
+                                        @if (Model.GradeId.HasValue)
+                                        {
+                                            <input type="hidden" name="gradeId" value="@Model.GradeId.Value" />
+                                        }
+                                        @if (Model.IsActive.HasValue)
+                                        {
+                                            <input type="hidden" name="activeFilter" value="@Model.IsActive.Value" />
+                                        }
+                                        <button type="submit" class="btn btn-sm btn-outline-warning"><i class="fas fa-ban me-1"></i>Deactivate</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form method="post" action="@toggleActiveUrl" class="d-inline">
+                                        <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                                        <input type="hidden" name="ids" value="@c.Id" />
+                                        <input type="hidden" name="active" value="true" />
+                                        @if (!string.IsNullOrWhiteSpace(Model.Query))
+                                        {
+                                            <input type="hidden" name="q" value="@Model.Query" />
+                                        }
+                                        @if (Model.CurriculumId.HasValue)
+                                        {
+                                            <input type="hidden" name="curriculumId" value="@Model.CurriculumId.Value" />
+                                        }
+                                        @if (Model.GradeId.HasValue)
+                                        {
+                                            <input type="hidden" name="gradeId" value="@Model.GradeId.Value" />
+                                        }
+                                        @if (Model.IsActive.HasValue)
+                                        {
+                                            <input type="hidden" name="activeFilter" value="@Model.IsActive.Value" />
+                                        }
+                                        <button type="submit" class="btn btn-sm btn-outline-success"><i class="fas fa-check me-1"></i>Activate</button>
+                                    </form>
+                                }
+                                <form method="post" action="@dupUrl" class="d-inline">
+                                    <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-clone me-1"></i>Duplicate</button>
+                                </form>
+                                <form method="post" action="@delUrl" class="d-inline" onsubmit="return confirm('Delete course?');">
+                                    <input name="__RequestVerificationToken" type="hidden" value="@csrf" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash me-1"></i>Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.Pagination != null)
+            {
+                <partial name="Components/_Pagination" model="Model.Pagination" />
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+  // Filter grade list when curriculum changes (reuse existing API)
+  document.getElementById('filterCurriculum')?.addEventListener('change', async function () {
+    const cid = this.value;
+    const gradeSel = document.getElementById('filterGrade');
+    if (!gradeSel) return;
+    gradeSel.innerHTML = "<option value=''>All</option>";
+    if (!cid) return;
+    const res = await fetch('/api/registration/grades?curriculumId=' + encodeURIComponent(cid));
+    if (!res.ok) return;
+    const list = await res.json();
+    gradeSel.innerHTML = "<option value=''>All</option>" + list.map(x => `<option value="${x.id}">${x.name}</option>`).join("");
+  });
+</script>
+
+

@@ -1,0 +1,193 @@
+2025-12-24 00:00:12.135 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:00:12.1354953Z"
+2025-12-24 00:01:12.220 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:01:12.2201045Z"
+2025-12-24 00:01:46.242 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-24 00:01:46.587 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-24 00:01:46.839 +05:00 [INF] Starting IGB Web Application
+2025-12-24 00:01:47.819 +05:00 [INF] Users already exist and are up-to-date. Skipping seed/backfill.
+2025-12-24 00:01:47.826 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-24 00:01:49.204 +05:00 [INF] Ensured demo users: added 9 accounts.
+2025-12-24 00:01:49.376 +05:00 [INF] Ensured demo courses/topics.
+2025-12-24 00:01:49.529 +05:00 [INF] Ensured credits V2 seed data.
+2025-12-24 00:01:49.741 +05:00 [INF] Ensured demo enrollments and lessons.
+2025-12-24 00:01:50.063 +05:00 [INF] Ensured demo progress + feedback seed data.
+2025-12-24 00:01:50.064 +05:00 [INF] Database initialized and seeded successfully
+2025-12-24 00:01:50.242 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-24 00:01:50.243 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-24 00:01:50.244 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-24 00:01:50.270 +05:00 [INF] Server desktop-jmka7tq:39872:d27230bf successfully announced in 11.6445 ms
+2025-12-24 00:01:50.278 +05:00 [INF] Server desktop-jmka7tq:39872:d27230bf is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-24 00:01:50.305 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-24 00:01:50.392 +05:00 [INF] Server desktop-jmka7tq:39872:d27230bf all the dispatchers started
+2025-12-24 00:01:51.934 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:01:51.950 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:01:54.466 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:01:54.468 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:01:56.794 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:01:56.795 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:02:00.001 +05:00 [INF] User logged out
+2025-12-24 00:02:00.099 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:02:00.101 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:02:03.255 +05:00 [INF] User logged in successfully: superadmin@igb.com
+2025-12-24 00:02:03.260 +05:00 [INF] User superadmin@igb.com logged in successfully
+2025-12-24 00:02:03.355 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:02:03.358 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:02:05.612 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:02:05.6115715Z"
+2025-12-24 00:03:05.653 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:03:05.6538424Z"
+2025-12-24 00:04:05.733 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:04:05.7338009Z"
+2025-12-24 00:05:05.868 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:05:05.8688666Z"
+2025-12-24 00:08:45.117 +05:00 [INF] Start installing Hangfire SQL objects...
+2025-12-24 00:08:45.485 +05:00 [INF] Hangfire SQL objects installed.
+2025-12-24 00:08:45.742 +05:00 [INF] Starting IGB Web Application
+2025-12-24 00:08:46.741 +05:00 [INF] Users already exist and are up-to-date. Skipping seed/backfill.
+2025-12-24 00:08:46.746 +05:00 [INF] Curricula already exist. Skipping courses seed.
+2025-12-24 00:08:46.855 +05:00 [INF] Ensured credits V2 seed data.
+2025-12-24 00:08:46.902 +05:00 [INF] Ensured demo enrollments and lessons.
+2025-12-24 00:08:47.208 +05:00 [INF] Ensured demo request workflows (pending enrollments, pending lessons, reschedules, cancellations).
+2025-12-24 00:08:47.273 +05:00 [INF] Ensured demo progress + feedback seed data.
+2025-12-24 00:08:47.291 +05:00 [INF] Database initialized and seeded successfully
+2025-12-24 00:08:47.471 +05:00 [INF] Starting Hangfire Server using job storage: 'SQL Server: .@IGBModern'
+2025-12-24 00:08:47.472 +05:00 [INF] Using the following options for SQL Server job storage: Queue poll interval: 00:00:15.
+2025-12-24 00:08:47.473 +05:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2025-12-24 00:08:47.500 +05:00 [INF] Server desktop-jmka7tq:21016:bce68e15 successfully announced in 10.8231 ms
+2025-12-24 00:08:47.509 +05:00 [INF] Server desktop-jmka7tq:21016:bce68e15 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2025-12-24 00:08:47.546 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-24 00:08:47.657 +05:00 [INF] Server desktop-jmka7tq:21016:bce68e15 all the dispatchers started
+2025-12-24 00:08:47.986 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:08:47.9855952Z"
+2025-12-24 00:08:48.301 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:08:48.330 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:02.982 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:09:02.9823211Z"
+2025-12-24 00:09:27.081 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:27.084 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:36.082 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:36.084 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:42.121 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:42.122 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:42.768 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:42.770 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:46.586 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:46.597 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:51.152 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:51.153 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:57.658 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:09:57.660 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:03.067 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:10:03.0674038Z"
+2025-12-24 00:10:19.262 +05:00 [INF] Getting user 1
+2025-12-24 00:10:19.296 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:19.298 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:22.343 +05:00 [INF] Getting user 1
+2025-12-24 00:10:22.370 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:22.372 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:27.516 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:27.521 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:28.238 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:28.240 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:29.354 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:29.357 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:39.881 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:39.883 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:50.236 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:10:50.238 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:01.389 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:01.391 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:03.188 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:11:03.1883862Z"
+2025-12-24 00:11:12.556 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:12.557 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:21.241 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:21.244 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:23.054 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:23.055 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:24.733 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:24.735 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:25.372 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:25.374 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:26.605 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:26.610 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:31.012 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:31.015 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:34.197 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:34.198 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:38.083 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:38.086 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:41.638 +05:00 [INF] User logged out
+2025-12-24 00:11:41.695 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:41.697 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:45.303 +05:00 [INF] User logged in successfully: teacher1@igb.com
+2025-12-24 00:11:45.308 +05:00 [INF] User teacher1@igb.com logged in successfully
+2025-12-24 00:11:45.330 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:45.331 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:46.894 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:46.897 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:52.349 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:52.351 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:53.194 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:53.197 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:55.146 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:11:55.148 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:01.604 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:01.605 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:03.279 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:12:03.2795935Z"
+2025-12-24 00:12:03.420 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:03.427 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:05.129 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:05.132 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:06.840 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:06.842 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:13.102 +05:00 [INF] User logged out
+2025-12-24 00:12:13.119 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:13.121 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:16.032 +05:00 [INF] User logged in successfully: student1@igb.com
+2025-12-24 00:12:16.033 +05:00 [INF] User student1@igb.com logged in successfully
+2025-12-24 00:12:16.053 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:16.055 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:18.975 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:18.977 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:20.426 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:20.428 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:23.520 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:23.521 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:24.859 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:24.861 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:26.384 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:26.385 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:39.690 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:39.693 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:48.857 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:48.858 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:51.971 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:51.972 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:54.478 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:54.479 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:56.840 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:56.863 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:57.746 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:57.748 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:59.502 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:12:59.503 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:13:02.343 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:13:02.345 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:13:02.884 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:13:02.886 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:13:03.410 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:13:03.4106269Z"
+2025-12-24 00:13:04.939 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:13:04.940 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:13:06.680 +05:00 [WRN] Unable to configure Browser Link script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:13:06.682 +05:00 [WRN] Unable to configure browser refresh script injection on the response. This may have been caused by the response's Content-Encoding: '["br"]'. Consider disabling response compression.
+2025-12-24 00:13:47.580 +05:00 [INF] 1 servers were removed due to timeout
+2025-12-24 00:14:03.491 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:14:03.4911620Z"
+2025-12-24 00:15:03.557 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:15:03.5574263Z"
+2025-12-24 00:16:03.648 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:16:03.6482364Z"
+2025-12-24 00:17:03.745 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:17:03.7451369Z"
+2025-12-24 00:18:03.847 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:18:03.8471995Z"
+2025-12-24 00:19:03.907 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:19:03.9078342Z"
+2025-12-24 00:20:03.989 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:20:03.9891411Z"
+2025-12-24 00:21:04.075 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:21:04.0755592Z"
+2025-12-24 00:22:04.170 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:22:04.1701003Z"
+2025-12-24 00:23:04.292 +05:00 [INF] Hangfire heartbeat at "2025-12-23T19:23:04.2921502Z"
