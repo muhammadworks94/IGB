@@ -1,0 +1,32 @@
+﻿################################################################################
+# ASP.NET Core / Visual Studio (Correct & Scalable)
+################################################################################
+
+## Build output
+**/bin/
+**/obj/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## VS Code / Rider
+.vscode/
+.idea/
+
+## NuGet
+**/project.assets.json
+**/project.nuget.cache
+**/*.nuget.g.props
+**/*.nuget.g.targets
+**/*.nuget.dgspec.json
+
+## Logs
+*.log
+
+## OS files
+.DS_Store
+Thumbs.db
