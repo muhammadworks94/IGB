@@ -41,6 +41,7 @@ public class DbInitializer
             await SeedEnrollmentsAndLessonsAsync();
             await SeedRequestsAsync();
             await SeedProgressAndFeedbackAsync();
+            await SeedGuardiansAsync();
             await SeedTestReportsAsync();
         }
         catch (Exception ex)
@@ -422,7 +423,7 @@ public class DbInitializer
             });
         }
 
-        // Guardians (guardian1..guardian2)
+        // Guardians (guardian1..guardian2) - basic seeding, realistic names added in EnsureRealisticBulkSeedAsync
         for (int i = 1; i <= 2; i++)
         {
             var email = $"guardian{i}@igb.com";
@@ -852,6 +853,39 @@ public class DbInitializer
                 ApprovalStatus = UserApprovalStatus.Approved,
                 ApprovedAt = now,
                 CreatedAt = now.AddSeconds(-studentAttempt)
+            });
+        }
+
+        // Ensure at least 20 approved guardians (real names with contact info)
+        var guardianCount = await _context.Users.AsNoTracking()
+            .CountAsync(u => !u.IsDeleted && u.Role == "Guardian" && u.ApprovalStatus == UserApprovalStatus.Approved);
+
+        int guardianAttempt = 1000; // offset so emails are unique
+        while (guardianCount + toAddUsers.Count(u => u.Role == "Guardian") < 20)
+        {
+            var fn = firstNames[rng.Next(firstNames.Length)];
+            var ln = lastNames[rng.Next(lastNames.Length)];
+            var email = NewEmail(fn, ln, guardianAttempt++);
+            if (emailSet.Contains(email)) continue;
+            emailSet.Add(email);
+
+            var phoneSuffix = (9000 + guardianAttempt).ToString().PadLeft(7, '0');
+            toAddUsers.Add(new User
+            {
+                Email = email,
+                FirstName = fn,
+                LastName = ln,
+                Role = "Guardian",
+                LocalNumber = $"+1{phoneSuffix}",
+                WhatsappNumber = $"+1{phoneSuffix}",
+                CountryCode = "US",
+                TimeZoneId = "UTC",
+                IsActive = true,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(defaultPassword),
+                EmailConfirmed = true,
+                ApprovalStatus = UserApprovalStatus.Approved,
+                ApprovedAt = now,
+                CreatedAt = now.AddSeconds(-guardianAttempt)
             });
         }
 
@@ -1843,6 +1877,108 @@ public class DbInitializer
         }
 
         _logger.LogInformation("Ensured demo progress + feedback seed data.");
+    }
+
+    private async Task SeedGuardiansAsync()
+    {
+        // Seed Guardian entities (linked to StudentUser) with realistic data
+        var students = await _context.Users.AsNoTracking()
+            .Where(u => !u.IsDeleted && u.Role == "Student" && u.ApprovalStatus == UserApprovalStatus.Approved)
+            .OrderBy(u => u.Id)
+            .Take(100)
+            .ToListAsync();
+
+        if (students.Count == 0) return;
+
+        var rng = new Random(20251225);
+        var now = DateTime.UtcNow;
+
+        // Realistic guardian first names (adults/parents)
+        var guardianFirstNames = new[]
+        {
+            "Robert", "Jennifer", "Michael", "Lisa", "William", "Patricia", "David", "Linda", "Richard", "Barbara",
+            "Joseph", "Elizabeth", "Thomas", "Susan", "Charles", "Jessica", "Christopher", "Sarah", "Daniel", "Karen",
+            "Matthew", "Nancy", "Anthony", "Betty", "Mark", "Margaret", "Donald", "Sandra", "Steven", "Ashley",
+            "Paul", "Kimberly", "Andrew", "Emily", "Joshua", "Donna", "Kenneth", "Michelle", "Kevin", "Carol",
+            "Brian", "Amanda", "George", "Dorothy", "Edward", "Melissa", "Ronald", "Deborah", "Timothy", "Stephanie",
+            "Ahmed", "Fatima", "Hassan", "Ayesha", "Mohammed", "Zainab", "Ali", "Maryam", "Omar", "Noor",
+            "Rajesh", "Priya", "Amit", "Kavya", "Rahul", "Ananya", "Vikram", "Meera", "Arjun", "Diya"
+        };
+
+        var guardianLastNames = new[]
+        {
+            "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
+            "Hernandez", "Lopez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee",
+            "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
+            "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores", "Green",
+            "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell", "Carter", "Roberts", "Gomez",
+            "Khan", "Ahmed", "Ali", "Hussain", "Malik", "Shaikh", "Iqbal", "Raza", "Siddiqui", "Qureshi",
+            "Patel", "Sharma", "Gupta", "Mehta", "Kapoor", "Singh", "Kaur", "Iyer", "Nair", "Reddy"
+        };
+
+        var relationships = new[] { "Father", "Mother", "Guardian", "Stepfather", "Stepmother" };
+
+        var existingGuardians = await _context.Guardians.AsNoTracking()
+            .Where(g => !g.IsDeleted)
+            .Select(g => g.StudentUserId)
+            .ToListAsync();
+
+        var studentsWithGuardians = existingGuardians.ToHashSet();
+        var toAdd = new List<Guardian>();
+
+        foreach (var student in students)
+        {
+            // Skip if student already has guardians
+            if (studentsWithGuardians.Contains(student.Id)) continue;
+
+            // Most students have 1-2 guardians (usually Father and/or Mother)
+            var guardianCount = rng.Next(1, 3); // 1 or 2 guardians per student
+
+            for (int i = 0; i < guardianCount; i++)
+            {
+                var firstName = guardianFirstNames[rng.Next(guardianFirstNames.Length)];
+                var lastName = guardianLastNames[rng.Next(guardianLastNames.Length)];
+                var fullName = $"{firstName} {lastName}";
+                
+                // Use student's last name for some guardians (realistic - family members)
+                if (rng.Next(2) == 0 && !string.IsNullOrWhiteSpace(student.LastName))
+                {
+                    lastName = student.LastName;
+                    fullName = $"{firstName} {lastName}";
+                }
+
+                var relationship = i == 0 
+                    ? (rng.Next(2) == 0 ? "Father" : "Mother") // First guardian is usually Father or Mother
+                    : relationships[rng.Next(relationships.Length)]; // Second can be any relationship
+
+                // Generate email based on guardian name and student ID for uniqueness
+                var emailBase = $"{firstName.ToLowerInvariant().Replace(" ", "")}.{lastName.ToLowerInvariant().Replace(" ", "")}";
+                var email = $"{emailBase}.{student.Id}.{i}@guardian.igb.com";
+
+                // Generate phone number
+                var phoneSuffix = (8000 + student.Id * 10 + i).ToString().PadLeft(7, '0');
+                var phone = $"+1{phoneSuffix}";
+
+                toAdd.Add(new Guardian
+                {
+                    StudentUserId = student.Id,
+                    FullName = fullName,
+                    Relationship = relationship,
+                    Email = email,
+                    LocalNumber = phone,
+                    WhatsappNumber = phone,
+                    IsPrimary = i == 0, // First guardian is primary
+                    CreatedAt = now
+                });
+            }
+        }
+
+        if (toAdd.Count > 0)
+        {
+            await _context.Guardians.AddRangeAsync(toAdd);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Seeded {Count} guardian entities for students.", toAdd.Count);
+        }
     }
 
     private async Task SeedTestReportsAsync()
