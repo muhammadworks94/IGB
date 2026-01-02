@@ -89,7 +89,22 @@
                 {
                     rows.AppendLine("<tr>");
                     rows.AppendLine($"<td class=\"text-muted small\">{r.CreatedAtUtc:yyyy-MM-dd}</td>");
-                    rows.AppendLine($"<td class=\"fw-semibold\">{r.Rating}</td>");
+                    rows.AppendLine("<td class=\"text-nowrap\">");
+                    rows.AppendLine($"<span class=\"fw-semibold\">{r.Rating}/5</span>");
+                    rows.AppendLine("<span class=\"ms-1 text-warning\">");
+                    for (var i = 1; i <= 5; i++)
+                    {
+                        if (r.Rating >= i)
+                        {
+                            rows.AppendLine("<i class=\"fas fa-star\"></i>");
+                        }
+                        else
+                        {
+                            rows.AppendLine("<i class=\"far fa-star\"></i>");
+                        }
+                    }
+                    rows.AppendLine("</span>");
+                    rows.AppendLine("</td>");
                     rows.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(r.TutorName)}</td>");
                     rows.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(r.StudentName)}</td>");
                     rows.AppendLine($"<td class=\"text-muted\">{System.Net.WebUtility.HtmlEncode(r.CourseName)}</td>");
