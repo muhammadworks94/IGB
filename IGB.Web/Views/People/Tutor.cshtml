@@ -1,33 +1,44 @@
 @model IGB.Web.ViewModels.People.TutorProfileVm
 @{
     ViewData["Title"] = "Tutor Profile";
+    
+    // Build action buttons
+    var actionButtons = new List<IGB.Web.ViewModels.PageHeaderActionButton>();
+    
+    if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+    {
+        actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+            Text: "View Schedule",
+            Url: Url.Action("Overview", "Schedule", new { tutorId = Model.Header.UserId }),
+            Icon: "fas fa-calendar-alt me-1",
+            ButtonType: "outline-primary"
+        ));
+        
+        actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+            Text: "Availability",
+            Url: Url.Action("Index", "AdminTutorAvailability", new { tutorId = Model.Header.UserId }),
+            Icon: "fas fa-clock me-1",
+            ButtonType: "outline-secondary"
+        ));
+    }
+    
+    // Build page header
+    var pageHeader = new IGB.Web.ViewModels.PageHeaderViewModel(
+        Title: "Teacher / Tutor Profile",
+        Breadcrumbs: new List<BreadcrumbItem>
+        {
+            new("Dashboard", Url.Action("Index", "Portal")),
+            new("Users", Url.Action("Index", "Users")),
+            new("Tutor Profile")
+        },
+        ActionButtons: actionButtons.Count > 0 ? actionButtons : null
+    );
 }
 
-@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: "Teacher / Tutor Profile",
-    Breadcrumbs: new List<BreadcrumbItem>
-    {
-        new("Dashboard", Url.Action("Index", "Portal")),
-        new("Users", Url.Action("Index","Users")),
-        new("Tutor Profile")
-    },
-    Centered: true
-))
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="container-fluid">
     <partial name="_PersonHeader" model="Model.Header" />
-
-    @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
-    {
-        <div class="d-flex flex-wrap gap-2 mb-3">
-            <a class="btn btn-outline-primary" href="@Url.Action("Overview","Schedule", new { tutorId = Model.Header.UserId })">
-                <i class="fas fa-calendar-alt me-1"></i>View Schedule
-            </a>
-            <a class="btn btn-outline-secondary" href="@Url.Action("Index","AdminTutorAvailability", new { tutorId = Model.Header.UserId })">
-                <i class="fas fa-clock me-1"></i>Availability
-            </a>
-        </div>
-    }
 
     <div class="row g-3 mb-3">
         <div class="col-12 col-md-6 col-xl-3">
