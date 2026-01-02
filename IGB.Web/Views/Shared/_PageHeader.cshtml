@@ -1,10 +1,11 @@
 @model IGB.Web.ViewModels.PageHeaderViewModel
 
-<div class="breadcrumb-header @(Model.Centered ? "text-center" : "")">
+<div class="breadcrumb-header">
+    <!-- Breadcrumbs -->
     @if (Model.Breadcrumbs != null && Model.Breadcrumbs.Count > 0)
     {
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-1 @(Model.Centered ? "justify-content-center" : "")">
+        <nav aria-label="breadcrumb" class="mb-2">
+            <ol class="breadcrumb mb-0">
                 @for (var i = 0; i < Model.Breadcrumbs.Count; i++)
                 {
                     var item = Model.Breadcrumbs[i];
@@ -24,12 +25,169 @@
         </nav>
     }
 
-    <h1 class="breadcrumb-title">@Model.Title</h1>
-
-    @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
-    {
-        <p class="breadcrumb-subtitle">@Model.Subtitle</p>
-    }
+    <!-- Title, Subtitle, Search, Filters, and Action Buttons -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-0">
+        <div class="flex-grow-1">
+            <h1 class="breadcrumb-title mb-0">
+                <i class="fas fa-cog me-2"></i>@Model.Title
+            </h1>
+            @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+            {
+                <p class="breadcrumb-subtitle mb-0 mt-1 text-muted">@Model.Subtitle</p>
+            }
+        </div>
+        
+        <!-- Right Side: Search, Filters, and Action Buttons -->
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <!-- Search Form -->
+            @if (Model.Search != null)
+            {
+                <form method="@(Model.Search.FormMethod ?? "get")" 
+                      action="@(Model.Search.FormAction ?? "")" 
+                      class="d-flex gap-2 align-items-center">
+                    <div style="width: 250px;">
+                        <input class="form-control form-control-sm" 
+                               name="@(Model.Search.QueryParamName ?? "q")" 
+                               value="@Model.Search.CurrentValue" 
+                               placeholder="@(Model.Search.Placeholder ?? "Search...")" />
+                    </div>
+                    <button class="btn btn-primary btn-sm" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    @if (Model.Search.ShowClearButton && !string.IsNullOrWhiteSpace(Model.Search.CurrentValue))
+                    {
+                        <a class="btn btn-outline-secondary btn-sm" 
+                           href="@(Model.Search.ClearButtonUrl ?? "#")">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    }
+                </form>
+            }
+            
+            <!-- Filters -->
+            @if (Model.Filters != null && Model.Filters.Count > 0)
+            {
+                @foreach (var filter in Model.Filters)
+                {
+                    <form method="get" class="d-flex gap-2 align-items-center">
+                        @if (filter.Type == "select")
+                        {
+                            <label class="text-muted small mb-0" for="@filter.Name">@filter.Label</label>
+                            <select id="@filter.Name" 
+                                    name="@filter.Name" 
+                                    class="form-select form-select-sm @filter.CssClass" 
+                                    style="width: auto;"
+                                    onchange="this.form.submit()">
+                                @if (filter.Options != null)
+                                {
+                                    @foreach (var option in filter.Options)
+                                    {
+                                        <option value="@option.Key" selected="@(option.Key == filter.Value)">@option.Value</option>
+                                    }
+                                }
+                            </select>
+                        }
+                        else if (filter.Type == "input")
+                        {
+                            <label class="text-muted small mb-0" for="@filter.Name">@filter.Label</label>
+                            <input type="text" 
+                                   id="@filter.Name" 
+                                   name="@filter.Name" 
+                                   value="@filter.Value" 
+                                   placeholder="@filter.Placeholder"
+                                   class="form-control form-control-sm @filter.CssClass" 
+                                   style="width: auto;" />
+                        }
+                    </form>
+                }
+            }
+            
+            <!-- Action Buttons -->
+            @if (Model.ActionButtons != null && Model.ActionButtons.Count > 0)
+            {
+                @foreach (var button in Model.ActionButtons)
+                {
+                    var btnClass = $"btn btn-{button.ButtonType} btn-sm";
+                    var hasBadge = !string.IsNullOrWhiteSpace(button.BadgeText);
+                    
+                    if (!string.IsNullOrWhiteSpace(button.ModalTarget))
+                    {
+                        <button type="button" 
+                                class="@btnClass @(hasBadge ? "position-relative" : "")" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="@button.ModalTarget"
+                                @if (!string.IsNullOrWhiteSpace(button.OnClick)) { <text>onclick="@button.OnClick"</text> }>
+                            @if (!string.IsNullOrWhiteSpace(button.Icon))
+                            {
+                                <i class="@button.Icon"></i>
+                            }
+                            @button.Text
+                            @if (hasBadge)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-@button.BadgeVariant text-dark" style="font-size: 0.7rem;">
+                                    @button.BadgeText
+                                </span>
+                            }
+                        </button>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(button.Url))
+                    {
+                        <a class="@btnClass @(hasBadge ? "position-relative" : "")" 
+                           href="@button.Url"
+                           @if (!string.IsNullOrWhiteSpace(button.OnClick)) { <text>onclick="@button.OnClick"</text> }>
+                            @if (!string.IsNullOrWhiteSpace(button.Icon))
+                            {
+                                <i class="@button.Icon"></i>
+                            }
+                            @button.Text
+                            @if (hasBadge)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-@button.BadgeVariant text-dark" style="font-size: 0.7rem;">
+                                    @button.BadgeText
+                                </span>
+                            }
+                        </a>
+                    }
+                    else if (button.IsSubmit)
+                    {
+                        <button type="submit" 
+                                class="@btnClass @(hasBadge ? "position-relative" : "")"
+                                @if (!string.IsNullOrWhiteSpace(button.OnClick)) { <text>onclick="@button.OnClick"</text> }>
+                            @if (!string.IsNullOrWhiteSpace(button.Icon))
+                            {
+                                <i class="@button.Icon"></i>
+                            }
+                            @button.Text
+                            @if (hasBadge)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-@button.BadgeVariant text-dark" style="font-size: 0.7rem;">
+                                    @button.BadgeText
+                                </span>
+                            }
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" 
+                                class="@btnClass @(hasBadge ? "position-relative" : "")"
+                                @if (!string.IsNullOrWhiteSpace(button.OnClick)) { <text>onclick="@button.OnClick"</text> }>
+                            @if (!string.IsNullOrWhiteSpace(button.Icon))
+                            {
+                                <i class="@button.Icon"></i>
+                            }
+                            @button.Text
+                            @if (hasBadge)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-@button.BadgeVariant text-dark" style="font-size: 0.7rem;">
+                                    @button.BadgeText
+                                </span>
+                            }
+                        </button>
+                    }
+                }
+            }
+        </div>
+    </div>
 </div>
 
 
