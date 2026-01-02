@@ -1,11 +1,30 @@
 @{
     ViewData["Title"] = "Dashboard";
+    
+    // Build action buttons
+    var actionButtons = new List<IGB.Web.ViewModels.PageHeaderActionButton>();
+    actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+        Text: "Profile",
+        Url: Url.Action("Index", "Profile"),
+        Icon: "fas fa-user-circle me-1",
+        ButtonType: "outline-secondary"
+    ));
+    actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+        Text: "Settings",
+        Icon: "fas fa-cog me-1",
+        ButtonType: "outline-secondary",
+        ModalTarget: "#settingsModal"
+    ));
+    
+    // Build page header
+    var pageHeader = new IGB.Web.ViewModels.PageHeaderViewModel(
+        Title: "Dashboard",
+        Breadcrumbs: new List<BreadcrumbItem> { new("Dashboard", Url.Action("Index", "Portal")) },
+        ActionButtons: actionButtons
+    );
 }
 
-@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: "Dashboard",
-    Breadcrumbs: new List<BreadcrumbItem> { new("Dashboard", Url.Action("Index", "Portal")) }
-))
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="container-fluid">
     <style>
@@ -13,46 +32,76 @@
             background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%);
             background-size: 400% 100%;
             animation: shimmer 1.2s ease-in-out infinite;
-            border-radius: 10px;
+            border-radius: 12px;
         }
         @@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
-        .stat-card { border: 0; }
-        .icon-circle {
-            width: 42px; height: 42px;
-            display:flex; align-items:center; justify-content:center;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.45);
+        
+        /* Professional card styling */
+        #widgets .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
-        .bg-grad-primary { background: linear-gradient(135deg, rgba(13,110,253,0.18), rgba(13,110,253,0.04)); }
-        .bg-grad-secondary { background: linear-gradient(135deg, rgba(108,117,125,0.18), rgba(108,117,125,0.04)); }
-        .bg-grad-info { background: linear-gradient(135deg, rgba(13,202,240,0.18), rgba(13,202,240,0.04)); }
-        .bg-grad-success { background: linear-gradient(135deg, rgba(25,135,84,0.18), rgba(25,135,84,0.04)); }
-        .bg-grad-warning { background: linear-gradient(135deg, rgba(255,193,7,0.22), rgba(255,193,7,0.04)); }
-        .pulse { animation: pulse 1.4s ease-in-out infinite; }
+        #widgets .card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+        #widgets .card-body {
+            padding: 1.5rem;
+        }
+        
+        
+        .pulse {
+            animation: pulse 1.4s ease-in-out infinite;
+        }
         @@keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(25,135,84,0.25); }
             70% { box-shadow: 0 0 0 10px rgba(25,135,84,0); }
             100% { box-shadow: 0 0 0 0 rgba(25,135,84,0); }
         }
+        
         .lesson-border-upcoming { border-left: 4px solid #0dcaf0; }
         .lesson-border-ongoing { border-left: 4px solid #198754; }
         .lesson-border-completed { border-left: 4px solid #6c757d; }
         .lesson-border-cancelled { border-left: 4px solid #dc3545; }
-        .widget-handle { cursor: grab; }
+        
+        .widget-handle {
+            cursor: grab;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .widget-handle:hover {
+            opacity: 1;
+        }
+        
+        /* Quick action cards */
+        #widgets a.card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(13,110,253,0.2) !important;
+            border-radius: 12px !important;
+        }
+        #widgets a.card:hover {
+            border-color: rgba(13,110,253,0.4) !important;
+            box-shadow: 0 4px 12px rgba(13,110,253,0.15);
+            transform: translateY(-2px);
+        }
     </style>
 
-    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-        <div>
-            <h3 class="mb-1" id="greeting">—</h3>
-            <div class="text-muted small"><span id="tutorClock">—</span></div>
-        </div>
-        <div class="d-flex gap-2 align-items-center">
-            <a class="btn btn-outline-secondary" href="/Profile/Index"><i class="fas fa-user-circle me-2"></i>Profile</a>
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Settings</button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><button class="dropdown-item" type="button" id="resetLayout">Reset layout</button></li>
-                </ul>
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dashboard Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <button class="btn btn-outline-secondary w-100" type="button" id="resetLayout">
+                        <i class="fas fa-redo me-2"></i>Reset Layout
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -67,59 +116,66 @@
         </div>
     </div>
 
-    <div id="profileBanner" class="alert alert-warning d-none">
-        <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-            <div>
-                <div class="fw-semibold"><i class="fas fa-exclamation-triangle me-2"></i>Profile status</div>
-                <div class="small text-muted">Your profile is <span class="fw-semibold" id="profilePct">0%</span> complete</div>
-                <div class="progress mt-2" style="height:8px;max-width:520px;">
-                    <div class="progress-bar bg-warning" id="profileBar" style="width:0%"></div>
-                </div>
-                <div class="small mt-2" id="profileChecklist"></div>
-            </div>
-            <div class="d-flex gap-2">
-                <a class="btn btn-sm btn-primary" href="/Profile/Index">Complete Profile</a>
-                <button class="btn btn-sm btn-outline-secondary" id="dismissProfile" type="button">Dismiss</button>
-            </div>
-        </div>
-    </div>
-
     <div id="widgets" class="row g-3">
-        <!-- Quote + Weather + Notes -->
-        <div class="col-12 col-xl-4" data-widget="quote">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0">Daily teaching quote</h6>
-                        <span class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></span>
-                    </div>
-                    <div class="text-muted" id="dailyQuote">—</div>
-                    <div class="text-muted small mt-1" id="dailyQuoteAuthor"></div>
-                </div>
-            </div>
-        </div>
+    
 
-        <div class="col-12 col-xl-4" data-widget="weather">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0">Weather</h6>
-                        <span class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></span>
+
+        <!-- Stats (5) -->
+        <div class="col-12" data-widget="stats">
+            <div class="overview-stats-section">
+                <div class="row g-3">
+                    <div class="col-xl-3 col-md-6">
+                        <a href="/Progress/Students" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-blue">
+                                <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value" id="statStudents">—</div>
+                                    <div class="kpi-label">My Students</div>
+                                    <div class="kpi-sub"><span id="statActiveThisMonth">0</span> active this month</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
                     </div>
-                    <div id="weatherBox" class="text-muted small">
-                        <div id="weatherStatus">Location not set.</div>
-                        <div class="mt-2 d-flex gap-2 flex-wrap">
-                            <button class="btn btn-sm btn-outline-primary" type="button" id="enableWeather">Use my location</button>
-                            <button class="btn btn-sm btn-outline-secondary d-none" type="button" id="clearWeather">Clear</button>
-                        </div>
-                        <div class="mt-2 d-none" id="weatherData">
-                            <div class="fw-semibold" id="weatherTemp">—</div>
-                            <div class="text-muted" id="weatherDesc">—</div>
-                            <div class="text-muted small" id="weatherUpdated">—</div>
-                        </div>
+                    <div class="col-xl-3 col-md-6">
+                        <a href="/Courses/My" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-green">
+                                <div class="kpi-icon"><i class="fas fa-book"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value" id="statCourses">—</div>
+                                    <div class="kpi-label">Teaching Courses</div>
+                                    <div class="kpi-sub">Across <span id="statCurriculums">0</span> curriculums</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
                     </div>
-                    <div class="text-muted small mt-2">
-                        Powered by Open‑Meteo (no API key).
+                
+                    <div class="col-xl-3 col-md-6">
+                        <a href="/Earnings/MyEarnings" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-amber">
+                                <div class="kpi-icon"><i class="fas fa-coins"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value" id="statEarningsTotal">—</div>
+                                    <div class="kpi-label">Total Earnings</div>
+                                    <div class="kpi-sub"><span id="statEarningsMonth">0</span> credits this month</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <a href="/Feedback/MyFeedbackTutor" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-red">
+                                <div class="kpi-icon"><i class="fas fa-star"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value" id="statRating">—</div>
+                                    <div class="kpi-label">Average Rating</div>
+                                    <div class="kpi-sub">Based on <span id="statReviews">0</span> reviews</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -137,93 +193,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Stats (5) -->
-        <div class="col-12" data-widget="stats">
-    <div class="row g-3">
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="card stat-card bg-grad-primary">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div class="icon-circle"><i class="fas fa-users"></i></div>
-                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
-                            </div>
-                            <div class="fs-2 fw-semibold mt-2" id="statStudents">—</div>
-                            <div class="text-muted">My Students</div>
-                            <div class="small text-muted mt-1"><span id="statActiveThisMonth">0</span> active this month</div>
-                            <div class="badge bg-success mt-2" id="statNewStudents">+0 new students</div>
-                            <a class="stretched-link" href="/Progress/Students"></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="card stat-card bg-grad-secondary">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div class="icon-circle"><i class="fas fa-book"></i></div>
-                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
-                            </div>
-                            <div class="fs-2 fw-semibold mt-2" id="statCourses">—</div>
-                            <div class="text-muted">Teaching Courses</div>
-                            <div class="small text-muted mt-1">Across <span id="statCurriculums">0</span> curriculums</div>
-                            <a class="stretched-link" href="/Courses/My"></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="card stat-card bg-grad-info">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div class="icon-circle"><i class="fas fa-calendar-alt"></i></div>
-                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
-                            </div>
-                            <div class="fs-2 fw-semibold mt-2" id="statWeekLessons">—</div>
-                            <div class="text-muted">Lessons This Week</div>
-                            <div class="d-flex flex-wrap gap-2 mt-2">
-                                <span class="badge bg-success" id="weekCompleted">0 completed</span>
-                                <span class="badge bg-primary" id="weekUpcoming">0 upcoming</span>
-                                <span class="badge bg-danger" id="weekCancelled">0 cancelled</span>
-                            </div>
-                            <a class="stretched-link" href="/Schedule/Tutor"></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="card stat-card bg-grad-success">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div class="icon-circle"><i class="fas fa-coins"></i></div>
-                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
-                            </div>
-                            <div class="fs-2 fw-semibold mt-2" id="statEarningsTotal">—</div>
-                            <div class="text-muted">Total Earnings</div>
-                            <div class="small text-muted mt-1"><span id="statEarningsMonth">0</span> credits this month</div>
-                            <div class="small mt-1" id="earningsChange"></div>
-                            <div class="mt-2" style="height:50px;">
-                                <canvas id="earningsSpark"></canvas>
-                            </div>
-                            <a class="stretched-link" href="/Earnings/MyEarnings"></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6 col-xl-3">
-                    <div class="card stat-card bg-grad-warning">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div class="icon-circle"><i class="fas fa-star"></i></div>
-                                <div class="text-muted small widget-handle"><i class="fas fa-grip-vertical"></i></div>
-                            </div>
-                            <div class="fs-2 fw-semibold mt-2" id="statRating">—</div>
-                            <div class="text-muted">Average Rating</div>
-                            <div class="small text-muted mt-1">Based on <span id="statReviews">0</span> reviews</div>
-                            <div class="small mt-1" id="ratingTrend"></div>
-                            <a class="stretched-link" href="/Feedback/MyFeedbackTutor"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Today's schedule -->
         <div class="col-12" data-widget="today">
             <div class="card">
@@ -365,7 +334,7 @@
                         <div class="col-6"><div class="p-2 border rounded"><div class="text-muted small">Avg / lesson</div><div class="fw-semibold" id="earnAvg">—</div></div></div>
                         <div class="col-6"><div class="p-2 border rounded"><div class="text-muted small">Pending payments</div><div class="fw-semibold" id="earnPending">—</div></div></div>
                     </div>
-                    <div style="height:240px;"><canvas id="earningsTrend"></canvas></div>
+                  @*   <div style="height:240px;"><canvas id="earningsTrend"></canvas></div> *@
                     <div class="mt-3">
                         <div class="fw-semibold mb-1">Earnings by course</div>
                         <div id="earnByCourse"></div>
@@ -451,9 +420,13 @@
         }
 
         function tickClock(){
-          document.getElementById('tutorClock').textContent = new Date().toLocaleString();
+          const clockEl = document.getElementById('tutorClock');
+          if (clockEl) {
+            clockEl.textContent = new Date().toLocaleString();
+          }
         }
-        setInterval(tickClock, 1000); tickClock();
+        setInterval(tickClock, 1000);
+        tickClock();
 
         async function getPrefs(){
           try{
@@ -507,10 +480,11 @@
           document.getElementById('quickNotes').value = (p.notes?.text || '');
           document.getElementById('notesSaved').textContent = p.notes?.updatedAtUtc ? `Saved: ${new Date(p.notes.updatedAtUtc).toLocaleTimeString()}` : '—';
 
-          // weather
+          // weather (only if widget exists)
           const loc = p.weather?.location;
-          if (loc && typeof loc.lat === 'number' && typeof loc.lon === 'number') {
-            document.getElementById('clearWeather').classList.remove('d-none');
+          const clearWeatherEl = document.getElementById('clearWeather');
+          if (loc && typeof loc.lat === 'number' && typeof loc.lon === 'number' && clearWeatherEl && typeof window.loadWeather === 'function') {
+            clearWeatherEl.classList.remove('d-none');
             window.loadWeather(loc.lat, loc.lon);
           }
         }
@@ -534,10 +508,6 @@
           applyPrefs();
         });
 
-        document.getElementById('dismissProfile').addEventListener('click', () => {
-          sessionStorage.setItem('igb:tutorDash:profileDismissed:v1', 'true');
-          document.getElementById('profileBanner').classList.add('d-none');
-        });
 
         let spark = null, trend = null;
         async function ensureChartJs(){
@@ -566,28 +536,12 @@
             options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ enabled:false } }, scales:{ x:{ display:false }, y:{ display:false } } }
           });
 
-          const tctx = document.getElementById('earningsTrend');
-          if (tctx) trend = new Chart(tctx, {
-            type:'line',
-            data:{ labels: d.earnings.labels, datasets:[{ data: d.earnings.values, borderColor:'#0d6efd', backgroundColor:'rgba(13,110,253,0.18)', fill:true, tension:0.25 }] },
-            options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
-          });
-        }
-
-        function renderProfile(){
-          const b = document.getElementById('profileBanner');
-          const dismissed = sessionStorage.getItem('igb:tutorDash:profileDismissed:v1') === 'true';
-          if (dismissed) { b.classList.add('d-none'); return; }
-          const p = state.data.profile;
-          if ((p.percent || 0) >= 100) { b.classList.add('d-none'); return; }
-          setText('profilePct', `${p.percent}%`);
-          document.getElementById('profileBar').style.width = `${p.percent}%`;
-          document.getElementById('profileChecklist').innerHTML = (p.items || []).map(i => {
-            const icon = i.done ? '✅' : '❌';
-            const link = i.url ? `<a href="${i.url}" class="ms-1">Fix</a>` : '';
-            return `<div class="small">${icon} ${escapeHtml(i.label)}${link}</div>`;
-          }).join('');
-          b.classList.remove('d-none');
+          // const tctx = document.getElementById('earningsTrend');
+          // if (tctx) trend = new Chart(tctx, {
+          //   type:'line',
+          //   data:{ labels: d.earnings.labels, datasets:[{ data: d.earnings.values, borderColor:'#0d6efd', backgroundColor:'rgba(13,110,253,0.18)', fill:true, tension:0.25 }] },
+          //   options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+          // });
         }
 
         function renderStats(){
@@ -598,15 +552,14 @@
           setText('statCourses', s.courses.total);
           setText('statCurriculums', s.courses.curriculums);
           setText('statWeekLessons', s.lessonsWeek.total);
-          setText('weekCompleted', `${s.lessonsWeek.completed} completed`);
-          setText('weekUpcoming', `${s.lessonsWeek.upcoming} upcoming`);
-          setText('weekCancelled', `${s.lessonsWeek.cancelled} cancelled`);
+          const weekCompletedEl = document.getElementById('weekCompleted');
+          if (weekCompletedEl) weekCompletedEl.textContent = `${s.lessonsWeek.completed} completed`;
+          const weekUpcomingEl = document.getElementById('weekUpcoming');
+          if (weekUpcomingEl) weekUpcomingEl.textContent = `${s.lessonsWeek.upcoming} upcoming`;
           setText('statEarningsTotal', s.earnings.totalCredits);
           setText('statEarningsMonth', s.earnings.thisMonthCredits);
-          setText('earningsChange', s.earnings.changePct >= 0 ? `+${s.earnings.changePct}% vs last month` : `${s.earnings.changePct}% vs last month`);
           setText('statRating', (s.rating.average || 0).toFixed(1));
           setText('statReviews', s.rating.reviews);
-          setText('ratingTrend', s.rating.changeThisMonth >= 0 ? `+${s.rating.changeThisMonth} this month` : `${s.rating.changeThisMonth} this month`);
 
           // quick action badges
           setText('newStudentsBadge', `+${s.students.newThisMonth} new`);
@@ -654,9 +607,9 @@
           const t = state.data.today;
           setText('todayTitle', `Today's Schedule - ${t.dateLabel}`);
           document.getElementById('todayBadges').innerHTML = `
-            <span class="badge bg-primary me-1">${t.lessonsCount} lessons</span>
-            <span class="badge bg-success me-1">${Math.round((t.totalMinutes||0)/60)} hours of teaching</span>
-            <span class="badge bg-secondary">${t.uniqueStudents} students</span>`;
+            <span style="color:white" class="badge bg-primary me-1">${t.lessonsCount} lessons</span>
+            <span style="color:white" class="badge bg-success me-1">${Math.round((t.totalMinutes||0)/60)} hours of teaching</span>
+            <span style="color:white" class="badge bg-secondary">${t.uniqueStudents} students</span>`;
           document.getElementById('todayEmpty').classList.toggle('d-none', t.items.length !== 0);
 
           const timeline = document.getElementById('todayTimeline');
@@ -847,10 +800,11 @@
             if (!dashRes.ok) throw new Error('bad response');
             state.data = await dashRes.json();
             setText('greeting', state.data.greeting || '—');
-            // quote
-            document.getElementById('dailyQuote').textContent = state.data.quote?.text || '—';
-            document.getElementById('dailyQuoteAuthor').textContent = state.data.quote?.author ? `— ${state.data.quote.author}` : '';
-            renderProfile();
+            // quote (only if elements exist)
+            const dailyQuoteEl = document.getElementById('dailyQuote');
+            const dailyQuoteAuthorEl = document.getElementById('dailyQuoteAuthor');
+            if (dailyQuoteEl) dailyQuoteEl.textContent = state.data.quote?.text || '—';
+            if (dailyQuoteAuthorEl) dailyQuoteAuthorEl.textContent = state.data.quote?.author ? `— ${state.data.quote.author}` : '';
             renderStats();
             renderToday();
             renderPending();
@@ -914,6 +868,7 @@
         async function loadWeather(lat, lon){
           const status = document.getElementById('weatherStatus');
           const dataBox = document.getElementById('weatherData');
+          if (!status || !dataBox) return; // Weather widget not present
           status.textContent = 'Loading weather…';
           try{
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&current=temperature_2m,weather_code&timezone=auto`;
@@ -922,9 +877,12 @@
             const json = await res.json();
             const temp = json?.current?.temperature_2m;
             const code = json?.current?.weather_code;
-            document.getElementById('weatherTemp').textContent = (temp !== undefined && temp !== null) ? `${temp}°C` : '—';
-            document.getElementById('weatherDesc').textContent = weatherCodeToText(code);
-            document.getElementById('weatherUpdated').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+            const tempEl = document.getElementById('weatherTemp');
+            const descEl = document.getElementById('weatherDesc');
+            const updatedEl = document.getElementById('weatherUpdated');
+            if (tempEl) tempEl.textContent = (temp !== undefined && temp !== null) ? `${temp}°C` : '—';
+            if (descEl) descEl.textContent = weatherCodeToText(code);
+            if (updatedEl) updatedEl.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
             dataBox.classList.remove('d-none');
             status.textContent = `Location set (${lat.toFixed(2)}, ${lon.toFixed(2)})`;
           }catch{
@@ -933,25 +891,35 @@
         }
         window.loadWeather = loadWeather; // used by applyPrefs
 
-        document.getElementById('enableWeather').addEventListener('click', () => {
-          if (!navigator.geolocation) return alert('Geolocation not supported.');
-          navigator.geolocation.getCurrentPosition((pos) => {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            prefsJson.weather = prefsJson.weather || {};
-            prefsJson.weather.location = { lat, lon };
+        // Weather widget event listeners (only if elements exist)
+        const enableWeatherEl = document.getElementById('enableWeather');
+        if (enableWeatherEl) {
+          enableWeatherEl.addEventListener('click', () => {
+            if (!navigator.geolocation) return alert('Geolocation not supported.');
+            navigator.geolocation.getCurrentPosition((pos) => {
+              const lat = pos.coords.latitude;
+              const lon = pos.coords.longitude;
+              prefsJson.weather = prefsJson.weather || {};
+              prefsJson.weather.location = { lat, lon };
+              savePrefsDebounced();
+              const clearWeatherEl = document.getElementById('clearWeather');
+              if (clearWeatherEl) clearWeatherEl.classList.remove('d-none');
+              loadWeather(lat, lon);
+            }, () => alert('Permission denied or unavailable.'));
+          });
+        }
+        const clearWeatherEl = document.getElementById('clearWeather');
+        if (clearWeatherEl) {
+          clearWeatherEl.addEventListener('click', () => {
+            prefsJson.weather = {};
             savePrefsDebounced();
-            document.getElementById('clearWeather').classList.remove('d-none');
-            loadWeather(lat, lon);
-          }, () => alert('Permission denied or unavailable.'));
-        });
-        document.getElementById('clearWeather').addEventListener('click', () => {
-          prefsJson.weather = {};
-          savePrefsDebounced();
-          document.getElementById('weatherStatus').textContent = 'Location not set.';
-          document.getElementById('weatherData').classList.add('d-none');
-          document.getElementById('clearWeather').classList.add('d-none');
-        });
+            const statusEl = document.getElementById('weatherStatus');
+            const dataEl = document.getElementById('weatherData');
+            if (statusEl) statusEl.textContent = 'Location not set.';
+            if (dataEl) dataEl.classList.add('d-none');
+            clearWeatherEl.classList.add('d-none');
+          });
+        }
 
         // Keyboard shortcuts + help overlay
         const overlay = document.createElement('div');
