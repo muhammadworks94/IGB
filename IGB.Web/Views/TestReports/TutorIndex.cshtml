@@ -23,27 +23,46 @@
     {
         <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
     }
+    <div class="overview-stats-section">
+        <div class="row g-3">
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-tile kpi-tile-blue">
+                    <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                    <div class="kpi-body">
+                        <div class="kpi-value">@Model.TotalReports</div>
+                        <div class="kpi-label">Total Reports</div>
 
-    <div class="row g-3 mb-3">
-        <div class="col-md-4">
-            <div class="card"><div class="card-body">
-                <div class="text-muted small">Total Reports Created</div>
-                <div class="fs-3 fw-semibold">@Model.TotalReports</div>
-            </div></div>
-        </div>
-        <div class="col-md-4">
-            <div class="card"><div class="card-body">
-                <div class="text-muted small">Average Score</div>
-                <div class="fs-3 fw-semibold">@Model.AvgPercentage.ToString("F2")%</div>
-            </div></div>
-        </div>
-        <div class="col-md-4">
-            <div class="card"><div class="card-body">
-                <div class="text-muted small">Recent Reports (last 7 days)</div>
-                <div class="fs-3 fw-semibold">@Model.RecentThisWeek</div>
-            </div></div>
+                        <div class="kpi-accent"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-tile kpi-tile-green">
+                    <div class="kpi-icon"><i class="fas fa-user-graduate"></i></div>
+                    <div class="kpi-body">
+                        <div class="kpi-value">@Model.AvgPercentage.ToString("F2")</div>
+                        <div class="kpi-label">Average Score</div>
+
+
+                        <div class="kpi-accent"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-tile kpi-tile-amber">
+                    <div class="kpi-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="kpi-body">
+                        <div class="kpi-value">@Model.RecentThisWeek</div>
+                        <div class="kpi-label">Recent Reports (last 7 days)</div>
+
+                        <div class="kpi-accent"></div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
+  
 
     <div class="card mb-3">
         <div class="card-body">

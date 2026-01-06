@@ -1,82 +1,107 @@
 @model IGB.Web.ViewModels.People.TutorProfileVm
 @{
     ViewData["Title"] = "Tutor Profile";
+    
+    // Build action buttons
+    var actionButtons = new List<IGB.Web.ViewModels.PageHeaderActionButton>();
+    
+    if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+    {
+        actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+            Text: "View Schedule",
+            Url: Url.Action("Overview", "Schedule", new { tutorId = Model.Header.UserId }),
+            Icon: "fas fa-calendar-alt me-1",
+            ButtonType: "outline-primary"
+        ));
+        
+        actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+            Text: "Availability",
+            Url: Url.Action("Index", "AdminTutorAvailability", new { tutorId = Model.Header.UserId }),
+            Icon: "fas fa-clock me-1",
+            ButtonType: "outline-secondary"
+        ));
+    }
+    
+    // Build page header
+    var pageHeader = new IGB.Web.ViewModels.PageHeaderViewModel(
+        Title: "Teacher / Tutor Profile",
+        Breadcrumbs: new List<BreadcrumbItem>
+        {
+            new("Dashboard", Url.Action("Index", "Portal")),
+            new("Users", Url.Action("Index", "Users")),
+            new("Tutor Profile")
+        },
+        ActionButtons: actionButtons.Count > 0 ? actionButtons : null
+    );
 }
 
-@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: "Teacher / Tutor Profile",
-    Breadcrumbs: new List<BreadcrumbItem>
-    {
-        new("Dashboard", Url.Action("Index", "Portal")),
-        new("Users", Url.Action("Index","Users")),
-        new("Tutor Profile")
-    },
-    Centered: true
-))
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="container-fluid">
     <partial name="_PersonHeader" model="Model.Header" />
 
-    @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
-    {
-        <div class="d-flex flex-wrap gap-2 mb-3">
-            <a class="btn btn-outline-primary" href="@Url.Action("Overview","Schedule", new { tutorId = Model.Header.UserId })">
-                <i class="fas fa-calendar-alt me-1"></i>View Schedule
-            </a>
-            <a class="btn btn-outline-secondary" href="@Url.Action("Index","AdminTutorAvailability", new { tutorId = Model.Header.UserId })">
-                <i class="fas fa-clock me-1"></i>Availability
-            </a>
-        </div>
-    }
+ 
+    <div class="overview-stats-section">
+        <div class="row g-3">
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-tile kpi-tile-blue">
+                    <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                    <div class="kpi-body">
+                        <div class="kpi-value">@Model.AssignedCourses.Count</div>
+                        <div class="kpi-label">Total Users</div>
+            
+                        <div class="kpi-accent"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-tile kpi-tile-green">
+                    <div class="kpi-icon"><i class="fas fa-user-graduate"></i></div>
+                    <div class="kpi-body">
+                        <div class="kpi-value">@Model.Rating.Average.ToString("0.0")</div>
+                        <div class="kpi-label">Average Rating</div>
+                     
+                     
+                        <div class="kpi-accent"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-tile kpi-tile-amber">
+                    <div class="kpi-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="kpi-body">
+                        <div class="kpi-value">@Model.Lessons.Upcoming</div>
+                        <div class="kpi-label">Upcoming Lessons </div>
 
-    <div class="row g-3 mb-3">
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Assigned Courses</div>
-                    <div class="h3 mb-0">@Model.AssignedCourses.Count</div>
+                        <div class="kpi-accent"></div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Average Rating</div>
-                    <div class="h3 mb-0">@Model.Rating.Average.ToString("0.0") <span class="text-muted fs-6">/ 5</span></div>
-                    <div class="text-muted small">@Model.Rating.Reviews reviews</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Upcoming Lessons</div>
-                    <div class="h3 mb-0">@Model.Lessons.Upcoming</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Students</div>
-                    <div class="h3 mb-0">@Model.Students.Count</div>
+            <div class="col-xl-3 col-md-6">
+                <div class="kpi-tile kpi-tile-red">
+                    <div class="kpi-icon"><i class="fas fa-book"></i></div>
+                    <div class="kpi-body">
+                        <div class="kpi-value">@Model.Students.Count</div>
+                        <div class="kpi-label">Students</div>
+
+                        <div class="kpi-accent"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <ul class="nav nav-tabs mb-3" id="tutorTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab" aria-controls="courses" aria-selected="true">Courses</button>
+            <button class="nav-link active" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab" aria-controls="courses" aria-selected="true">Courses<span class="badge bg-light text-dark ms-1">@Model.AssignedCourses.Count</span></button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="ratings-tab" data-bs-toggle="tab" data-bs-target="#ratings" type="button" role="tab" aria-controls="ratings" aria-selected="false">Ratings</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="classes-tab" data-bs-toggle="tab" data-bs-target="#classes" type="button" role="tab" aria-controls="classes" aria-selected="false">Current Classes</button>
+            <button class="nav-link" id="classes-tab" data-bs-toggle="tab" data-bs-target="#classes" type="button" role="tab" aria-controls="classes" aria-selected="false">Current Classes <span class="badge bg-light text-dark ms-1">@Model.CurrentClasses.Count</span></button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="false">Students</button>
+            <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="false">Students <span class="badge bg-light text-dark ms-1">@Model.Students.Count</span></button>
         </li>
     </ul>
 

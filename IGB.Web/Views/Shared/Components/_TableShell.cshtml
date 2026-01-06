@@ -15,26 +15,30 @@
             <div class="h5 mb-0">@Model.Title</div>
         }
 
-        <form method="get" class="d-flex align-items-center gap-2" role="search" aria-label="Table search">
-            @* Preserve current query string filters when searching (e.g., courseId/rating/flagged). *@
-            @foreach (var key in Context.Request.Query.Keys)
-            {
-                if (string.IsNullOrWhiteSpace(key)) continue;
-                if (string.Equals(key, Model.SearchParamName, StringComparison.OrdinalIgnoreCase)) continue;
-                if (string.Equals(key, "page", StringComparison.OrdinalIgnoreCase)) continue;
-                // allow pageSize to persist so users don't lose their selection
-                var value = Context.Request.Query[key].ToString();
-                if (string.IsNullOrWhiteSpace(value)) continue;
-                <input type="hidden" name="@key" value="@value" />
-            }
-            <input type="search"
-                   name="@Model.SearchParamName"
-                   value="@Model.SearchQuery"
-                   class="form-control form-control-sm"
-                   placeholder="@Model.SearchPlaceholder"
-                   aria-label="Search" />
-            <button class="btn btn-sm btn-outline-primary" type="submit">Search</button>
-        </form>
+        @* Only show search form if SearchQuery is provided (not null) *@
+        @if (Model.SearchQuery != null)
+        {
+            <form method="get" class="d-flex align-items-center gap-2" role="search" aria-label="Table search">
+                @* Preserve current query string filters when searching (e.g., courseId/rating/flagged). *@
+                @foreach (var key in Context.Request.Query.Keys)
+                {
+                    if (string.IsNullOrWhiteSpace(key)) continue;
+                    if (string.Equals(key, Model.SearchParamName, StringComparison.OrdinalIgnoreCase)) continue;
+                    if (string.Equals(key, "page", StringComparison.OrdinalIgnoreCase)) continue;
+                    // allow pageSize to persist so users don't lose their selection
+                    var value = Context.Request.Query[key].ToString();
+                    if (string.IsNullOrWhiteSpace(value)) continue;
+                    <input type="hidden" name="@key" value="@value" />
+                }
+                <input type="search"
+                       name="@Model.SearchParamName"
+                       value="@Model.SearchQuery"
+                       class="form-control form-control-sm"
+                       placeholder="@Model.SearchPlaceholder"
+                       aria-label="Search" />
+                <button class="btn btn-sm btn-outline-primary" type="submit">Search</button>
+            </form>
+        }
     </div>
 
     @if (Model.IsLoading)
