@@ -1808,28 +1808,57 @@ public class DbInitializer
         }
 
         var sfCount = await _context.StudentFeedbacks.AsNoTracking().CountAsync(f => !f.IsDeleted);
-        if (sfCount < 50 && completedLessons.Count > 0)
+        // Seed more student feedback records with varied ratings (aim for at least 200 to ensure students have ratings)
+        if (sfCount < 200 && completedLessons.Count > 0)
         {
-            foreach (var l in completedLessons.Take(50))
+            var random = new Random(42); // Fixed seed for reproducibility
+            var lessonsToProcess = completedLessons.Take(Math.Min(200, completedLessons.Count)).ToList();
+            var toAdd = new List<StudentFeedback>();
+            
+            foreach (var l in lessonsToProcess)
             {
                 var exists = await _context.StudentFeedbacks.AnyAsync(f => !f.IsDeleted && f.LessonBookingId == l.Id);
                 if (exists) continue;
-                _context.StudentFeedbacks.Add(new StudentFeedback
+                
+                // Generate varied ratings (1-5 range, but mostly 3-5 for realistic distribution)
+                // Use lesson ID + index to create consistent but varied ratings per student
+                var baseRating = 2 + (int)((l.StudentUserId + l.Id) % 4); // Range: 2-5
+                var ratingVariation = random.Next(-1, 2); // -1, 0, or 1
+                var rating = Math.Clamp(baseRating + ratingVariation, 1, 5);
+                
+                // Other metrics should be around the same rating with some variation
+                var participation = Math.Clamp(rating + random.Next(-1, 2), 1, 5);
+                var homeworkCompletion = Math.Clamp(rating + random.Next(-2, 1), 1, 5);
+                var attentiveness = Math.Clamp(rating + random.Next(-1, 1), 1, 5);
+                var improvement = Math.Clamp(rating + random.Next(-1, 2), 1, 5);
+                
+                var comments = rating >= 4 
+                    ? "Excellent progress. Keep up the great work and continue practicing regularly."
+                    : rating >= 3
+                    ? "Good effort. Please review homework and practice the key exercises to improve further."
+                    : "Needs improvement. Please focus on completing assignments and participating more actively in sessions.";
+                
+                toAdd.Add(new StudentFeedback
                 {
                     LessonBookingId = l.Id,
                     CourseId = l.CourseId,
                     StudentUserId = l.StudentUserId,
                     TutorUserId = l.TutorUserId!.Value,
-                    Rating = 4,
-                    Participation = 4,
-                    HomeworkCompletion = 3,
-                    Attentiveness = 4,
-                    Improvement = 4,
-                    Comments = "Good effort. Please review homework and practice the key exercises.",
-                    CreatedAt = now.AddDays(-2)
+                    Rating = rating,
+                    Participation = participation,
+                    HomeworkCompletion = homeworkCompletion,
+                    Attentiveness = attentiveness,
+                    Improvement = improvement,
+                    Comments = comments,
+                    CreatedAt = now.AddDays(-random.Next(1, 30)) // Spread out creation dates
                 });
             }
-            await _context.SaveChangesAsync();
+            
+            if (toAdd.Count > 0)
+            {
+                _context.StudentFeedbacks.AddRange(toAdd);
+                await _context.SaveChangesAsync();
+            }
         }
 
         // Attachments: 50 (create tiny placeholder pdf files if possible)
