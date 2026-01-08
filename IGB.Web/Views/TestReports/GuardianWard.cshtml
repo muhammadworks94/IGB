@@ -112,8 +112,8 @@
                                 <td class="fw-semibold">@r.TestName</td>
                                 <td class="text-muted">@r.TutorUser?.FullName</td>
                                 <td class="text-muted">@r.ObtainedMarks / @r.TotalMarks (@r.Percentage.ToString("F2")%)</td>
-                                <td><span class="badge bg-primary">@r.Grade</span></td>
-                                <td class="text-end">
+                                <td><span class="">@r.Grade</span></td>
+                                <td class="">
                                     <a class="btn btn-sm btn-outline-primary" href="@Url.Action("WardDetails","TestReports", new { id = r.Id, studentUserId = selectedStudentId })">View</a>
                                 </td>
                             </tr>

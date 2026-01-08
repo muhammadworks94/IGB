@@ -1,48 +1,210 @@
-@model List<IGB.Domain.Entities.User>
+@model IGB.Web.ViewModels.Progress.TutorStudentsListViewModel
 @{
-    ViewData["Title"] = "Students";
-    var q = (string?)ViewBag.Query;
+    ViewData["Title"] = "My Students";
+    var courses = ViewBag.Courses as System.Collections.IEnumerable;
+    
+    // Build search
+    var search = new PageHeaderSearch(
+        Placeholder: "Search by name or email...",
+        QueryParamName: "q",
+        CurrentValue: Model.Query,
+        FormAction: Url.Action("Students", "Progress"),
+        ShowClearButton: false
+    );
+    
+    // Build filters
+    var courseOptions = new Dictionary<string, string> { { "", "All Courses" } };
+    if (courses != null)
+    {
+        foreach (dynamic c in courses)
+        {
+            courseOptions.Add(c.Id.ToString(), c.Name);
+        }
+    }
+    
+    var progressOptions = new Dictionary<string, string>
+    {
+        { "", "All Progress" },
+        { "high", "High (≥70%)" },
+        { "medium", "Medium (40-69%)" },
+        { "low", "Low (<40%)" }
+    };
+    
+    var filters = new List<PageHeaderFilter>
+    {
+        new("Course", "courseId", "select", Model.CourseId?.ToString() ?? "", courseOptions),
+        new("Progress", "progressFilter", "select", Model.ProgressFilter ?? "", progressOptions)
+    };
+    
+    // Build action buttons - Reset button if any filters are active
+    var hasActiveFilters = Model.CourseId.HasValue || !string.IsNullOrWhiteSpace(Model.ProgressFilter) || !string.IsNullOrWhiteSpace(Model.Query);
+    var actionButtons = new List<PageHeaderActionButton>();
+    if (hasActiveFilters)
+    {
+        actionButtons.Add(new PageHeaderActionButton(
+            "Reset",
+            Url.Action("Students", "Progress"),
+            Icon: "fas fa-rotate-left me-1",
+            ButtonType: "outline-secondary"
+        ));
+    }
+    
+    string riskClass(int p) => p >= 70 ? "bg-success" : (p >= 40 ? "bg-warning" : "bg-danger");
 }
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: "Students",
+    Title: "My Students",
     Icon: "fas fa-user-graduate",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Home")),
+        new("Progress"),
         new("Students")
-    }
+    },
+    Subtitle: "View and manage your students' progress",
+    Search: search,
+    Filters: filters,
+    ActionButtons: actionButtons.Count > 0 ? actionButtons : null
 ))
 
 <div class="container-fluid">
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="get" class="row g-2 align-items-end">
-                <div class="col-md-6">
-                    <label class="form-label">Search</label>
-                    <input class="form-control" name="q" value="@q" placeholder="Name or email..." />
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-primary" type="submit">Search</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    @if (TempData["Success"] != null)
+    {
+        <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
+    }
 
     <div class="card">
-        <div class="card-body">
-            <h5 class="mb-3">My Students</h5>
-            <div class="list-group">
-                @foreach (var s in Model)
-                {
-                    <a class="list-group-item list-group-item-action" href="@Url.Action("Student", "Progress", new { studentUserId = s.Id })">
-                        <div class="fw-semibold">@s.FullName</div>
-                        <div class="text-muted small">@s.Email</div>
-                    </a>
-                }
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    <i class="fas fa-users me-2 text-primary"></i>Students (@Model.Pagination.TotalCount)
+                </h6>
             </div>
+        </div>
+        <div class="card-body">
+            @if (Model.Items.Count == 0)
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-user-graduate fa-3x mb-3"></i>
+                    <div class="fw-semibold">No students found</div>
+                    <div class="small">Try adjusting your filters or search criteria.</div>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Courses</th>
+                            <th>Progress</th>
+                            <th>Topics</th>
+                            <th>Rating</th>
+                            <th>Last Lesson</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var r in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">@r.StudentName</div>
+                                            <div class="text-muted small">@r.Email</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">@r.TotalCourses course@(r.TotalCourses == 1 ? "" : "s")</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between small mb-1">
+                                                <span class="fw-semibold">@r.OverallProgressPercent%</span>
+                                                <span class="text-muted">@r.CompletedTopics / @r.TotalTopics</span>
+                                            </div>
+                                            <div class="progress" style="height: 10px; border-radius: 5px;">
+                                                <div class="progress-bar @riskClass(r.OverallProgressPercent) progress-bar-striped" 
+                                                     style="width: @r.OverallProgressPercent%" 
+                                                     role="progressbar">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-check-circle text-success me-1"></i>@r.CompletedTopics completed
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-circle text-muted me-1"></i>@(r.TotalTopics - r.CompletedTopics) remaining
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (r.AverageRating.HasValue && r.RatingCount > 0)
+                                    {
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="fw-semibold">@r.AverageRating.Value.ToString("F1")</span>
+                                            <span class="text-warning">
+                                                @for (var i = 1; i <= 5; i++)
+                                                {
+                                                    if (r.AverageRating.Value >= i)
+                                                    {
+                                                        <i class="fas fa-star" style="font-size: 0.75rem;"></i>
+                                                    }
+                                                    else if (r.AverageRating.Value >= (i - 0.5))
+                                                    {
+                                                        <i class="fas fa-star-half-alt" style="font-size: 0.75rem;"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star" style="font-size: 0.75rem;"></i>
+                                                    }
+                                                }
+                                            </span>
+                                            <span class="text-muted small ms-1">(@r.RatingCount)</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">No ratings</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (r.LastLessonDate.HasValue)
+                                    {
+                                        <div class="text-muted small">@r.LastLessonDate.Value.ToString("MMM dd, yyyy")</div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">—</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Student", "Progress", new { studentUserId = r.StudentId })">
+                                        <i class="fas fa-eye me-1"></i>View Progress
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (Model.Pagination.TotalPages > 1)
+                {
+                    <div class="mt-3">
+                        <partial name="Components/_Pagination" model="Model.Pagination" />
+                    </div>
+                }
+            }
         </div>
     </div>
 </div>
-
-

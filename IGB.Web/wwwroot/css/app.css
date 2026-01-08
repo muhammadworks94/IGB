@@ -590,14 +590,14 @@ a,
 .btn-link,
 .nav-link,
 .breadcrumb-item a {
-    color: var(--primary-color) !important;
+    color: var(--primary-color);
 }
 
 a:hover,
 .btn-link:hover,
 .nav-link:hover,
 .breadcrumb-item a:hover {
-    color: var(--primary-color-hover) !important;
+    color: var(--primary-color-hover);
 }
 
 /* Primary Color for Icons */
@@ -845,6 +845,7 @@ th {
     font-weight: 500;
     padding: 0.375rem 0.5rem;
     font-size: 0.75rem;
+    color:white;
 }
 
 .badge.bg-success {
@@ -4123,7 +4124,12 @@ canvas {
     transform: none;
     box-shadow: none;
 }
-
+.btn-secondary{
+    color:white !important;
+}
+    .btn-secondary:hover {
+        color: white !important;
+    }
 /* Button Sizes */
 .btn-system-lg {
     padding: 20px 40px;
@@ -8855,9 +8861,9 @@ html, body {
     line-height: 1.2;
 }
 
-.breadcrumb-header form {
+/*.breadcrumb-header form {
     min-width: 300px;
-}
+}*/
 
 .breadcrumb-header form .form-control-sm {
     height: calc(1.5em + 0.5rem + 2px);
