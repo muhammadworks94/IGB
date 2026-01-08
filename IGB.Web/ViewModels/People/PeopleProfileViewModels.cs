@@ -66,7 +66,7 @@ public sealed record ReviewItemVm(
 );
 
 public sealed record StudentMiniVm(long StudentId, string Name);
-public sealed record GuardianMiniVm(long GuardianUserId, string Name);
+public sealed record GuardianMiniVm(long GuardianUserId, string Name, string? Email, string? Phone, string? WhatsApp);
 public sealed record WardVm(long StudentId, string StudentName, List<CourseEnrollmentVm> Courses);
 
 public sealed record LessonsSummaryVm(int Total, int Upcoming, int Completed, int Cancelled);

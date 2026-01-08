@@ -34,12 +34,12 @@
                         var w = Model.Wards[i];
                         var cid = "w" + w.StudentId;
                         <div class="accordion-item">
-                            <h2 class="accordion-header" id="h@cid">
-                                <button class="accordion-button @(i==0 ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#c@cid" aria-expanded="@(i==0 ? "true" : "false")" aria-controls="c@cid">
+                            <h2 class="accordion-header" id="h@(cid)">
+                                <button class="accordion-button @(i==0 ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#c@(cid)" aria-expanded="@(i==0 ? "true" : "false")" aria-controls="c@(cid)">
                                     @w.StudentName
                                 </button>
                             </h2>
-                            <div id="c@cid" class="accordion-collapse collapse @(i==0 ? "show" : "")" aria-labelledby="h@cid" data-bs-parent="#wardsAcc">
+                            <div id="c@(cid)" class="accordion-collapse collapse @(i==0 ? "show" : "")" aria-labelledby="h@(cid)" data-bs-parent="#wardsAcc">
                                 <div class="accordion-body">
                                     <div class="mb-2">
                                         <a class="btn btn-sm btn-outline-primary" href="/People/Student/@w.StudentId">Open student profile</a>
