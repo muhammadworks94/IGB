@@ -52,6 +52,17 @@
                 <form method="@(Model.Search.FormMethod ?? "get")" 
                       action="@(Model.Search.FormAction ?? "")" 
                       class="d-flex gap-2 align-items-center">
+                    @* Preserve filter values when searching *@
+                    @if (Model.Filters != null && Model.Filters.Count > 0)
+                    {
+                        @foreach (var f in Model.Filters)
+                        {
+                            @if (f.Value != null && f.Value != "")
+                            {
+                                <input type="hidden" name="@f.Name" value="@f.Value" />
+                            }
+                        }
+                    }
                     <div style="width: 250px;">
                         <input class="form-control form-control-sm" 
                                name="@(Model.Search.QueryParamName ?? "q")" 
@@ -74,9 +85,64 @@
             <!-- Filters -->
             @if (Model.Filters != null && Model.Filters.Count > 0)
             {
-                @foreach (var filter in Model.Filters)
+             
+                    // Group filters: separate date filters from others
+                    var dateFilters = Model.Filters.Where(f => f.Type == "date").ToList();
+                    var otherFilters = Model.Filters.Where(f => f.Type != "date").ToList();
+              
+                
+                @* Date filters grouped together with Apply button *@
+                @if (dateFilters.Count > 0)
                 {
-                    <form method="get" class="d-flex gap-2 align-items-center">
+                    <form method="get" action="@Context.Request.Path" class="d-flex gap-2 align-items-center" id="dateFiltersForm">
+                        @* Preserve search query *@
+                        @if (Model.Search != null && !string.IsNullOrWhiteSpace(Model.Search.CurrentValue))
+                        {
+                            <input type="hidden" name="@(Model.Search.QueryParamName ?? "q")" value="@Model.Search.CurrentValue" />
+                        }
+                        @* Preserve other non-date filters *@
+                        @foreach (var otherFilter in otherFilters)
+                        {
+                            @if (otherFilter.Value != null && otherFilter.Value != "")
+                            {
+                                <input type="hidden" name="@otherFilter.Name" value="@otherFilter.Value" />
+                            }
+                        }
+                        
+                        @foreach (var filter in dateFilters)
+                        {
+                            <label class="text-muted small mb-0" for="@filter.Name">@filter.Label</label>
+                            <input type="date" 
+                                   id="@filter.Name" 
+                                   name="@filter.Name" 
+                                   value="@filter.Value" 
+                                   placeholder="@filter.Placeholder"
+                                   class="form-control form-control-sm @filter.CssClass" 
+                                   style="width: auto; min-width: 150px;" />
+                        }
+                        <button class="btn btn-primary btn-sm" type="submit">
+                            <i class="fas fa-filter me-1"></i>Apply
+                        </button>
+                    </form>
+                }
+                
+                @* Other filters (select, input) - each in its own form with auto-submit *@
+                @foreach (var filter in otherFilters)
+                {
+                    <form method="get" action="@Context.Request.Path" class="d-flex gap-2 align-items-center">
+                        @* Preserve search query and other filters when this filter changes *@
+                        @if (Model.Search != null && !string.IsNullOrWhiteSpace(Model.Search.CurrentValue))
+                        {
+                            <input type="hidden" name="@(Model.Search.QueryParamName ?? "q")" value="@Model.Search.CurrentValue" />
+                        }
+                        @foreach (var otherFilter in Model.Filters)
+                        {
+                            @if (otherFilter.Name != filter.Name && otherFilter.Value != null && otherFilter.Value != "")
+                            {
+                                <input type="hidden" name="@otherFilter.Name" value="@otherFilter.Value" />
+                            }
+                        }
+                        
                         @if (filter.Type == "select")
                         {
                             <label class="text-muted small mb-0" for="@filter.Name">@filter.Label</label>

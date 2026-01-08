@@ -2,11 +2,30 @@
 @{
     ViewData["Title"] = "Missing Classes";
     
+    // Build filters
+    var filters = new List<PageHeaderFilter>
+    {
+        new("From", "from", "date", Model.From?.ToString("yyyy-MM-dd") ?? "", null, "From date"),
+        new("To", "to", "date", Model.To?.ToString("yyyy-MM-dd") ?? "", null, "To date")
+    };
+    
+    // Build action buttons
+    var hasActiveFilters = Model.From.HasValue || Model.To.HasValue;
     var actionButtons = new List<PageHeaderActionButton>
     {
         new("Export CSV", Url.Action("MissingClassesExportCsv", "Reports", new { from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") }), Icon: "fas fa-file-csv me-1", ButtonType: "outline-secondary"),
         new("PDF", Url.Action("MissingClassesExportPdf", "Reports", new { from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") }), Icon: "fas fa-file-pdf me-1", ButtonType: "outline-secondary")
     };
+    
+    if (hasActiveFilters)
+    {
+        actionButtons.Add(new PageHeaderActionButton(
+            "Reset",
+            Url.Action("MissingClasses", "Reports"),
+            Icon: "fas fa-rotate-left me-1",
+            ButtonType: "outline-secondary"
+        ));
+    }
 }
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
@@ -18,26 +37,9 @@
         new("Reports"),
         new("Missing Classes")
     },
+    Filters: filters,
     ActionButtons: actionButtons
 ))
-
-<div class="container-fluid">
-    <form method="get" id="missingClassesFilterForm" class="mb-3 d-flex gap-2 align-items-end">
-        <div style="width: 150px;">
-            <label class="form-label small">From</label>
-            <input class="form-control form-control-sm" name="from" type="date" value="@(Model.From?.ToString("yyyy-MM-dd") ?? "")" placeholder="From" />
-        </div>
-        <div style="width: 150px;">
-            <label class="form-label small">To</label>
-            <input class="form-control form-control-sm" name="to" type="date" value="@(Model.To?.ToString("yyyy-MM-dd") ?? "")" placeholder="To" />
-        </div>
-        <button class="btn btn-primary btn-sm" type="submit">
-            <i class="fas fa-filter me-1"></i>Filter
-        </button>
-        <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("MissingClasses", "Reports")">
-            <i class="fas fa-rotate-left me-1"></i>Reset
-        </a>
-    </form>
 
 <div class="container-fluid">
 
@@ -80,52 +82,51 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('missingClassesFilterForm');
-        if (form) {
-            form.addEventListener('change', function() {
-                const from = form.querySelector('[name="from"]')?.value || '';
-                const to = form.querySelector('[name="to"]')?.value || '';
-                
-                const csvLink = document.getElementById('exportCsvLink');
-                const pdfLink = document.getElementById('exportPdfLink');
-                
-                if (csvLink) {
-                    csvLink.href = '@Url.Action("MissingClassesExportCsv","Reports")' + 
-                        '?from=' + encodeURIComponent(from) + 
-                        '&to=' + encodeURIComponent(to);
+        // Update export button URLs based on current date filter values
+        const updateExportUrls = function() {
+            const fromInput = document.querySelector('input[name="from"]');
+            const toInput = document.querySelector('input[name="to"]');
+            const from = fromInput?.value || '';
+            const to = toInput?.value || '';
+            
+            // Find export buttons by their href pattern
+            const exportButtons = document.querySelectorAll('a[href*="MissingClassesExport"]');
+            exportButtons.forEach(function(btn) {
+                let baseUrl = btn.getAttribute('data-base-url');
+                if (!baseUrl) {
+                    // Extract base URL from current href
+                    baseUrl = btn.href.split('?')[0];
+                    btn.setAttribute('data-base-url', baseUrl);
                 }
-                if (pdfLink) {
-                    pdfLink.href = '@Url.Action("MissingClassesExportPdf","Reports")' + 
-                        '?from=' + encodeURIComponent(from) + 
-                        '&to=' + encodeURIComponent(to);
-                }
+                const params = [];
+                if (from) params.push('from=' + encodeURIComponent(from));
+                if (to) params.push('to=' + encodeURIComponent(to));
+                btn.href = baseUrl + (params.length > 0 ? '?' + params.join('&') : '');
+            });
+        };
+        
+        // Watch for date input changes to update export URLs in real-time
+        const fromInput = document.querySelector('input[name="from"]');
+        const toInput = document.querySelector('input[name="to"]');
+        
+        if (fromInput) {
+            fromInput.addEventListener('change', updateExportUrls);
+        }
+        if (toInput) {
+            toInput.addEventListener('change', updateExportUrls);
+        }
+        
+        // Also update when the form is submitted (before submit)
+        const dateFiltersForm = document.getElementById('dateFiltersForm');
+        if (dateFiltersForm) {
+            dateFiltersForm.addEventListener('submit', function() {
+                // Update URLs before form submits
+                updateExportUrls();
             });
         }
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('missingClassesFilterForm');
-        if (form) {
-            form.addEventListener('change', function() {
-                const from = form.querySelector('[name="from"]')?.value || '';
-                const to = form.querySelector('[name="to"]')?.value || '';
-                
-                const csvLink = document.getElementById('exportCsvLink');
-                const pdfLink = document.getElementById('exportPdfLink');
-                
-                if (csvLink) {
-                    csvLink.href = '@Url.Action("MissingClassesExportCsv","Reports")' + 
-                        '?from=' + encodeURIComponent(from) + 
-                        '&to=' + encodeURIComponent(to);
-                }
-                if (pdfLink) {
-                    pdfLink.href = '@Url.Action("MissingClassesExportPdf","Reports")' + 
-                        '?from=' + encodeURIComponent(from) + 
-                        '&to=' + encodeURIComponent(to);
-                }
-            });
-        }
+        
+        // Initial update on page load
+        updateExportUrls();
     });
 </script>
 
