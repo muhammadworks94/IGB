@@ -29,17 +29,6 @@
                 </a>
             </li>
 
-            @* Admin + SuperAdmin *@
-            @if (isAuthenticated && isAdmin)
-            {
-                <!-- Approvals -->
-                <li class="nav-item">
-                    <a asp-controller="Approvals" asp-action="Index" class="nav-link">
-                        <i class="link-icon fas fa-user-check"></i>
-                        <span class="link-title">Approvals</span>
-                    </a>
-                </li>
-            }
 
             @* Admin + SuperAdmin *@
             @if (isAuthenticated && isAdmin)
@@ -89,12 +78,12 @@
                 </li>
 
                 <!-- Guardians -->
-                <li class="nav-item">
+           @*      <li class="nav-item">
                     <a class="nav-link" href="/People/Guardians">
                         <i class="link-icon fas fa-user-friends"></i>
                         <span class="link-title">Guardians</span>
                     </a>
-                </li>
+                </li> *@
 
                 <!-- Academics -->
                 <li class="nav-item">
@@ -115,7 +104,18 @@
                     </div>
                 </li>
             }
-
+            
+            @* Admin + SuperAdmin *@
+            @if (isAuthenticated && isAdmin)
+            {
+                <!-- Approvals -->
+                <li class="nav-item">
+                    <a asp-controller="Approvals" asp-action="Index" class="nav-link">
+                        <i class="link-icon fas fa-user-check"></i>
+                        <span class="link-title">Approvals</span>
+                    </a>
+                </li>
+            }
             @* Admin + SuperAdmin *@
             @if (isAuthenticated && isAdmin)
             {

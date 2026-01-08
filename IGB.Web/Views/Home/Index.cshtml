@@ -13,15 +13,7 @@
     Subtitle: "Welcome to your IGB System Dashboard - Manage your educational platform efficiently"
 ))
 
-@if (User.IsInRole("SuperAdmin"))
-{
-    <form asp-action="SendTestNotification" method="post" class="mt-2">
-        @Html.AntiForgeryToken()
-        <button type="submit" class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-bell me-2"></i>Send Test Notification (SignalR)
-        </button>
-    </form>
-}
+
 
 <div class="container-fluid @(isSuperAdmin ? "admin-dashboard-container" : "")">
     
