@@ -14,6 +14,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: $"{selectedStudentName}'s Test Reports",
+    Icon: "fas fa-clipboard-check",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Home")),

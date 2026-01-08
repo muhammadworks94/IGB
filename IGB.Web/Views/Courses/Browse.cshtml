@@ -5,6 +5,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: "Browse Courses",
+    Icon: "fas fa-search",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Home", Url.Action("Index", "Home")),

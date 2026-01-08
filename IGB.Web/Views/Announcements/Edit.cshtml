@@ -8,7 +8,8 @@
 }
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: ViewData["Title"]?.ToString() ?? "Announcement"
+    Title: ViewData["Title"]?.ToString() ?? "Announcement",
+    Icon: Model.Id == null ? "fas fa-plus-circle" : "fas fa-edit"
 ))
 
 <div class="container-fluid">

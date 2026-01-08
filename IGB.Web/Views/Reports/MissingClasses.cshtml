@@ -1,43 +1,43 @@
 @model IGB.Web.ViewModels.Reports.MissingClassesViewModel
 @{
     ViewData["Title"] = "Missing Classes";
+    
+    var actionButtons = new List<PageHeaderActionButton>
+    {
+        new("Export CSV", Url.Action("MissingClassesExportCsv", "Reports", new { from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") }), Icon: "fas fa-file-csv me-1", ButtonType: "outline-secondary"),
+        new("PDF", Url.Action("MissingClassesExportPdf", "Reports", new { from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") }), Icon: "fas fa-file-pdf me-1", ButtonType: "outline-secondary")
+    };
 }
 
-<div class="breadcrumb-header">
-    <!-- Breadcrumbs -->
-    <nav aria-label="breadcrumb" class="mb-2">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Reports</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Missing Classes</li>
-        </ol>
-    </nav>
-    
-    <!-- Title, Filters, and Action Buttons in one row -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
-        <h1 class="breadcrumb-title mb-0">Missing Classes</h1>
-        
-        <div class="d-flex gap-2 align-items-center flex-wrap">
-            <form method="get" id="missingClassesFilterForm" class="d-flex gap-2 align-items-center">
-                <div style="width: 150px;">
-                    <input class="form-control form-control-sm" name="from" type="date" value="@(Model.From?.ToString("yyyy-MM-dd") ?? "")" placeholder="From" />
-                </div>
-                <div style="width: 150px;">
-                    <input class="form-control form-control-sm" name="to" type="date" value="@(Model.To?.ToString("yyyy-MM-dd") ?? "")" placeholder="To" />
-                </div>
-                <button class="btn btn-primary btn-sm" type="submit">
-                    <i class="fas fa-filter me-1"></i>Filter
-                </button>
-                <a class="btn btn-outline-secondary btn-sm" id="exportCsvLink" href="@Url.Action("MissingClassesExportCsv","Reports", new { from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") })">
-                    <i class="fas fa-file-csv me-1"></i>Export CSV
-                </a>
-                <a class="btn btn-outline-secondary btn-sm" target="_blank" id="exportPdfLink" href="@Url.Action("MissingClassesExportPdf","Reports", new { from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") })">
-                    <i class="fas fa-file-pdf me-1"></i>PDF
-                </a>
-            </form>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Missing Classes",
+    Icon: "fas fa-exclamation-triangle",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Reports"),
+        new("Missing Classes")
+    },
+    ActionButtons: actionButtons
+))
+
+<div class="container-fluid">
+    <form method="get" id="missingClassesFilterForm" class="mb-3 d-flex gap-2 align-items-end">
+        <div style="width: 150px;">
+            <label class="form-label small">From</label>
+            <input class="form-control form-control-sm" name="from" type="date" value="@(Model.From?.ToString("yyyy-MM-dd") ?? "")" placeholder="From" />
         </div>
-    </div>
-</div>
+        <div style="width: 150px;">
+            <label class="form-label small">To</label>
+            <input class="form-control form-control-sm" name="to" type="date" value="@(Model.To?.ToString("yyyy-MM-dd") ?? "")" placeholder="To" />
+        </div>
+        <button class="btn btn-primary btn-sm" type="submit">
+            <i class="fas fa-filter me-1"></i>Filter
+        </button>
+        <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("MissingClasses", "Reports")">
+            <i class="fas fa-rotate-left me-1"></i>Reset
+        </a>
+    </form>
 
 <div class="container-fluid">
 
