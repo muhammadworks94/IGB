@@ -1,56 +1,143 @@
-@model List<IGB.Domain.Entities.CourseBooking>
+@model IGB.Web.ViewModels.Student.MyCourseBookingsViewModel
 @{
     ViewData["Title"] = "My Course Bookings";
+    
+    var filters = new List<PageHeaderFilter>();
+    
+    if (Model.Curricula.Count > 0)
+    {
+        var curriculumOptions = Model.Curricula.Select(c => new KeyValuePair<string, string>(c.Id.ToString(), c.Name)).Prepend(new KeyValuePair<string, string>("", "All")).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        filters.Add(new PageHeaderFilter(
+            Name: "curriculumId",
+            Label: "Curriculum",
+            Type: "select",
+            Value: Model.CurriculumId?.ToString(),
+            Options: curriculumOptions
+        ));
+    }
+    
+    if (Model.Grades.Count > 0)
+    {
+        var gradeOptions = Model.Grades.Select(g => new KeyValuePair<string, string>(g.Id.ToString(), g.Name)).Prepend(new KeyValuePair<string, string>("", "All")).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        filters.Add(new PageHeaderFilter(
+            Name: "gradeId",
+            Label: "Grade",
+            Type: "select",
+            Value: Model.GradeId?.ToString(),
+            Options: gradeOptions
+        ));
+    }
+    
+    if (Model.Courses.Count > 0)
+    {
+        var courseOptions = Model.Courses.Select(c => new KeyValuePair<string, string>(c.Id.ToString(), c.Name)).Prepend(new KeyValuePair<string, string>("", "All")).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        filters.Add(new PageHeaderFilter(
+            Name: "courseId",
+            Label: "Course",
+            Type: "select",
+            Value: Model.CourseId?.ToString(),
+            Options: courseOptions
+        ));
+    }
+    
+    if (Model.StatusOptions != null && Model.StatusOptions.Count > 0)
+    {
+        var statusOptions = Model.StatusOptions.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        statusOptions = new Dictionary<string, string> { { "", "All" } }.Concat(statusOptions).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        filters.Add(new PageHeaderFilter(
+            Name: "status",
+            Label: "Status",
+            Type: "select",
+            Value: Model.Status,
+            Options: statusOptions
+        ));
+    }
+    
+    var actionButtons = new List<PageHeaderActionButton>();
+    if (!string.IsNullOrWhiteSpace(Model.Query) || Model.CurriculumId.HasValue || Model.GradeId.HasValue || Model.CourseId.HasValue || !string.IsNullOrWhiteSpace(Model.Status))
+    {
+        actionButtons.Add(new PageHeaderActionButton(
+            Text: "Reset",
+            Url: Url.Action("My", "CourseBookings"),
+            Icon: "fas fa-times me-1",
+            ButtonType: "outline-secondary"
+        ));
+    }
+    
+    var pageHeader = new PageHeaderViewModel(
+        Title: "My Course Bookings",
+        Icon: "fas fa-bookmark",
+        Breadcrumbs: new List<BreadcrumbItem>
+        {
+            new("Home", Url.Action("Index", "Home")),
+            new("Browse Courses", Url.Action("Browse", "Courses")),
+            new("My Bookings")
+        },
+        Search: new PageHeaderSearch(
+            QueryParamName: "q",
+            CurrentValue: Model.Query,
+            Placeholder: "Search bookings..."
+        ),
+        Filters: filters.Count > 0 ? filters : null,
+        ActionButtons: actionButtons.Count > 0 ? actionButtons : null
+    );
 }
 
-@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: "My Course Bookings",
-    Icon: "fas fa-bookmark",
-    Breadcrumbs: new List<BreadcrumbItem>
-    {
-        new("Home", Url.Action("Index", "Home")),
-        new("Browse Courses", Url.Action("Browse", "Courses")),
-        new("My Bookings")
-    }
-))
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="container-fluid">
     <div class="card">
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                    <tr>
-                        <th>Course</th>
-                        <th>Grade</th>
-                        <th>Curriculum</th>
-                        <th>Status</th>
-                        <th>Requested</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var b in Model)
-                    {
-                        var badge = b.Status switch
-                        {
-                            IGB.Domain.Enums.BookingStatus.Approved => "bg-success",
-                            IGB.Domain.Enums.BookingStatus.Rejected => "bg-danger",
-                            IGB.Domain.Enums.BookingStatus.Cancelled => "bg-secondary",
-                            _ => "bg-warning"
-                        };
+            @if (Model.Items.Count == 0)
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-bookmark fa-3x mb-3"></i>
+                    <div>No course bookings found.</div>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
                         <tr>
-                            <td>@b.Course?.Name</td>
-                            <td>@b.Course?.Grade?.Name</td>
-                            <td>@b.Course?.Grade?.Curriculum?.Name</td>
-                            <td><span class="badge @badge">@b.Status</span></td>
-                            <td>@b.RequestedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <th>Course</th>
+                            <th>Grade</th>
+                            <th>Curriculum</th>
+                            <th>Status</th>
+                            <th>Requested</th>
                         </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                        @foreach (var b in Model.Items)
+                        {
+                            var badge = b.Status switch
+                            {
+                                "Approved" => "bg-success",
+                                "Rejected" => "bg-danger",
+                                "Cancelled" => "bg-secondary",
+                                "Completed" => "bg-info",
+                                _ => "bg-warning"
+                            };
+                            <tr>
+                                <td>@b.CourseName</td>
+                                <td>@b.Grade</td>
+                                <td>@b.Curriculum</td>
+                                <td><span class="badge @badge">@b.Status</span></td>
+                                <td>@b.RequestedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
     </div>
+
+    @if (Model.Pagination.TotalCount > 0)
+    {
+        <partial name="Components/_Pagination" model="Model.Pagination" />
+    }
 </div>
 
 

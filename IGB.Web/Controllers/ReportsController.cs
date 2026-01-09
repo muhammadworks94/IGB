@@ -2,6 +2,7 @@ using System.Security.Claims;
 using IGB.Infrastructure.Data;
 using IGB.Shared.Security;
 using IGB.Web.Security;
+using IGB.Web.ViewModels.Components;
 using IGB.Web.ViewModels.Reports;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -260,14 +261,74 @@ public class ReportsController : Controller
     }
 
     // Missing class reports
-    public async Task<IActionResult> MissingClasses(DateTime? from, DateTime? to, CancellationToken ct)
+    public async Task<IActionResult> MissingClasses(DateTime? from, DateTime? to, int page = 1, int pageSize = 25, CancellationToken ct = default)
+    {
+        page = page <= 0 ? 1 : page;
+        pageSize = pageSize is < 5 or > 100 ? 25 : pageSize;
+
+        var q = _db.LessonBookings.AsNoTracking()
+            .Include(l => l.Course)
+            .Include(l => l.StudentUser)
+            .Include(l => l.TutorUser)
+            .Where(l => !l.IsDeleted && (l.Status == IGB.Domain.Enums.LessonStatus.Completed || l.Status == IGB.Domain.Enums.LessonStatus.Scheduled || l.Status == IGB.Domain.Enums.LessonStatus.Rescheduled)
+                        && l.ScheduledStart.HasValue
+                        && (!l.StudentAttended || !l.TutorAttended)); // Filter missing classes in query
+
+        if (from.HasValue)
+        {
+            var f = new DateTimeOffset(from.Value.Date, TimeSpan.Zero);
+            q = q.Where(l => l.ScheduledStart!.Value >= f);
+        }
+        if (to.HasValue)
+        {
+            var t = new DateTimeOffset(to.Value.Date.AddDays(1), TimeSpan.Zero);
+            q = q.Where(l => l.ScheduledStart!.Value < t);
+        }
+
+        var total = await q.CountAsync(ct);
+
+        var items = await q
+            .OrderByDescending(l => l.ScheduledStart)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        var rows = items
+            .Select(l => new MissingClassesViewModel.Row(
+                l.Id,
+                l.Course?.Name ?? "Course",
+                l.StudentUser?.FullName ?? l.StudentUserId.ToString(),
+                l.TutorUser?.FullName ?? (l.TutorUserId?.ToString() ?? "N/A"),
+                l.ScheduledStart!.Value,
+                l.StudentAttended,
+                l.TutorAttended,
+                l.AttendanceNote
+            )).ToList();
+
+        return View(new MissingClassesViewModel 
+        { 
+            From = from, 
+            To = to, 
+            Rows = rows,
+            Pagination = new IGB.Web.ViewModels.Components.PaginationViewModel(
+                page, 
+                pageSize, 
+                total, 
+                Action: "MissingClasses", 
+                Controller: "Reports", 
+                RouteValues: new { from, to })
+        });
+    }
+
+    private async Task<List<MissingClassesViewModel.Row>> GetMissingClassesRows(DateTime? from, DateTime? to, CancellationToken ct)
     {
         var q = _db.LessonBookings.AsNoTracking()
             .Include(l => l.Course)
             .Include(l => l.StudentUser)
             .Include(l => l.TutorUser)
             .Where(l => !l.IsDeleted && (l.Status == IGB.Domain.Enums.LessonStatus.Completed || l.Status == IGB.Domain.Enums.LessonStatus.Scheduled || l.Status == IGB.Domain.Enums.LessonStatus.Rescheduled)
-                        && l.ScheduledStart.HasValue);
+                        && l.ScheduledStart.HasValue
+                        && (!l.StudentAttended || !l.TutorAttended));
 
         if (from.HasValue)
         {
@@ -282,11 +343,9 @@ public class ReportsController : Controller
 
         var items = await q
             .OrderByDescending(l => l.ScheduledStart)
-            .Take(500)
             .ToListAsync(ct);
 
-        var rows = items
-            .Where(l => !l.StudentAttended || !l.TutorAttended)
+        return items
             .Select(l => new MissingClassesViewModel.Row(
                 l.Id,
                 l.Course?.Name ?? "Course",
@@ -297,20 +356,16 @@ public class ReportsController : Controller
                 l.TutorAttended,
                 l.AttendanceNote
             )).ToList();
-
-        return View(new MissingClassesViewModel { From = from, To = to, Rows = rows });
     }
 
     public async Task<IActionResult> MissingClassesExportCsv(DateTime? from, DateTime? to, CancellationToken ct)
     {
-        var vm = await MissingClasses(from, to, ct) as ViewResult;
-        var model = vm?.Model as MissingClassesViewModel;
-        if (model == null) return BadRequest();
+        var rows = await GetMissingClassesRows(from, to, ct);
 
         var sb = new System.Text.StringBuilder();
         sb.AppendLine("LessonId,Course,Student,Tutor,ScheduledStartUtc,StudentAttended,TutorAttended,Note");
         string esc(string s) => $"\"{(s ?? "").Replace("\"", "\"\"")}\"";
-        foreach (var r in model.Rows)
+        foreach (var r in rows)
         {
             sb.AppendLine($"{r.LessonId},{esc(r.CourseName)},{esc(r.StudentName)},{esc(r.TutorName)},{r.ScheduledStartUtc:yyyy-MM-dd HH:mm},{r.StudentAttended},{r.TutorAttended},{esc(r.Note ?? "")}");
         }
@@ -320,9 +375,8 @@ public class ReportsController : Controller
     // Print-friendly view (users can "Save as PDF")
     public async Task<IActionResult> MissingClassesExportPdf(DateTime? from, DateTime? to, CancellationToken ct)
     {
-        var vr = await MissingClasses(from, to, ct) as ViewResult;
-        var model = vr?.Model as MissingClassesViewModel;
-        if (model == null) return BadRequest();
+        var rows = await GetMissingClassesRows(from, to, ct);
+        var model = new MissingClassesViewModel { From = from, To = to, Rows = rows };
         return View("MissingClassesPrint", model);
     }
 

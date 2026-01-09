@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using IGB.Web.ViewModels.Components;
 
 namespace IGB.Web.ViewModels.TestReports;
 
@@ -82,6 +83,34 @@ public class TestReportUpsertViewModel
 
     public IFormFile? TestFile { get; set; }
     public bool RemoveFile { get; set; }
+}
+
+public class StudentMyTestReportsViewModel
+{
+    public string View { get; set; } = "grid";
+    public long? CourseId { get; set; }
+    public string? Grade { get; set; }
+    public string? Query { get; set; }
+    public int PageSize { get; set; } = 10;
+
+    public List<IGB.Web.ViewModels.LookupItem> Courses { get; set; } = new();
+    public Dictionary<string, string> GradeOptions { get; set; } = new();
+
+    public IGB.Web.ViewModels.Components.PaginationViewModel Pagination { get; set; } = new(1, 10, 0, "My", "TestReports");
+    public List<TestReportRow> Items { get; set; } = new();
+
+    public record TestReportRow(
+        long Id,
+        DateOnly TestDate,
+        long CourseId,
+        string CourseName,
+        string TestName,
+        string? TutorName,
+        int ObtainedMarks,
+        int TotalMarks,
+        decimal Percentage,
+        string Grade
+    );
 }
 
 

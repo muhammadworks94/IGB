@@ -1,75 +1,52 @@
 @{
     ViewData["Title"] = "Dashboard";
+    
+    // Build action buttons
+    var actionButtons = new List<IGB.Web.ViewModels.PageHeaderActionButton>();
+    actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+        Text: "Profile",
+        Url: Url.Action("Index", "Profile"),
+        Icon: "fas fa-user-circle me-1",
+        ButtonType: "outline-secondary"
+    ));
+    
+    // Build page header
+    var pageHeader = new IGB.Web.ViewModels.PageHeaderViewModel(
+        Title: "Dashboard",
+        Icon: "fas fa-tachometer-alt",
+        Breadcrumbs: new List<BreadcrumbItem> { new("Dashboard", Url.Action("Index", "Portal")) },
+        ActionButtons: actionButtons
+    );
 }
 
-@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: "Dashboard",
-    Icon: "fas fa-tachometer-alt",
-    Breadcrumbs: new List<BreadcrumbItem> { new("Dashboard", Url.Action("Index", "Portal")) }
-))
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-        <div>
-            <h3 class="mb-1">Welcome back, <span id="studentName">Student</span>!</h3>
-            <div class="text-muted small">
-                <span id="tipOfDay">—</span>
-                <span class="mx-2">•</span>
-                <span id="studentClock">—</span>
-            </div>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <a class="btn btn-outline-secondary" href="/Profile/Index"><i class="fas fa-user-circle me-2"></i>Profile</a>
-        </div>
-    </div>
-
     <style>
         .skeleton {
             background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.12) 37%, rgba(0,0,0,0.06) 63%);
             background-size: 400% 100%;
             animation: shimmer 1.2s ease-in-out infinite;
-            border-radius: 10px;
+            border-radius: 12px;
         }
         @@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
-        /* Overview cards: solid colorful tiles (like modern dashboards) */
-        .overview-card {
-            border: 0;
-            overflow: hidden;
-            box-shadow: 0 14px 28px rgba(16,24,40,.14);
-        }
-        /* Only switch text to white when the gradient class is applied (prevents "blank" cards if CSS is overridden) */
-        .overview-card[class*="card-grad-"] { color: #fff; }
-        .overview-card[class*="card-grad-"] .text-muted { color: rgba(255,255,255,.72) !important; }
-        .overview-card[class*="card-grad-"] .small.text-muted { color: rgba(255,255,255,.72) !important; }
-        .overview-card[class*="card-grad-"] a { color: rgba(255,255,255,.88) !important; }
-        .overview-card[class*="card-grad-"] a:hover { color: #fff !important; text-decoration: underline; }
-
-        .overview-icon {
-            width: 44px; height: 44px;
-            display: inline-flex; align-items: center; justify-content: center;
+        
+        /* Professional card styling */
+        #widgets .card {
+            border: none;
             border-radius: 16px;
-            background: rgba(255,255,255,0.20);
-            border: 1px solid rgba(255,255,255,0.18);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
-        .overview-icon i { font-size: 16px; color: #fff; opacity: .95; }
-
-        /* Bold gradients */
-        /* Use !important to beat theme/default card background rules */
-        .overview-card.card-grad-primary { background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #4f46e5 100%) !important; }
-        .overview-card.card-grad-success { background: linear-gradient(135deg, #16a34a 0%, #22c55e 55%, #059669 100%) !important; }
-        .overview-card.card-grad-info { background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 55%, #2563eb 100%) !important; }
-        .overview-card.card-grad-secondary { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 55%, #6366f1 100%) !important; }
-        /* Used when credits are low */
-        .overview-card.card-grad-warning { background: linear-gradient(135deg, #f59e0b 0%, #facc15 55%, #ef4444 100%) !important; }
-
-        /* White progress bar on colored tiles */
-        .overview-card .progress { background: rgba(255,255,255,.22) !important; }
-        .overview-card .progress-bar { background: rgba(255,255,255,.92) !important; }
-        .lesson-border-upcoming { border-left: 4px solid #0dcaf0; }
-        .lesson-border-ongoing { border-left: 4px solid #198754; }
-        .lesson-border-completed { border-left: 4px solid #6c757d; }
-        .lesson-border-cancelled { border-left: 4px solid #dc3545; }
+        #widgets .card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+        #widgets .card-body {
+            padding: 1.5rem;
+        }
+        
         .pulse {
             animation: pulse 1.4s ease-in-out infinite;
         }
@@ -77,6 +54,23 @@
             0% { box-shadow: 0 0 0 0 rgba(25,135,84,0.25); }
             70% { box-shadow: 0 0 0 10px rgba(25,135,84,0); }
             100% { box-shadow: 0 0 0 0 rgba(25,135,84,0); }
+        }
+        
+        .lesson-border-upcoming { border-left: 4px solid #0dcaf0; }
+        .lesson-border-ongoing { border-left: 4px solid #198754; }
+        .lesson-border-completed { border-left: 4px solid #6c757d; }
+        .lesson-border-cancelled { border-left: 4px solid #dc3545; }
+        
+        /* Quick action cards */
+        #widgets a.card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(13,110,253,0.2) !important;
+            border-radius: 12px !important;
+        }
+        #widgets a.card:hover {
+            border-color: rgba(13,110,253,0.4) !important;
+            box-shadow: 0 4px 12px rgba(13,110,253,0.15);
+            transform: translateY(-2px);
         }
     </style>
 
@@ -90,182 +84,343 @@
         </div>
     </div>
 
-    <div id="profileBanner" class="alert alert-warning d-none">
-        <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-            <div>
-                <div class="fw-semibold"><i class="fas fa-exclamation-triangle me-2"></i>Profile incomplete</div>
-                <div class="small text-muted">Your profile is <span class="fw-semibold" id="profilePct">0%</span> complete. Missing: <span id="profileMissing">—</span></div>
-                <div class="progress mt-2" style="height:8px;max-width:520px;">
-                    <div class="progress-bar bg-warning" id="profileBar" style="width:0%"></div>
-                </div>
-            </div>
-            <div class="d-flex gap-2">
-                <a class="btn btn-sm btn-outline-dark" href="/Profile/Index">Complete Profile</a>
-                <button class="btn btn-sm btn-outline-secondary" id="dismissProfile" type="button">Dismiss</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Overview cards -->
-    <div class="row g-3 mb-3">
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="card overview-card card-grad-primary">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="overview-icon"><i class="fas fa-book"></i></div>
-                        <a class="small text-decoration-none" href="/CourseBookings/My">My Courses</a>
+    <div id="widgets" class="row g-3">
+        <!-- Stats (4) -->
+        <div class="col-12" data-widget="stats">
+            <div class="overview-stats-section">
+                <div class="row g-3">
+                    <div class="col-xl-3 col-md-6">
+                        <a href="/CourseBookings/My" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-blue">
+                                <div class="kpi-icon"><i class="fas fa-book"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value" id="cardCourses">—</div>
+                                    <div class="kpi-label">Enrolled Courses</div>
+                                    <div class="kpi-sub"><span id="cardCoursesCompleted">0</span> completed</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
                     </div>
-                    <div class="fs-2 fw-semibold mt-2" id="cardCourses">—</div>
-                    <div class="text-muted">Enrolled Courses</div>
-                    <div class="small text-muted mt-1"><span id="cardCoursesCompleted">0</span> completed</div>
+                    <div class="col-xl-3 col-md-6">
+                        <a href="/Credits/My" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-green" id="creditsCard">
+                                <div class="kpi-icon"><i class="fas fa-coins"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value" id="cardCredits">—</div>
+                                    <div class="kpi-label">Available Credits</div>
+                                    <div class="kpi-sub" id="creditWarning">Healthy balance</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <a href="/Schedule/My" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-amber">
+                                <div class="kpi-icon"><i class="fas fa-calendar-alt"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value" id="cardWeekLessons">—</div>
+                                    <div class="kpi-label">Lessons This Week</div>
+                                    <div class="kpi-sub" id="nextLesson">Next: —</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <a href="/Progress/My" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-red">
+                                <div class="kpi-icon"><i class="fas fa-chart-pie"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value" id="overallPct">—</div>
+                                    <div class="kpi-label">Overall Progress</div>
+                                    <div class="kpi-sub">Across all courses</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="card overview-card card-grad-success" id="creditsCard">
+
+        <!-- My Schedule -->
+        <div class="col-12" data-widget="schedule">
+            <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="overview-icon"><i class="fas fa-coins"></i></div>
-                        <a class="small text-decoration-none" href="/Credits/My">Credits</a>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h6 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>My Schedule
+                        </h6>
+                        <a class="btn btn-sm btn-outline-primary" href="/Schedule/My">
+                            <i class="fas fa-external-link-alt me-1"></i>View Full Schedule
+                        </a>
                     </div>
-                    <div class="fs-2 fw-semibold mt-2" id="cardCredits">—</div>
-                    <div class="text-muted">Available Credits</div>
-                    <div class="small mt-1" id="creditWarning"></div>
-                    <div class="progress mt-2" style="height:8px;">
-                        <div class="progress-bar" id="creditsBar" style="width:0%"></div>
-                    </div>
+                    <div id="scheduleCalendar"></div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="card overview-card card-grad-info">
+
+        <!-- Quick actions -->
+        <div class="col-12" data-widget="actions">
+            <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="overview-icon"><i class="fas fa-calendar-alt"></i></div>
-                        <a class="small text-decoration-none" href="/Schedule/My">My Schedule</a>
-                    </div>
-                    <div class="fs-2 fw-semibold mt-2" id="cardWeekLessons">—</div>
-                    <div class="text-muted">Lessons This Week</div>
-                    <div class="small text-muted mt-1" id="nextLesson">Next: —</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="card overview-card card-grad-secondary">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="overview-icon"><i class="fas fa-chart-pie"></i></div>
-                        <a class="small text-decoration-none" href="/Progress/My">Progress</a>
-                    </div>
-                    <div class="d-flex align-items-center gap-3 mt-2">
-                        <div style="width:54px;height:54px;">
-                            <canvas id="overallProgressChart"></canvas>
+                    <h6 class="mb-2">Quick actions</h6>
+                    <div class="row g-2">
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/LessonBookings/Create" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="icon-circle"><i class="fas fa-book-open"></i></div>
+                                <div class="fw-semibold mt-2">Book a Lesson</div>
+                                <div class="text-muted small">Schedule your next class</div>
+                            </a>
                         </div>
-                        <div>
-                            <div class="fw-semibold" id="overallPct">—</div>
-                            <div class="text-muted small">Overall Progress</div>
-                            <div class="text-muted small">Across all courses</div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Courses/Browse" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="icon-circle"><i class="fas fa-search"></i></div>
+                                <div class="fw-semibold mt-2">Browse Courses</div>
+                                <div class="text-muted small">Explore available courses</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Schedule/My" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="icon-circle"><i class="fas fa-calendar-alt"></i></div>
+                                <div class="fw-semibold mt-2">My Schedule</div>
+                                <div class="text-muted small">View upcoming lessons</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Credits/My" id="purchaseCreditsBtn" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="d-flex justify-content-between">
+                                    <div class="icon-circle"><i class="fas fa-credit-card"></i></div>
+                                    <span class="badge bg-danger d-none" id="lowCreditBadge">Low!</span>
+                                </div>
+                                <div class="fw-semibold mt-2">Credits</div>
+                                <div class="text-muted small">Manage your credits</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Progress/My" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="icon-circle"><i class="fas fa-chart-line"></i></div>
+                                <div class="fw-semibold mt-2">My Progress</div>
+                                <div class="text-muted small">Track your learning</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Feedback/My" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="d-flex justify-content-between">
+                                    <div class="icon-circle"><i class="fas fa-star"></i></div>
+                                    <span class="badge bg-primary d-none" id="pendingFeedbackBadge">0</span>
+                                </div>
+                                <div class="fw-semibold mt-2">Give Feedback</div>
+                                <div class="text-muted small">Rate your lessons</div>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- My Schedule -->
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-                <h6 class="mb-0">My Schedule</h6>
-                <div class="d-flex align-items-center gap-2">
-                    <div class="btn-group" role="group" aria-label="Schedule tabs">
-                        <button class="btn btn-sm btn-outline-secondary active" data-tab="today" type="button">Today</button>
-                        <button class="btn btn-sm btn-outline-secondary" data-tab="tomorrow" type="button">Tomorrow</button>
-                        <button class="btn btn-sm btn-outline-secondary" data-tab="week" type="button">This Week</button>
+        <!-- My Courses (Recent) -->
+        <div class="col-12" data-widget="courses">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <h6 class="mb-0">Recent Course Bookings</h6>
+                            <span class="badge bg-light text-dark" id="coursesTotalBadge">0</span>
+                        </div>
+                        <a class="small text-decoration-none" href="/CourseBookings/My">View All</a>
                     </div>
-                    <div class="btn-group" role="group" aria-label="View toggle">
-                        <button class="btn btn-sm btn-outline-secondary active" id="listViewBtn" type="button">List</button>
-                        <button class="btn btn-sm btn-outline-secondary" id="timelineViewBtn" type="button">Timeline</button>
+                    <div class="row g-3" id="courseGrid">
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <div class="card"><div class="card-body"><div class="skeleton" style="height:140px;"></div></div></div>
+                        </div>
                     </div>
-                    <a class="btn btn-sm btn-outline-primary" href="/Schedule/My">View Full Schedule</a>
+                    <div class="text-muted d-none" id="coursesEmpty">No recent course bookings.</div>
                 </div>
             </div>
-            <div class="text-muted small mb-2" id="scheduleDateLabel">—</div>
-
-            <div id="scheduleEmpty" class="text-muted d-none">
-                <div class="py-3">No classes for this range.</div>
-            </div>
-
-            <div id="scheduleList"></div>
-            <div id="scheduleTimeline" class="d-none"></div>
-        </div>
-    </div>
-
-    <!-- Quick actions -->
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="mb-2">Quick actions</h6>
-            <div class="row g-2">
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="btn btn-primary w-100 py-3" href="/LessonBookings/Create"><i class="fas fa-book-open me-2"></i>Book a Lesson</a>
-                </div>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="btn btn-outline-secondary w-100 py-3" href="/Courses/Browse"><i class="fas fa-search me-2"></i>Browse Courses</a>
-                </div>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="btn btn-outline-secondary w-100 py-3" href="/Schedule/My"><i class="fas fa-calendar-alt me-2"></i>View My Schedule</a>
-                </div>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="btn btn-outline-secondary w-100 py-3" href="/Credits/My" id="purchaseCreditsBtn"><i class="fas fa-credit-card me-2"></i>Credits <span class="badge bg-danger ms-1 d-none" id="lowCreditBadge">Low!</span></a>
-                </div>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="btn btn-outline-secondary w-100 py-3" href="/Progress/My"><i class="fas fa-chart-line me-2"></i>View My Progress</a>
-                </div>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <a class="btn btn-outline-secondary w-100 py-3" href="/Feedback/My"><i class="fas fa-star me-2"></i>Give Feedback <span class="badge bg-primary ms-1 d-none" id="pendingFeedbackBadge">0</span></a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Course progress -->
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-                <h6 class="mb-0">My Courses</h6>
-                <div class="d-flex gap-2 align-items-center">
-                    <div class="btn-group" role="group" aria-label="Course tabs">
-                        <button class="btn btn-sm btn-outline-secondary active" data-course-tab="active" type="button">Active</button>
-                        <button class="btn btn-sm btn-outline-secondary" data-course-tab="completed" type="button">Completed</button>
-                        <button class="btn btn-sm btn-outline-secondary" data-course-tab="all" type="button">All</button>
-                    </div>
-                    <select class="form-select form-select-sm" id="courseSort" style="width:190px;">
-                        <option value="progress_desc">Sort: Progress</option>
-                        <option value="name_asc">Sort: Course Name</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row g-3" id="courseGrid">
-                <div class="col-12 col-md-6 col-xl-4">
-                    <div class="card"><div class="card-body"><div class="skeleton" style="height:140px;"></div></div></div>
-                </div>
-            </div>
-            <div class="text-muted d-none" id="coursesEmpty">No courses to show.</div>
         </div>
     </div>
 </div>
 
+<!-- Lesson Details Modal -->
+<div class="modal fade" id="lessonDetailsModal" tabindex="-1" aria-labelledby="lessonDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lessonDetailsModalLabel">
+                    <i class="fas fa-calendar-check me-2"></i><span id="lessonModalTitle">Lesson Details</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-book text-primary me-2"></i>
+                            <div>
+                                <div class="text-muted small">Course / Subject</div>
+                                <div class="fw-semibold" id="lessonModalCourse">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-user-tie text-info me-2"></i>
+                            <div>
+                                <div class="text-muted small">Tutor / Teacher</div>
+                                <div class="fw-semibold" id="lessonModalTutor">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-clock text-warning me-2"></i>
+                            <div>
+                                <div class="text-muted small">Time</div>
+                                <div class="fw-semibold" id="lessonModalTime">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-info-circle text-secondary me-2"></i>
+                            <div>
+                                <div class="text-muted small">Status</div>
+                                <div>
+                                    <span class="badge" id="lessonModalStatusBadge">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" id="lessonModalZoom" style="display: none;">
+                        <hr />
+                        <h6 class="mb-3"><i class="fas fa-video me-2"></i>Zoom Meeting</h6>
+                        <div class="mb-2">
+                            <div class="text-muted small">Meeting ID</div>
+                            <div class="fw-semibold" id="lessonModalMeetingId">-</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted small">Password</div>
+                            <div class="fw-semibold" id="lessonModalPassword">-</div>
+                        </div>
+                        <button type="button" class="btn btn-success w-100" id="lessonModalJoinBtn" style="display: none;">
+                            <i class="fas fa-video me-2"></i>Join Zoom Meeting
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+       @*          <a class="btn btn-outline-primary" id="lessonModalViewDetails" href="#" style="display: none;">
+                    <i class="fas fa-info-circle me-2"></i>View Full Details
+                </a> *@
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="/nobleui/vendors/fullcalendar/main.min.css" rel="stylesheet" />
+<style>
+    /* Professional Calendar Styling */
+    #scheduleCalendar {
+        font-family: inherit;
+    }
+    
+    #scheduleCalendar .fc {
+        background: #fff;
+        border-radius: 8px;
+    }
+    
+    #scheduleCalendar .fc-toolbar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    #scheduleCalendar .fc-button {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    #scheduleCalendar .fc-button:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #212529;
+    }
+    
+    #scheduleCalendar .fc-button-active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+    }
+    
+    #scheduleCalendar .fc-daygrid-day {
+        border-color: #e9ecef;
+    }
+    
+    #scheduleCalendar .fc-col-header-cell {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        padding: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    
+    #scheduleCalendar .fc-timegrid-slot {
+        border-color: #f1f3f5;
+        height: 2.5rem;
+    }
+    
+    #scheduleCalendar .fc-timegrid-event {
+        border-radius: 4px;
+        padding: 8px 10px !important;
+        min-height: 70px !important;
+        overflow: visible !important;
+    }
+    
+    #scheduleCalendar .fc-event {
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+    
+    #scheduleCalendar .fc-event:hover {
+        opacity: 0.9;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        transform: translateY(-1px);
+    }
+    
+    #scheduleCalendar .fc-day-today {
+        background-color: #fffbf0;
+    }
+    
+    /* Month view styling */
+    #scheduleCalendar .fc-daygrid-event { 
+        padding: 2px 4px; 
+    }
+    
+    #scheduleCalendar .fc-daygrid-event .fc-event-title { 
+        font-size: 0.85rem; 
+        line-height: 1.3; 
+    }
+</style>
+
 @section Scripts {
-    <script src="/nobleui/vendors/chartjs/Chart.min.js"></script>
+    <script src="/nobleui/vendors/fullcalendar/main.min.js"></script>
     <script>
         (function(){
-            const state = { data: null, scheduleTab: 'today', scheduleView: 'list', courseTab: 'active' };
+            const state = { data: null, courseTab: 'active', calendar: null };
 
-            function tickClock(){
-                document.getElementById('studentClock').textContent = new Date().toLocaleString();
-            }
-            setInterval(tickClock, 1000);
-            tickClock();
 
             const errorBox = document.getElementById('errorBox');
             const retryBtn = document.getElementById('retryBtn');
@@ -310,47 +465,21 @@
                 return 'lesson-border-upcoming';
             }
 
-            function renderProfileBanner(){
-                const banner = document.getElementById('profileBanner');
-                if (!state.data) return;
-                const p = state.data.profile;
-                const dismissed = sessionStorage.getItem('igb:studentDash:profileDismissed:v1') === 'true';
-                if (p.isComplete || dismissed) { banner.classList.add('d-none'); return; }
-                document.getElementById('profilePct').textContent = `${p.percent}%`;
-                document.getElementById('profileMissing').textContent = (p.missing || []).join(', ') || '—';
-                document.getElementById('profileBar').style.width = `${p.percent}%`;
-                banner.classList.remove('d-none');
-            }
-
-            document.getElementById('dismissProfile').addEventListener('click', () => {
-                sessionStorage.setItem('igb:studentDash:profileDismissed:v1', 'true');
-                renderProfileBanner();
-            });
-
             function renderOverview(){
                 const d = state.data;
-                document.getElementById('studentName').textContent = d.studentName || 'Student';
-                document.getElementById('tipOfDay').textContent = d.tipOfTheDay?.text || '—';
-
                 document.getElementById('cardCourses').textContent = d.overview?.courses?.enrolledCount ?? 0;
                 document.getElementById('cardCoursesCompleted').textContent = d.overview?.courses?.completedCount ?? 0;
 
                 const credits = d.overview?.credits;
                 const remaining = credits?.remaining ?? 0;
-                const total = credits?.total ?? Math.max(remaining + (credits?.used ?? 0), 0);
-                const used = credits?.used ?? 0;
                 document.getElementById('cardCredits').textContent = remaining;
 
                 // low credit styling
                 const creditsCard = document.getElementById('creditsCard');
-                creditsCard.classList.toggle('card-grad-success', !(credits?.isLow));
-                creditsCard.classList.toggle('card-grad-warning', !!(credits?.isLow));
+                creditsCard.classList.toggle('kpi-tile-green', !(credits?.isLow));
+                creditsCard.classList.toggle('kpi-tile-amber', !!(credits?.isLow));
                 document.getElementById('lowCreditBadge').classList.toggle('d-none', !(credits?.isLow));
-                document.getElementById('creditWarning').innerHTML = (credits?.isLow) ? '<span class="text-danger">Low balance!</span>' : '<span class="text-muted">Healthy balance</span>';
-
-                const denom = (used + remaining) || 1;
-                const usedPct = Math.round((used * 100) / denom);
-                document.getElementById('creditsBar').style.width = `${Math.max(0, Math.min(100, 100 - usedPct))}%`;
+                document.getElementById('creditWarning').textContent = (credits?.isLow) ? 'Low balance!' : 'Healthy balance';
 
                 document.getElementById('cardWeekLessons').textContent = d.overview?.lessonsThisWeek?.count ?? 0;
                 document.getElementById('nextLesson').textContent = d.overview?.lessonsThisWeek?.nextLessonStartUtc ? `Next: ${fmtLocal(d.overview.lessonsThisWeek.nextLessonStartUtc)}` : 'Next: —';
@@ -361,142 +490,35 @@
                 pb.textContent = pending;
                 pb.classList.toggle('d-none', pending <= 0);
 
-                // overall progress chart
+                // overall progress
                 const pct = d.overview?.overallProgress?.percent ?? 0;
                 document.getElementById('overallPct').textContent = `${pct}%`;
-                if (typeof Chart !== 'undefined') {
-                    const ctx = document.getElementById('overallProgressChart');
-                    if (ctx) {
-                        if (state._progressChart) { try { state._progressChart.destroy(); } catch {} }
-                        state._progressChart = new Chart(ctx, {
-                            type: 'doughnut',
-                            data: { labels: ['Done','Remaining'], datasets: [{ data: [pct, 100-pct], backgroundColor: ['#0d6efd', '#e9ecef'], borderWidth: 0 }] },
-                            options: { responsive:true, maintainAspectRatio:false, cutout:'70%', plugins: { legend: { display:false }, tooltip: { enabled:false } } }
-                        });
-                    }
-                }
-            }
-
-            function getScheduleItems(){
-                const s = state.data?.schedule;
-                if (!s) return [];
-                if (state.scheduleTab === 'today') return s.today || [];
-                if (state.scheduleTab === 'tomorrow') return s.tomorrow || [];
-                return s.thisWeek || [];
             }
 
             function renderSchedule(){
-                const items = getScheduleItems();
-                const list = document.getElementById('scheduleList');
-                const tl = document.getElementById('scheduleTimeline');
-                const empty = document.getElementById('scheduleEmpty');
-                const label = document.getElementById('scheduleDateLabel');
-
-                const now = new Date();
-                if (state.scheduleTab === 'today') label.textContent = now.toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' });
-                else if (state.scheduleTab === 'tomorrow') {
-                    const d = new Date(now.getTime() + 86400000);
-                    label.textContent = d.toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' });
+                // Initialize calendar if not already done
+                if (!state.calendar) {
+                    initCalendar();
                 } else {
-                    label.textContent = 'Next 7 days';
+                    state.calendar.refetchEvents();
                 }
-
-                empty.classList.toggle('d-none', items.length !== 0);
-                list.classList.toggle('d-none', state.scheduleView !== 'list');
-                tl.classList.toggle('d-none', state.scheduleView !== 'timeline');
-
-                if (!items.length) { list.innerHTML = ''; tl.innerHTML = ''; return; }
-
-                // list view
-                list.innerHTML = items.map(l => {
-                    const start = new Date(l.startUtc).getTime();
-                    const minsToStart = (start - Date.now()) / 60000;
-                    const startingSoon = minsToStart > 0 && minsToStart <= 15;
-                    const canJoinSoon = startingSoon && l.joinUrl;
-                    const canReschedule = minsToStart > 24*60;
-
-                    const timeRemaining = relStart(l.startUtc);
-                    const timeClass = minsToStart <= 60 ? 'text-danger' : (minsToStart <= 180 ? 'text-warning' : 'text-muted');
-
-                    const joinBtn = canJoinSoon
-                        ? `<a class="btn btn-sm btn-primary pulse" target="_blank" href="${l.joinUrl}">Join Class</a>`
-                        : (l.canJoin && l.joinUrl ? `<a class="btn btn-sm btn-primary pulse" target="_blank" href="${l.joinUrl}">Join Now</a>` : `<a class="btn btn-sm btn-outline-secondary" href="/LessonBookings/Details?id=${l.id}">View Details</a>`);
-
-                    const reschedBtn = canReschedule ? `<a class="btn btn-sm btn-outline-warning" title="Reschedule" href="/LessonBookings/Reschedule?id=${l.id}"><i class="fas fa-exchange-alt"></i></a>` : '';
-                    const day = new Date(l.startUtc);
-                    const from = day.toISOString().slice(0,10);
-                    const to = from;
-                    const icalBtn = `<a class="btn btn-sm btn-outline-secondary" title="Add to Calendar" href="/Schedule/ExportIcal?from=${from}&to=${to}"><i class="fas fa-calendar-plus"></i></a>`;
-
-                    const status = statusBadge(l.status, l.canJoin);
-                    const border = leftBorder(l.status, l.canJoin);
-                    const highlight = startingSoon ? 'shadow-sm' : '';
-
-                    return `
-                      <div class="card mb-2 ${border} ${highlight}">
-                        <div class="card-body">
-                          <div class="row g-2 align-items-center">
-                            <div class="col-12 col-md-3">
-                              <div class="fw-semibold fs-5">${fmtTime(l.startUtc)}</div>
-                              <div class="text-muted small">${fmtTime(l.endUtc)}</div>
-                              <div class="text-muted small">${Math.round(l.durationMinutes/60)} hour</div>
-                              <div class="small ${timeClass}">${timeRemaining}</div>
-                            </div>
-                            <div class="col-12 col-md-6">
-                              <div class="fw-semibold"><i class="fas fa-book me-2 text-muted"></i>${l.courseName}</div>
-                              <div class="text-muted small d-flex align-items-center gap-2 mt-1">
-                                <i class="fas fa-user me-1"></i>${l.tutorName}
-                              </div>
-                              <div class="text-muted small mt-1">Topic: <span class="text-muted">Not set</span></div>
-                            </div>
-                            <div class="col-12 col-md-3 d-flex flex-column align-items-md-end gap-2">
-                              <div>${status}</div>
-                              <div class="d-flex gap-2 flex-wrap justify-content-md-end">
-                                ${joinBtn}
-                                ${reschedBtn}
-                                ${icalBtn}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>`;
-                }).join('');
-
-                // timeline view (simple)
-                const sorted = [...items].sort((a,b) => new Date(a.startUtc) - new Date(b.startUtc));
-                tl.innerHTML = `
-                  <div class="position-relative ps-3">
-                    <div style="position:absolute;left:10px;top:0;bottom:0;width:2px;background:#e9ecef;"></div>
-                    ${sorted.map(l => `
-                      <div class="d-flex gap-3 mb-3">
-                        <div style="width:90px" class="text-muted small">${fmtTime(l.startUtc)}</div>
-                        <div class="flex-grow-1">
-                          <div class="fw-semibold">${l.courseName}</div>
-                          <div class="text-muted small">${l.tutorName} • ${fmtTime(l.startUtc)} - ${fmtTime(l.endUtc)}</div>
-                        </div>
-                      </div>
-                    `).join('')}
-                  </div>`;
             }
 
             function renderCourses(){
                 const grid = document.getElementById('courseGrid');
                 const empty = document.getElementById('coursesEmpty');
-                const items = (state.data?.courses?.items || []).map(x => ({...x}));
+                const badge = document.getElementById('coursesTotalBadge');
+                const items = (state.data?.courses?.items || []);
 
-                function isCompleted(c){ return (c.totalTopics || 0) > 0 && (c.coveredTopics || 0) >= (c.totalTopics || 0); }
-                let filtered = items;
-                if (state.courseTab === 'active') filtered = items.filter(c => !isCompleted(c));
-                if (state.courseTab === 'completed') filtered = items.filter(c => isCompleted(c));
+                // Show only recent course bookings (limit to 6 most recent)
+                // The API returns courses ordered by most recent bookings first
+                const recent = items.slice(0, 6);
 
-                const sort = document.getElementById('courseSort').value;
-                if (sort === 'progress_desc') filtered.sort((a,b) => (b.progressPercent||0) - (a.progressPercent||0));
-                if (sort === 'name_asc') filtered.sort((a,b) => (a.courseName||'').localeCompare(b.courseName||''));
+                badge.textContent = `${recent.length} recent`;
+                empty.classList.toggle('d-none', recent.length !== 0);
+                if (!recent.length) { grid.innerHTML = ''; return; }
 
-                empty.classList.toggle('d-none', filtered.length !== 0);
-                if (!filtered.length) { grid.innerHTML = ''; return; }
-
-                grid.innerHTML = filtered.map(c => {
+                grid.innerHTML = recent.map(c => {
                     const img = c.imageUrl ? `<div style="height:120px;background:#f8f9fa url('${c.imageUrl}') center/cover no-repeat;border-radius:10px;"></div>` : `<div style="height:120px;background:#f8f9fa;border-radius:10px;"></div>`;
                     const pct = c.progressPercent || 0;
                     const barClass = pct >= 70 ? 'bg-success' : (pct >= 40 ? 'bg-warning' : 'bg-danger');
@@ -537,7 +559,6 @@
                     if (!res.ok) throw new Error('bad response');
                     state.data = await res.json();
                     renderOverview();
-                    renderProfileBanner();
                     renderSchedule();
                     renderCourses();
                 }catch(e){
@@ -548,24 +569,166 @@
 
             retryBtn.addEventListener('click', () => load());
 
-            // schedule tabs
-            document.querySelectorAll('button[data-tab]').forEach(b => b.addEventListener('click', () => {
-                document.querySelectorAll('button[data-tab]').forEach(x => x.classList.remove('active'));
-                b.classList.add('active');
-                state.scheduleTab = b.getAttribute('data-tab');
-                renderSchedule();
-            }));
-            document.getElementById('listViewBtn').addEventListener('click', () => { state.scheduleView = 'list'; document.getElementById('listViewBtn').classList.add('active'); document.getElementById('timelineViewBtn').classList.remove('active'); renderSchedule(); });
-            document.getElementById('timelineViewBtn').addEventListener('click', () => { state.scheduleView = 'timeline'; document.getElementById('timelineViewBtn').classList.add('active'); document.getElementById('listViewBtn').classList.remove('active'); renderSchedule(); });
+            function fmtDateTime(isoUtc) {
+                if (!isoUtc) return "";
+                const d = new Date(isoUtc);
+                const opts = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+                return new Intl.DateTimeFormat(undefined, opts).format(d);
+            }
 
-            // course tabs + sort
-            document.querySelectorAll('button[data-course-tab]').forEach(b => b.addEventListener('click', () => {
-                document.querySelectorAll('button[data-course-tab]').forEach(x => x.classList.remove('active'));
-                b.classList.add('active');
-                state.courseTab = b.getAttribute('data-course-tab');
-                renderCourses();
-            }));
-            document.getElementById('courseSort').addEventListener('change', () => renderCourses());
+            function initCalendar() {
+                const el = document.getElementById('scheduleCalendar');
+                if (!el || typeof FullCalendar === 'undefined') return;
+
+                const url = '/Schedule/Events?scope=student';
+
+                function esc(s){ return (s||'').toString().replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+                
+                function applyRichTitle(info){
+                    const el = info?.el;
+                    const ev = info?.event;
+                    if (!el || !ev) return;
+                    const p = ev.extendedProps || {};
+                    const course = p.courseName || ev.title || '';
+                    const teacher = p.tutorName || '';
+                    const view = info.view.type;
+                    
+                    const titleEl = el.querySelector('.fc-event-title, .fc-title');
+                    if (!titleEl) return;
+
+                    if (view === 'dayGridMonth') {
+                        const parts = [`<div class="fw-semibold">${esc(course)}</div>`];
+                        if (teacher) parts.push(`<div class="small text-muted">👤 ${esc(teacher)}</div>`);
+                        titleEl.innerHTML = parts.join('');
+                    } else {
+                        const startTime = ev.start ? new Date(ev.start).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '';
+                        const endTime = ev.end ? new Date(ev.end).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '';
+                        
+                        const parts = [
+                            `<div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; color: inherit; line-height: 1.3;">${esc(course)}</div>`,
+                            `<div style="font-size: 0.875rem; margin-bottom: 4px; opacity: 0.95; line-height: 1.4;"><i class="fas fa-user-tie" style="width: 14px; display: inline-block;"></i> ${esc(teacher || 'N/A')}</div>`,
+                            `<div style="font-size: 0.8rem; opacity: 0.9; line-height: 1.3;"><i class="fas fa-clock" style="width: 14px; display: inline-block;"></i> ${startTime} - ${endTime}</div>`
+                        ];
+                        titleEl.innerHTML = parts.join('');
+                        titleEl.style.whiteSpace = 'normal';
+                        titleEl.style.overflow = 'visible';
+                        titleEl.style.height = 'auto';
+                        titleEl.style.lineHeight = '1.5';
+                    }
+                }
+
+                state.calendar = new FullCalendar.Calendar(el, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+                    height: 'auto',
+                    expandRows: true,
+                    nowIndicator: true,
+                    timeZone: 'UTC',
+                    slotMinTime: '00:00:00',
+                    slotMaxTime: '24:00:00',
+                    slotDuration: '00:30:00',
+                    slotLabelInterval: '01:00:00',
+                    eventMinHeight: 70,
+                    eventDidMount: applyRichTitle,
+                    eventRender: applyRichTitle,
+                    events: async (info, success) => {
+                        try {
+                            const res = await fetch(url, { credentials: 'include' });
+                            if (!res.ok) throw new Error('Failed to load events');
+                            const data = await res.json();
+                            success(data.map(e => ({
+                                id: e.id,
+                                title: e.title,
+                                start: e.start,
+                                end: e.end,
+                                color: e.color,
+                                extendedProps: {
+                                    status: e.status,
+                                    joinUrl: e.joinUrl,
+                                    canJoin: e.canJoin,
+                                    zoomMeetingId: e.zoomMeetingId,
+                                    zoomPassword: e.zoomPassword,
+                                    courseName: e.courseName,
+                                    tutorName: e.tutorName
+                                }
+                            })));
+                        } catch (error) {
+                            console.error('Error loading calendar events:', error);
+                            success([]);
+                        }
+                    },
+                    eventClick: (info) => {
+                        info.jsEvent.preventDefault();
+                        const ev = info.event;
+                        const p = ev.extendedProps || {};
+                        const start = fmtDateTime(ev.start);
+                        const end = fmtTime(ev.end);
+                        
+                        // Populate modal
+                        const modalTitle = document.getElementById('lessonModalTitle');
+                        const modalCourse = document.getElementById('lessonModalCourse');
+                        const modalTutor = document.getElementById('lessonModalTutor');
+                        const modalTime = document.getElementById('lessonModalTime');
+                        const statusBadge = document.getElementById('lessonModalStatusBadge');
+                        // const viewDetailsLink = document.getElementById('lessonModalViewDetails');
+                        
+                        if (modalTitle) modalTitle.textContent = p.courseName || 'Lesson Details';
+                        if (modalCourse) modalCourse.textContent = p.courseName || 'N/A';
+                        if (modalTutor) modalTutor.textContent = p.tutorName || 'N/A';
+                        if (modalTime) modalTime.textContent = `${start} - ${end}`;
+                        // if (viewDetailsLink && ev.id) {
+                        //     viewDetailsLink.href = `/LessonBookings/Details?id=${ev.id}`;
+                        //     viewDetailsLink.style.display = 'inline-block';
+                        // }
+                        
+                        // Status badge
+                        if (statusBadge) {
+                            const status = (p.status || '').toLowerCase();
+                            statusBadge.className = 'badge ';
+                            if (status.includes('completed')) statusBadge.className += 'bg-success';
+                            else if (status.includes('cancelled') || status.includes('rejected')) statusBadge.className += 'bg-secondary';
+                            else if (status.includes('scheduled') || status.includes('rescheduled')) statusBadge.className += 'bg-primary';
+                            else statusBadge.className += 'bg-warning';
+                            statusBadge.textContent = p.status || 'N/A';
+                        }
+                        
+                        // Zoom info
+                        const zoomSection = document.getElementById('lessonModalZoom');
+                        if (zoomSection) {
+                            if (p.zoomMeetingId || p.joinUrl) {
+                                zoomSection.style.display = 'block';
+                                const meetingId = document.getElementById('lessonModalMeetingId');
+                                const password = document.getElementById('lessonModalPassword');
+                                const joinBtn = document.getElementById('lessonModalJoinBtn');
+                                
+                                if (meetingId) meetingId.textContent = p.zoomMeetingId || 'N/A';
+                                if (password) password.textContent = p.zoomPassword || 'N/A';
+                                
+                                if (joinBtn) {
+                                    if (p.canJoin && p.joinUrl) {
+                                        joinBtn.style.display = 'inline-block';
+                                        joinBtn.onclick = () => window.open(p.joinUrl, '_blank');
+                                    } else {
+                                        joinBtn.style.display = 'none';
+                                    }
+                                }
+                            } else {
+                                zoomSection.style.display = 'none';
+                            }
+                        }
+                        
+                        // Show modal
+                        const modalEl = document.getElementById('lessonDetailsModal');
+                        if (modalEl) {
+                            const modal = new bootstrap.Modal(modalEl);
+                            modal.show();
+                        }
+                    }
+                });
+
+                state.calendar.render();
+            }
+
 
             // notification hook (refresh dashboard after relevant events)
             window.igbStudentDashboard = {

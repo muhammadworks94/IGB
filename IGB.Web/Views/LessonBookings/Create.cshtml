@@ -33,74 +33,117 @@
                 <form asp-action="Create" method="post">
                     @Html.AntiForgeryToken()
 
-                    <div class="mb-3">
-                        <label class="form-label">Step 1: Select Course</label>
-                        <select asp-for="CourseBookingId" class="form-select" id="courseBookingId">
-                            <option value="">-- Select --</option>
-                            @foreach (var b in bookings)
-                            {
-                                <option value="@b.Id">
-                                    @(b.Course?.Grade?.Curriculum?.Name) / @(b.Course?.Grade?.Name) / @(b.Course?.Name)
-                                </option>
-                            }
-                        </select>
-                        <span asp-validation-for="CourseBookingId" class="text-danger"></span>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Step 2: Start Date</label>
-                            <input asp-for="DateFrom" class="form-control" type="date" id="dateFrom" />
-                            <span asp-validation-for="DateFrom" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">End Date (optional)</label>
-                            <input asp-for="DateTo" class="form-control" type="date" id="dateTo" />
-                            <span asp-validation-for="DateTo" class="text-danger"></span>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Step 1: Select Course <span class="text-danger">*</span></label>
+                            <select asp-for="CourseBookingId" class="form-select" id="courseBookingId">
+                                <option value="">-- Select a course --</option>
+                                @foreach (var b in bookings)
+                                {
+                                    <option value="@b.Id">
+                                        @(b.Course?.Grade?.Curriculum?.Name) / @(b.Course?.Grade?.Name) / @(b.Course?.Name)
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="CourseBookingId" class="text-danger small"></span>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">Lesson Duration</label>
+                            <label class="form-label fw-semibold">Step 2: Start Date <span class="text-danger">*</span></label>
+                            <input asp-for="DateFrom" class="form-control" type="date" id="dateFrom" />
+                            <span asp-validation-for="DateFrom" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">End Date</label>
+                            <input asp-for="DateTo" class="form-control" type="date" id="dateTo" />
+                            <span asp-validation-for="DateTo" class="text-danger small"></span>
+                            <small class="text-muted">Optional - defaults to start date</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Lesson Duration <span class="text-danger">*</span></label>
                             <select asp-for="DurationMinutes" class="form-select" id="durationMinutes">
                                 <option value="30">30 minutes</option>
                                 <option value="45">45 minutes</option>
                                 <option value="60" selected>60 minutes</option>
                             </select>
-                            <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                            <span asp-validation-for="DurationMinutes" class="text-danger small"></span>
                         </div>
                     </div>
 
                     <hr class="my-4" />
 
-                    <div class="mb-2">
-                        <label class="form-label">Step 3: Select 3 Time Slot Options</label>
-                        <div class="text-muted small">Click three available slots in the calendar. They’ll populate Option 1–3.</div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Step 3: Select 3 Time Slot Options</label>
+                        <div class="text-muted small">Click three available slots in the calendar below. They'll populate Option 1–3 automatically.</div>
                     </div>
 
                     <div class="row g-3">
                         <div class="col-lg-8">
-                            <div id="availabilityMsg" class="alert alert-info d-none"></div>
-                            <div id="studentAvailabilityCalendar"></div>
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-calendar-alt me-2"></i>Tutor Availability Calendar
+                                        </h6>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-secondary" id="calendarPrev">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" id="calendarToday">Today</button>
+                                            <button type="button" class="btn btn-outline-secondary" id="calendarNext">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div id="availabilityMsg" class="alert alert-info d-none mb-3"></div>
+                                    <div id="studentAvailabilityCalendar"></div>
+                                    <div class="mt-3 pt-3 border-top">
+                                        <div class="d-flex flex-wrap gap-3 small">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="rounded" style="width: 16px; height: 16px; background-color: #d1e7dd; border: 1px solid #a3cfbb;"></div>
+                                                <span class="text-muted">Available Slot</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="rounded" style="width: 16px; height: 16px; background-color: #0d6efd; border: 1px solid #0a58ca;"></div>
+                                                <span class="text-muted">Selected Slot</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-clock me-2"></i>Selected Time Slots
+                                    </h6>
+                                </div>
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <label class="form-label">Option 1</label>
+                                        <label class="form-label fw-semibold">Option 1 <span class="text-danger">*</span></label>
                                         <input asp-for="Option1" class="form-control" type="datetime-local" id="opt1" />
-                                        <span asp-validation-for="Option1" class="text-danger"></span>
+                                        <span asp-validation-for="Option1" class="text-danger small"></span>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Option 2</label>
+                                        <label class="form-label fw-semibold">Option 2 <span class="text-danger">*</span></label>
                                         <input asp-for="Option2" class="form-control" type="datetime-local" id="opt2" />
-                                        <span asp-validation-for="Option2" class="text-danger"></span>
+                                        <span asp-validation-for="Option2" class="text-danger small"></span>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Option 3</label>
+                                        <label class="form-label fw-semibold">Option 3 <span class="text-danger">*</span></label>
                                         <input asp-for="Option3" class="form-control" type="datetime-local" id="opt3" />
-                                        <span asp-validation-for="Option3" class="text-danger"></span>
+                                        <span asp-validation-for="Option3" class="text-danger small"></span>
                                     </div>
-                                    <button type="button" class="btn btn-outline-secondary w-100" id="clearSlotsBtn">Clear selected slots</button>
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="clearSlotsBtn">
+                                        <i class="fas fa-times me-2"></i>Clear All Slots
+                                    </button>
+                                    <div class="text-muted small mt-2">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Select slots from the calendar or enter manually
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -118,6 +161,130 @@
     </div>
 </div>
 
+<link href="/nobleui/vendors/fullcalendar/main.min.css" rel="stylesheet" />
+
+<style>
+    #studentAvailabilityCalendar {
+        font-family: inherit;
+    }
+    
+    /* FullCalendar Professional Styling */
+    #studentAvailabilityCalendar .fc {
+        background: #fff;
+        border-radius: 8px;
+    }
+    
+    .fc-toolbar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .fc-button {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .fc-button:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #212529;
+    }
+    
+    .fc-button-active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+    }
+    
+    .fc-button-active:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+    
+    .fc-daygrid-day {
+        border-color: #e9ecef;
+    }
+    
+    .fc-col-header-cell {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        padding: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    
+    .fc-timegrid-slot {
+        border-color: #f1f3f5;
+        height: 2.5rem;
+    }
+    
+    .fc-timegrid-slot-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        padding: 0.25rem;
+    }
+    
+    .fc-timegrid-now-indicator-line {
+        border-color: #dc3545;
+        border-width: 2px;
+    }
+    
+    .fc-event {
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 0.8rem;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .fc-event:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .fc-event-title {
+        padding: 0;
+    }
+    
+    .fc-day-today {
+        background-color: #fffbf0;
+    }
+    
+    .fc-timegrid-event {
+        border-radius: 4px;
+        margin: 1px 2px;
+    }
+    
+    .fc-event-selected {
+        border: 2px solid #0d6efd !important;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+    }
+    
+    .fc-event-available {
+        background-color: #d1e7dd;
+        border-color: #a3cfbb;
+        color: #0f5132;
+    }
+    
+    .fc-event-selected-slot {
+        background-color: #0d6efd !important;
+        border-color: #0a58ca !important;
+        color: #fff !important;
+        font-weight: 600;
+    }
+</style>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="/nobleui/vendors/fullcalendar/main.min.js"></script>
@@ -127,24 +294,42 @@
         if (!calEl || typeof FullCalendar === "undefined") return;
 
         const sel = [];
+        let calendar = null;
+
         function toLocalInputValue(d) {
           const pad = n => String(n).padStart(2, "0");
           return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
         }
+
         function syncOptions() {
           document.getElementById("opt1").value = sel[0] ? toLocalInputValue(sel[0]) : "";
           document.getElementById("opt2").value = sel[1] ? toLocalInputValue(sel[1]) : "";
           document.getElementById("opt3").value = sel[2] ? toLocalInputValue(sel[2]) : "";
+          updateSelectedEvents();
+        }
+
+        function updateSelectedEvents() {
+          if (!calendar) return;
+          const events = calendar.getEvents();
+          events.forEach(event => {
+            const eventTime = new Date(event.start);
+            const isSelected = sel.some(s => Math.abs(s - eventTime) < 60000); // Within 1 minute
+            event.setProp('classNames', isSelected ? ['fc-event-selected-slot'] : ['fc-event-available']);
+          });
         }
 
         document.getElementById("clearSlotsBtn")?.addEventListener("click", function () {
           sel.splice(0, sel.length);
           syncOptions();
-          cal.refetchEvents();
+          if (calendar) {
+            calendar.refetchEvents();
+          }
         });
 
-        async function loadSlots() {
-          const bookingId = document.getElementById("courseBookingId").value;
+        async function loadSlots(fetchInfo) {
+          console.log('loadSlots called', { fetchInfo });
+          
+          const bookingId = document.getElementById("courseBookingId")?.value;
           const msg = document.getElementById("availabilityMsg");
           const showMsg = (html, kind) => {
             if (!msg) return;
@@ -154,54 +339,228 @@
           };
           const hideMsg = () => { if (msg) msg.classList.add("d-none"); };
 
-          if (!bookingId) { showMsg("Select a course to see available tutor slots.", "info"); return []; }
-          const df = document.getElementById("dateFrom").value;
-          const dt = document.getElementById("dateTo").value || df;
-          const duration = document.getElementById("durationMinutes").value;
-          if (!df) { showMsg("Select a start date to see available tutor slots.", "info"); return []; }
+          if (!bookingId) { 
+            showMsg("<i class='fas fa-info-circle me-2'></i>Select a course to see available tutor slots.", "info"); 
+            return []; 
+          }
+          
+          const df = document.getElementById("dateFrom")?.value;
+          const dt = document.getElementById("dateTo")?.value || df;
+          const duration = document.getElementById("durationMinutes")?.value || 60;
+          
+          if (!df) { 
+            showMsg("<i class='fas fa-info-circle me-2'></i>Select a start date to see available tutor slots.", "info"); 
+            return []; 
+          }
 
-          const fromUtc = new Date(df + "T00:00:00").toISOString();
-          const toUtc = new Date(dt + "T23:59:59").toISOString();
+          // Always prioritize form inputs over calendar fetchInfo
+          // Only use fetchInfo if form inputs aren't available
+          let fromDate, toDate;
+          if (df) {
+            // Use form inputs - these are the user's selected date range
+            fromDate = new Date(df + "T00:00:00Z");
+            toDate = new Date((dt || df) + "T23:59:59Z");
+            console.log('Using form date inputs:', { df, dt, fromDate, toDate });
+          } else if (fetchInfo && fetchInfo.start && fetchInfo.end) {
+            // Fallback to calendar's view range if form inputs aren't set
+            fromDate = fetchInfo.start;
+            toDate = fetchInfo.end;
+            console.log('Using calendar fetchInfo dates:', { fromDate, toDate });
+          } else {
+            // No dates available
+            showMsg("<i class='fas fa-info-circle me-2'></i>Select a start date to see available tutor slots.", "info"); 
+            return [];
+          }
+
+          const fromUtc = fromDate.toISOString();
+          const toUtc = toDate.toISOString();
           const url = `/api/lessons/availability?courseBookingId=${encodeURIComponent(bookingId)}&fromUtc=${encodeURIComponent(fromUtc)}&toUtc=${encodeURIComponent(toUtc)}&durationMinutes=${encodeURIComponent(duration)}`;
-          const res = await fetch(url, { credentials: "include" });
-          if (!res.ok) { showMsg("Unable to load tutor availability right now. Please try again.", "warning"); return []; }
-          const data = await res.json();
-          if (!data.tutorAssigned) { showMsg("No tutor is assigned to this course yet. Please contact admin.", "warning"); return []; }
-          const slots = (data.slots || []);
-          if (slots.length === 0) { showMsg("No available slots found for the selected range. Try a different date range or ask your tutor to set availability.", "info"); return []; }
-          hideMsg();
-          return slots.map(s => ({
-            title: "Available",
-            start: s.startUtc,
-            end: s.endUtc,
-            color: "#d1e7dd"
-          }));
+          
+          console.log('Fetching availability from:', url);
+          console.log('Request parameters:', { bookingId, fromUtc, toUtc, duration });
+          
+          try {
+            const res = await fetch(url, { 
+              credentials: "include",
+              headers: {
+                'Accept': 'application/json'
+              }
+            });
+            
+            console.log('API Response status:', res.status, res.statusText);
+            
+            if (!res.ok) {
+              const errorText = await res.text();
+              console.error('API Error:', res.status, errorText);
+              showMsg(`<i class='fas fa-exclamation-triangle me-2'></i>Unable to load tutor availability (${res.status}). Please try again.`, "warning"); 
+              return []; 
+            }
+            
+            const data = await res.json();
+            console.log('API Response data:', data);
+            console.log('Full API response:', JSON.stringify(data, null, 2));
+            
+            if (!data.tutorAssigned) { 
+              showMsg("<i class='fas fa-exclamation-triangle me-2'></i>No tutor is assigned to this course yet. Please contact admin.", "warning"); 
+              return []; 
+            }
+            
+            const slots = (data.slots || []);
+            console.log('Loaded slots count:', slots.length);
+            console.log('Slots data:', slots);
+            
+            if (slots.length === 0) { 
+              showMsg("<i class='fas fa-info-circle me-2'></i>No available slots found for the selected date range (" + df + (dt && dt !== df ? " to " + dt : "") + "). Try a different date range or ask your tutor to set availability.", "info"); 
+              return []; 
+            }
+            
+            hideMsg();
+            
+            return slots.map(s => {
+              const eventTime = new Date(s.startUtc);
+              const isSelected = sel.some(selected => Math.abs(selected - eventTime) < 60000);
+              return {
+                title: "Available",
+                start: s.startUtc,
+                end: s.endUtc,
+                classNames: isSelected ? ['fc-event-selected-slot'] : ['fc-event-available'],
+                extendedProps: {
+                  slotStart: s.startUtc
+                }
+              };
+            });
+          } catch (error) {
+            console.error('Error loading slots:', error);
+            showMsg("<i class='fas fa-exclamation-triangle me-2'></i>Error loading availability: " + error.message, "danger");
+            return [];
+          }
         }
 
-        const cal = new FullCalendar.Calendar(calEl, {
+        // Get initial date from form or use today
+        const initialDate = document.getElementById("dateFrom")?.value 
+          ? new Date(document.getElementById("dateFrom").value + "T00:00:00")
+          : new Date();
+        
+        calendar = new FullCalendar.Calendar(calEl, {
           initialView: "timeGridWeek",
-          height: 650,
+          initialDate: initialDate,
+          headerToolbar: false,
+          height: "auto",
+          aspectRatio: 1.35,
           nowIndicator: true,
+          nowIndicatorClass: "fc-now-indicator",
           allDaySlot: false,
-          events: async function (fetchInfo, successCallback) {
-            successCallback(await loadSlots());
+          slotMinTime: "00:00:00",
+          slotMaxTime: "24:00:00",
+          slotDuration: "00:30:00",
+          slotLabelInterval: "01:00:00",
+          slotLabelFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
           },
+          events: async function (fetchInfo, successCallback, failureCallback) {
+            console.log('Calendar events function called', fetchInfo);
+            
+            // Check if form is ready before loading events
+            const bookingId = document.getElementById("courseBookingId")?.value;
+            const dateFrom = document.getElementById("dateFrom")?.value;
+            
+            if (!bookingId || !dateFrom) {
+              console.log('Form not ready - skipping event load', { bookingId, dateFrom });
+              successCallback([]);
+              return;
+            }
+            
+            try {
+              const events = await loadSlots(fetchInfo);
+              console.log('Successfully loaded events:', events.length);
+              successCallback(events);
+              setTimeout(updateSelectedEvents, 100);
+            } catch (error) {
+              console.error('Failed to load events:', error);
+              if (failureCallback) {
+                failureCallback(error);
+              }
+              successCallback([]);
+            }
+          },
+          eventDisplay: 'block',
+          eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          },
+          dayHeaderFormat: {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short'
+          },
+          firstDay: 1,
+          locale: 'en',
           eventClick: function (info) {
             const dt = new Date(info.event.start);
             const key = dt.toISOString();
-            if (sel.find(x => x.toISOString() === key)) return;
-            if (sel.length >= 3) sel.shift();
-            sel.push(dt);
-            sel.sort((a,b) => a - b);
+            const existingIndex = sel.findIndex(x => Math.abs(x - dt) < 60000);
+            
+            if (existingIndex >= 0) {
+              // Remove if already selected
+              sel.splice(existingIndex, 1);
+            } else {
+              // Add if not selected
+              if (sel.length >= 3) {
+                sel.shift(); // Remove oldest selection
+              }
+              sel.push(dt);
+              sel.sort((a, b) => a - b);
+            }
+            
             syncOptions();
+            info.event.setProp('classNames', sel.some(s => Math.abs(s - dt) < 60000) ? ['fc-event-selected-slot'] : ['fc-event-available']);
+          },
+          eventContent: function(arg) {
+            const isSelected = sel.some(s => Math.abs(s - new Date(arg.event.start)) < 60000);
+            const title = isSelected ? `Selected: ${arg.event.title}` : arg.event.title;
+            return {
+              html: `<div class="fc-event-title">${title}</div>`
+            };
           }
         });
 
-        ["courseBookingId","dateFrom","dateTo","durationMinutes"].forEach(id => {
-          document.getElementById(id)?.addEventListener("change", () => cal.refetchEvents());
+        // Custom navigation buttons
+        document.getElementById("calendarPrev")?.addEventListener("click", () => {
+          calendar.prev();
+        });
+        document.getElementById("calendarNext")?.addEventListener("click", () => {
+          calendar.next();
+        });
+        document.getElementById("calendarToday")?.addEventListener("click", () => {
+          calendar.today();
         });
 
-        cal.render();
+        ["courseBookingId","dateFrom","dateTo","durationMinutes"].forEach(id => {
+          document.getElementById(id)?.addEventListener("change", () => {
+            console.log('Filter changed:', id);
+            if (calendar) {
+              calendar.refetchEvents();
+            }
+          });
+        });
+
+        calendar.render();
+        console.log('Calendar rendered');
+        
+        // Try to load events after a short delay if form is already filled
+        setTimeout(() => {
+          const bookingId = document.getElementById("courseBookingId")?.value;
+          const dateFrom = document.getElementById("dateFrom")?.value;
+          if (bookingId && dateFrom && calendar) {
+            console.log('Triggering initial event load - form is ready');
+            calendar.refetchEvents();
+          } else {
+            console.log('Form not ready for initial load', { bookingId, dateFrom });
+          }
+        }, 500);
       })();
     </script>
 }

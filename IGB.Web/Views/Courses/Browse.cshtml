@@ -1,63 +1,130 @@
-@model List<IGB.Domain.Entities.Course>
+@model IGB.Web.ViewModels.Student.BrowseCoursesViewModel
 @{
     ViewData["Title"] = "Browse Courses";
+    
+    var filters = new List<PageHeaderFilter>();
+    
+    if (Model.Curricula.Count > 0)
+    {
+        var curriculumOptions = Model.Curricula.Select(c => new KeyValuePair<string, string>(c.Id.ToString(), c.Name)).Prepend(new KeyValuePair<string, string>("", "All")).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        filters.Add(new PageHeaderFilter(
+            Name: "curriculumId",
+            Label: "Curriculum",
+            Type: "select",
+            Value: Model.CurriculumId?.ToString(),
+            Options: curriculumOptions
+        ));
+    }
+    
+    if (Model.Grades.Count > 0)
+    {
+        var gradeOptions = Model.Grades.Select(g => new KeyValuePair<string, string>(g.Id.ToString(), g.Name)).Prepend(new KeyValuePair<string, string>("", "All")).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        filters.Add(new PageHeaderFilter(
+            Name: "gradeId",
+            Label: "Grade",
+            Type: "select",
+            Value: Model.GradeId?.ToString(),
+            Options: gradeOptions
+        ));
+    }
+    
+    if (Model.Courses.Count > 0)
+    {
+        var courseOptions = Model.Courses.Select(c => new KeyValuePair<string, string>(c.Id.ToString(), c.Name)).Prepend(new KeyValuePair<string, string>("", "All")).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        filters.Add(new PageHeaderFilter(
+            Name: "courseId",
+            Label: "Course",
+            Type: "select",
+            Value: Model.CourseId?.ToString(),
+            Options: courseOptions
+        ));
+    }
+    
+    var actionButtons = new List<PageHeaderActionButton>();
+    if (!string.IsNullOrWhiteSpace(Model.Query) || Model.CurriculumId.HasValue || Model.GradeId.HasValue || Model.CourseId.HasValue)
+    {
+        actionButtons.Add(new PageHeaderActionButton(
+            Text: "Reset",
+            Url: Url.Action("Browse", "Courses"),
+            Icon: "fas fa-times me-1",
+            ButtonType: "outline-secondary"
+        ));
+    }
+    
+    var pageHeader = new PageHeaderViewModel(
+        Title: "Browse Courses",
+        Icon: "fas fa-search",
+        Breadcrumbs: new List<BreadcrumbItem>
+        {
+            new("Home", Url.Action("Index", "Home")),
+            new("Browse Courses")
+        },
+        Subtitle: "Request booking for a course (Admin approval required).",
+        Search: new PageHeaderSearch(
+            QueryParamName: "q",
+            CurrentValue: Model.Query,
+            Placeholder: "Search courses..."
+        ),
+        Filters: filters.Count > 0 ? filters : null,
+        ActionButtons: actionButtons.Count > 0 ? actionButtons : null
+    );
 }
 
-@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: "Browse Courses",
-    Icon: "fas fa-search",
-    Breadcrumbs: new List<BreadcrumbItem>
-    {
-        new("Home", Url.Action("Index", "Home")),
-        new("Browse Courses")
-    },
-    Subtitle: "Request booking for a course (Admin approval required)."
-))
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="container-fluid">
     <div class="card">
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                    <tr>
-                        <th>Curriculum</th>
-                        <th>Grade</th>
-                        <th>Course</th>
-                        <th>Credits</th>
-                        <th class="text-end">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var c in Model)
-                    {
+            @if (Model.Items.Count == 0)
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-search fa-3x mb-3"></i>
+                    <div>No courses found.</div>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
                         <tr>
-                            <td>@c.Grade?.Curriculum?.Name</td>
-                            <td>@c.Grade?.Name</td>
-                            <td>@c.Name</td>
-                            <td>@c.CreditCost</td>
-                            <td class="text-end">
-                                <form asp-action="Book" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="courseId" value="@c.Id" />
-                                    <button type="submit" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-calendar-plus me-1"></i>Book
-                                    </button>
-                                </form>
-                            </td>
+                            <th>Curriculum</th>
+                            <th>Grade</th>
+                            <th>Course</th>
+                            <th>Credits</th>
+                            <th class="text-end">Action</th>
                         </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                        @foreach (var c in Model.Items)
+                        {
+                            <tr>
+                                <td>@c.Curriculum</td>
+                                <td>@c.Grade</td>
+                                <td>@c.Name</td>
+                                <td>@c.CreditCost</td>
+                                <td class="text-end">
+                                    <form asp-action="Book" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="courseId" value="@c.Id" />
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-calendar-plus me-1"></i>Book
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
     </div>
 
-    <div class="mt-3">
-        <a asp-controller="CourseBookings" asp-action="My" class="btn btn-outline-secondary">
-            <i class="fas fa-list me-2"></i>My Bookings
-        </a>
-    </div>
+    @if (Model.Pagination.TotalCount > 0)
+    {
+        <partial name="Components/_Pagination" model="Model.Pagination" />
+    }
 </div>
 
 

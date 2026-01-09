@@ -7,6 +7,7 @@ public class MissingClassesViewModel
     public DateTime? From { get; set; }
     public DateTime? To { get; set; }
 
+    public PaginationViewModel Pagination { get; set; } = new(1, 25, 0, "MissingClasses", "Reports");
     public List<Row> Rows { get; set; } = new();
 
     public record Row(long LessonId, string CourseName, string StudentName, string TutorName, DateTimeOffset ScheduledStartUtc, bool StudentAttended, bool TutorAttended, string? Note);

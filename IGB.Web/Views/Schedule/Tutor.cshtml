@@ -125,14 +125,146 @@
     {
         <div class="card">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="mb-0">Calendar</h5>
-                    <div class="text-muted small">Click a lesson to start class when available.</div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Calendar</h5>
+                    <div class="text-muted small">
+                        <i class="fas fa-circle text-primary me-1"></i>Scheduled 
+                        <i class="fas fa-circle text-info ms-2 me-1"></i>Rescheduled 
+                        <i class="fas fa-circle text-success ms-2 me-1"></i>Completed 
+                        <i class="fas fa-circle text-secondary ms-2 me-1"></i>Cancelled 
+                        <i class="fas fa-circle text-warning ms-2 me-1"></i>Pending
+                    </div>
                 </div>
+                <style>
+                  /* Month view styling */
+                  .fc-daygrid-event { padding: 2px 4px; }
+                  .fc-daygrid-event .fc-event-title { font-size: 0.85rem; line-height: 1.3; }
+                  
+                  /* Week and Day view styling - enhanced for visibility */
+                  .fc-timegrid-event { 
+                    padding: 8px 10px !important; 
+                    min-height: 70px !important;
+                    border-radius: 6px;
+                    overflow: visible !important;
+                  }
+                  .fc-timegrid-event .fc-event-title { 
+                    font-size: 0.95rem !important; 
+                    line-height: 1.6 !important; 
+                    font-weight: 500;
+                    white-space: normal !important;
+                    overflow: visible !important;
+                    height: auto !important;
+                  }
+                  .fc-timegrid-event .fc-event-title div {
+                    margin-bottom: 4px;
+                    display: block;
+                  }
+                  .fc-timegrid-event .fc-event-title div:last-child {
+                    margin-bottom: 0;
+                  }
+                  
+                  /* Ensure short events also have enough height */
+                  .fc-timegrid-event-short { 
+                    min-height: 70px !important;
+                  }
+                  .fc-timegrid-event.fc-event-short { 
+                    min-height: 70px !important;
+                  }
+                  
+                  /* General event styling */
+                  .fc-event { cursor: pointer; border-radius: 4px; }
+                  .fc-event:hover { opacity: 0.9; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transform: translateY(-1px); }
+                  .igb-fc-title { font-weight: 600; }
+                  .igb-fc-meta { font-size: 0.85rem; opacity: 0.9; }
+                  
+                  /* Prevent text clipping */
+                  .fc-timegrid-event .fc-event-main {
+                    overflow: visible !important;
+                    height: auto !important;
+                  }
+                  .fc-timegrid-event .fc-event-main-frame {
+                    height: auto !important;
+                    min-height: 60px !important;
+                  }
+                </style>
                 <div id="scheduleCalendar"></div>
             </div>
         </div>
     }
+</div>
+
+<!-- Lesson Details Modal -->
+<div class="modal fade" id="lessonDetailsModal" tabindex="-1" aria-labelledby="lessonDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lessonDetailsModalLabel">
+                    <i class="fas fa-calendar-check me-2"></i><span id="lessonModalTitle">Lesson Details</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-book text-primary me-2"></i>
+                            <div>
+                                <div class="text-muted small">Course / Subject</div>
+                                <div class="fw-semibold" id="lessonModalCourse">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-user text-info me-2"></i>
+                            <div>
+                                <div class="text-muted small">Student</div>
+                                <div class="fw-semibold" id="lessonModalStudent">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-clock text-warning me-2"></i>
+                            <div>
+                                <div class="text-muted small">Time</div>
+                                <div class="fw-semibold" id="lessonModalTime">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-info-circle text-secondary me-2"></i>
+                            <div>
+                                <div class="text-muted small">Status</div>
+                                <div>
+                                    <span class="badge" id="lessonModalStatusBadge">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" id="lessonModalZoom" style="display: none;">
+                        <hr />
+                        <h6 class="mb-3"><i class="fas fa-video me-2"></i>Zoom Meeting</h6>
+                        <div class="mb-2">
+                            <div class="text-muted small">Meeting ID</div>
+                            <div class="fw-semibold" id="lessonModalMeetingId">-</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-muted small">Password</div>
+                            <div class="fw-semibold" id="lessonModalPassword">-</div>
+                        </div>
+                        <button type="button" class="btn btn-success w-100" id="lessonModalJoinBtn" style="display: none;">
+                            <i class="fas fa-video me-2"></i>Start Class
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -179,6 +311,7 @@
           '&to=@(Model.To?.ToString("yyyy-MM-dd") ?? "")';
 
         function esc(s){ return (s||'').toString().replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+        
         function applyRichTitle(info){
           const el = info?.el;
           const ev = info?.event;
@@ -186,11 +319,56 @@
           const p = ev.extendedProps || {};
           const course = p.courseName || ev.title || '';
           const student = p.studentName || '';
-          const titleEl = el.querySelector('.fc-event-title, .fc-title');
-          if (!titleEl) return;
-          const parts = [`<div class="igb-fc-title">${esc(course)}</div>`];
-          if (student) parts.push(`<div class="igb-fc-meta">Student: ${esc(student)}</div>`);
-          titleEl.innerHTML = parts.join('');
+          const view = info.view.type;
+          
+          // Customize based on view type
+          if (view === 'dayGridMonth') {
+            // Month view: show course and student in compact format
+            const titleEl = el.querySelector('.fc-event-title, .fc-title');
+            if (titleEl) {
+              const parts = [`<div class="fw-semibold">${esc(course)}</div>`];
+              if (student) parts.push(`<div class="small text-muted">👤 ${esc(student)}</div>`);
+              titleEl.innerHTML = parts.join('');
+            }
+          } else {
+            // Week and Day views: show more details with better visibility
+            const titleEl = el.querySelector('.fc-event-title, .fc-title');
+            if (titleEl) {
+              // Ensure event has enough height
+              if (el.classList.contains('fc-timegrid-event')) {
+                el.style.minHeight = '70px';
+                el.style.padding = '8px 10px';
+                el.style.overflow = 'visible';
+                
+                // Also set on parent containers
+                const main = el.querySelector('.fc-event-main');
+                if (main) {
+                  main.style.overflow = 'visible';
+                  main.style.height = 'auto';
+                }
+                const mainFrame = el.querySelector('.fc-event-main-frame');
+                if (mainFrame) {
+                  mainFrame.style.height = 'auto';
+                  mainFrame.style.minHeight = '60px';
+                }
+              }
+              
+              const startTime = fmtTime(ev.start);
+              const endTime = fmtTime(ev.end);
+              
+              const parts = [
+                `<div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; color: inherit; line-height: 1.3;">${esc(course)}</div>`,
+                `<div style="font-size: 0.875rem; margin-bottom: 4px; opacity: 0.95; line-height: 1.4;"><i class="fas fa-user" style="width: 14px; display: inline-block;"></i> ${esc(student || 'N/A')}</div>`,
+                `<div style="font-size: 0.8rem; opacity: 0.9; line-height: 1.3;"><i class="fas fa-clock" style="width: 14px; display: inline-block;"></i> ${startTime} - ${endTime}</div>`
+              ];
+              titleEl.innerHTML = parts.join('');
+              titleEl.style.whiteSpace = 'normal';
+              titleEl.style.overflow = 'visible';
+              titleEl.style.textOverflow = 'clip';
+              titleEl.style.height = 'auto';
+              titleEl.style.lineHeight = '1.5';
+            }
+          }
         }
 
         const cal = new FullCalendar.Calendar(el, {
@@ -200,6 +378,11 @@
           expandRows: true,
           nowIndicator: true,
           timeZone: '@Model.CalendarTimeZone',
+          slotMinTime: '00:00:00',
+          slotMaxTime: '24:00:00',
+          slotDuration: '00:30:00',
+          slotLabelInterval: '01:00:00',
+          eventMinHeight: 70,
           eventDidMount: applyRichTitle,
           eventRender: applyRichTitle, // v4 fallback
           events: async (info, success) => {
@@ -223,8 +406,67 @@
             })));
           },
           eventClick: (info) => {
-            const p = info.event.extendedProps || {};
-            if (p.canJoin && p.joinUrl) window.open(p.joinUrl, '_blank');
+            info.jsEvent.preventDefault();
+            const ev = info.event;
+            const p = ev.extendedProps || {};
+            const start = fmtDateTime(ev.start);
+            const end = fmtTime(ev.end);
+            
+            // Populate modal - check if elements exist before setting
+            const modalTitle = document.getElementById('lessonModalTitle');
+            const modalCourse = document.getElementById('lessonModalCourse');
+            const modalStudent = document.getElementById('lessonModalStudent');
+            const modalTime = document.getElementById('lessonModalTime');
+            const statusBadge = document.getElementById('lessonModalStatusBadge');
+            
+            if (modalTitle) modalTitle.textContent = p.courseName || 'Lesson Details';
+            if (modalCourse) modalCourse.textContent = p.courseName || 'N/A';
+            if (modalStudent) modalStudent.textContent = p.studentName || 'N/A';
+            if (modalTime) modalTime.textContent = `${start} - ${end}`;
+            
+            // Status badge
+            if (statusBadge) {
+              const status = (p.status || '').toLowerCase();
+              statusBadge.className = 'badge ';
+              if (status.includes('completed')) statusBadge.className += 'bg-success';
+              else if (status.includes('cancelled') || status.includes('rejected')) statusBadge.className += 'bg-secondary';
+              else if (status.includes('scheduled') || status.includes('rescheduled')) statusBadge.className += 'bg-primary';
+              else statusBadge.className += 'bg-warning';
+              statusBadge.textContent = p.status || 'N/A';
+            }
+            
+            // Zoom info
+            const zoomSection = document.getElementById('lessonModalZoom');
+            if (zoomSection) {
+              if (p.zoomMeetingId || p.joinUrl) {
+                zoomSection.style.display = 'block';
+                const meetingId = document.getElementById('lessonModalMeetingId');
+                const password = document.getElementById('lessonModalPassword');
+                const joinBtn = document.getElementById('lessonModalJoinBtn');
+                
+                if (meetingId) meetingId.textContent = p.zoomMeetingId || 'N/A';
+                if (password) password.textContent = p.zoomPassword || 'N/A';
+                
+                if (joinBtn) {
+                  if (p.canJoin && p.joinUrl) {
+                    joinBtn.style.display = 'inline-block';
+                    joinBtn.onclick = () => window.open(p.joinUrl, '_blank');
+                    joinBtn.innerHTML = '<i class="fas fa-video me-2"></i>Start Class';
+                  } else {
+                    joinBtn.style.display = 'none';
+                  }
+                }
+              } else {
+                zoomSection.style.display = 'none';
+              }
+            }
+            
+            // Show modal
+            const modalEl = document.getElementById('lessonDetailsModal');
+            if (modalEl) {
+              const modal = new bootstrap.Modal(modalEl);
+              modal.show();
+            }
           }
         });
         cal.render();

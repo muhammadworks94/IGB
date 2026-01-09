@@ -342,8 +342,9 @@
 
   // Calendar preview from rules + blocks (professional rendering)
   document.addEventListener("DOMContentLoaded", function () {
-    const rules = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Rules));
-    const blocks = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Blocks));
+    // Serialize with camelCase for JavaScript compatibility (done server-side in Razor)
+    const rules = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Rules, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+    const blocks = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Blocks, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
     const calEl = document.getElementById("availabilityCalendar");
     if (!calEl || typeof FullCalendar === "undefined") return;
 
@@ -351,37 +352,66 @@
 
     function buildEvents() {
       const events = [];
+      console.log('Rules:', rules);
       
       // Render weekly rules as background events (available slots)
       rules.forEach(r => {
-        if (!r.isActive) return;
-        const startHour = Math.floor(r.startMinutes / 60);
-        const startMin = r.startMinutes % 60;
-        const endHour = Math.floor(r.endMinutes / 60);
-        const endMin = r.endMinutes % 60;
+        // Handle both camelCase and PascalCase for backwards compatibility
+        const isActive = r.isActive !== undefined ? r.isActive : r.IsActive;
+        const dayOfWeek = r.dayOfWeek !== undefined ? r.dayOfWeek : r.DayOfWeek;
+        const startMinutes = r.startMinutes !== undefined ? r.startMinutes : r.StartMinutes;
+        const endMinutes = r.endMinutes !== undefined ? r.endMinutes : r.EndMinutes;
+        const slotMinutes = r.slotMinutes !== undefined ? r.slotMinutes : r.SlotMinutes;
+        
+        if (!isActive) return;
+        
+        const startHour = Math.floor(startMinutes / 60);
+        const startMin = startMinutes % 60;
+        const endHour = Math.floor(endMinutes / 60);
+        const endMin = endMinutes % 60;
         const start = `${String(startHour).padStart(2,'0')}:${String(startMin).padStart(2,'0')}`;
         const end = `${String(endHour).padStart(2,'0')}:${String(endMin).padStart(2,'0')}`;
         
-        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        // FullCalendar daysOfWeek: 0=Sunday, 1=Monday, 2=Tuesday, etc.
+        // C# DayOfWeek: 0=Sunday, 1=Monday, 2=Tuesday, etc. (same mapping)
+        // So we can use the value directly
+        let dayValue = dayOfWeek;
         
-        events.push({
-          title: `${start} - ${end} (${r.slotMinutes}m slots)`,
-          daysOfWeek: [r.dayOfWeek === 0 ? 0 : r.dayOfWeek], // Handle Sunday = 0
+        // FullCalendar recurring event format
+        // daysOfWeek: 0=Sunday, 1=Monday, 2=Tuesday, etc. (matches C# DayOfWeek)
+        const event = {
+          title: `${start} - ${end} (${slotMinutes}m slots)`,
+          daysOfWeek: [dayValue],
           startTime: start,
           endTime: end,
           display: "background",
           backgroundColor: "#d1e7dd",
           borderColor: "#a3cfbb",
-          classNames: ['availability-slot']
-        });
+          classNames: ['availability-slot'],
+          extendedProps: {
+            dayOfWeek: dayValue,
+            startTime: start,
+            endTime: end,
+            slotMinutes: slotMinutes,
+            daysOfWeek: [dayValue]
+          }
+        };
+        
+        console.log('Adding availability event:', event);
+        events.push(event);
       });
       
       // Render blocked times
       blocks.forEach(b => {
+        // Handle both camelCase and PascalCase
+        const reason = b.reason !== undefined ? b.reason : (b.Reason || "Blocked");
+        const startUtc = b.startUtc !== undefined ? b.startUtc : b.StartUtc;
+        const endUtc = b.endUtc !== undefined ? b.endUtc : b.EndUtc;
+        
         events.push({
-          title: b.reason || "Blocked",
-          start: b.startUtc,
-          end: b.endUtc,
+          title: reason,
+          start: startUtc,
+          end: endUtc,
           backgroundColor: "#f8d7da",
           borderColor: "#f5c2c7",
           textColor: "#842029",
@@ -389,6 +419,7 @@
         });
       });
       
+      console.log('Generated events:', events);
       return events;
     }
 
@@ -411,6 +442,18 @@
       },
       events: buildEvents(),
       eventDisplay: 'block',
+      eventDidMount: function(arg) {
+        // Debug: log events as they're mounted
+        if (arg.event.display === 'background') {
+          console.log('Background event mounted:', {
+            title: arg.event.title,
+            dayOfWeek: arg.event.extendedProps.dayOfWeek,
+            startTime: arg.event.extendedProps.startTime,
+            endTime: arg.event.extendedProps.endTime,
+            daysOfWeek: arg.event.extendedProps.daysOfWeek
+          });
+        }
+      },
       eventTimeFormat: {
         hour: '2-digit',
         minute: '2-digit',
@@ -423,11 +466,12 @@
       },
       firstDay: 1, // Start week on Monday
       locale: 'en',
-      timeZone: 'UTC',
+      // Don't set timeZone for recurring events - they use local time by default
+      // timeZone: 'local' is the default, which is what we want for recurring weekly rules
       eventContent: function(arg) {
         if (arg.event.display === 'background') {
           return {
-            html: `<div class="fc-bg-event-content">${arg.event.title}</div>`
+            html: `<div class="fc-bg-event-content" title="${arg.event.title}">${arg.event.title}</div>`
           };
         }
         return {

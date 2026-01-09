@@ -5,6 +5,7 @@ using IGB.Infrastructure.Data;
 using IGB.Shared.Security;
 using IGB.Web.Security;
 using IGB.Web.Services;
+using IGB.Web.ViewModels;
 using IGB.Web.ViewModels.TestReports;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -471,7 +472,7 @@ public class TestReportsController : Controller
     [Authorize(Roles = "Student")]
     [RequirePermission(PermissionCatalog.Permissions.TestReportsViewOwn)]
     [HttpGet]
-    public async Task<IActionResult> My(string view = "grid", long? courseId = null, DateTime? from = null, DateTime? to = null, string? grade = null, string? q = null, string sort = "date_desc", int page = 1, int pageSize = 10, CancellationToken ct = default)
+    public async Task<IActionResult> My(string view = "grid", long? courseId = null, string? grade = null, string? q = null, int page = 1, int pageSize = 10, CancellationToken ct = default)
     {
         var studentId = GetUserId();
         if (studentId == null) return Forbid();
@@ -487,16 +488,6 @@ public class TestReportsController : Controller
         if (courseId.HasValue) query = query.Where(r => r.CourseId == courseId.Value);
         if (!string.IsNullOrWhiteSpace(grade)) query = query.Where(r => r.Grade == grade);
 
-        if (from.HasValue)
-        {
-            var f = DateOnly.FromDateTime(from.Value.Date);
-            query = query.Where(r => r.TestDate >= f);
-        }
-        if (to.HasValue)
-        {
-            var t = DateOnly.FromDateTime(to.Value.Date);
-            query = query.Where(r => r.TestDate <= t);
-        }
         if (!string.IsNullOrWhiteSpace(q))
         {
             var term = q.Trim();
@@ -507,41 +498,51 @@ public class TestReportsController : Controller
             );
         }
 
-        query = sort switch
-        {
-            "date_asc" => query.OrderBy(r => r.TestDate).ThenBy(r => r.Id),
-            "grade_desc" => query.OrderByDescending(r => r.Percentage),
-            "marks_desc" => query.OrderByDescending(r => r.ObtainedMarks),
-            _ => query.OrderByDescending(r => r.TestDate).ThenByDescending(r => r.Id)
-        };
+        // Always sort by date descending (newest first)
+        query = query.OrderByDescending(r => r.TestDate).ThenByDescending(r => r.Id);
 
         var total = await query.CountAsync(ct);
         var items = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .Select(r => new IGB.Web.ViewModels.TestReports.StudentMyTestReportsViewModel.TestReportRow(
+                r.Id,
+                r.TestDate,
+                r.CourseId,
+                r.Course != null ? r.Course.Name : "Course",
+                r.TestName,
+                r.TutorUser != null ? r.TutorUser.FullName : null,
+                r.ObtainedMarks,
+                r.TotalMarks,
+                r.Percentage,
+                r.Grade
+            ))
             .ToListAsync(ct);
 
         // Courses filter list (enrolled courses)
-        ViewBag.Courses = await _db.CourseBookings.AsNoTracking()
+        var courses = await _db.CourseBookings.AsNoTracking()
             .Include(b => b.Course)
             .Where(b => !b.IsDeleted && b.StudentUserId == studentId.Value && (b.Status == BookingStatus.Approved || b.Status == BookingStatus.Completed) && b.Course != null)
             .Select(b => b.Course!)
             .Distinct()
             .OrderBy(c => c.Name)
+            .Select(c => new IGB.Web.ViewModels.LookupItem(c.Id, c.Name))
             .ToListAsync(ct);
 
-        ViewBag.ViewMode = view;
-        ViewBag.CourseId = courseId;
-        ViewBag.From = from;
-        ViewBag.To = to;
-        ViewBag.Grade = grade;
-        ViewBag.Query = q;
-        ViewBag.Sort = sort;
-        ViewBag.Page = page;
-        ViewBag.PageSize = pageSize;
-        ViewBag.Total = total;
+        var gradeOptions = TestGradeCatalog.GradeOptions.ToDictionary(g => g, g => g);
 
-        return View("StudentMy", items);
+        return View("StudentMy", new IGB.Web.ViewModels.TestReports.StudentMyTestReportsViewModel
+        {
+            View = view,
+            CourseId = courseId,
+            Grade = grade,
+            Query = q,
+            PageSize = pageSize,
+            Courses = courses,
+            GradeOptions = gradeOptions,
+            Items = items,
+            Pagination = new IGB.Web.ViewModels.Components.PaginationViewModel(page, pageSize, total, Action: "My", Controller: "TestReports", RouteValues: new { view, courseId, grade, q, pageSize })
+        });
     }
 
     [Authorize(Roles = "Student")]

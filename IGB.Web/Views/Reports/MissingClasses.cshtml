@@ -78,6 +78,11 @@
             </div>
         </div>
     </div>
+
+    @if (Model.Pagination.TotalCount > 0)
+    {
+        <partial name="Components/_Pagination" model="Model.Pagination" />
+    }
 </div>
 
 <script>

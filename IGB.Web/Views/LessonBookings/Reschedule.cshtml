@@ -12,7 +12,7 @@
         new("My Schedule", Url.Action("My", "LessonBookings")),
         new("Reschedule Lesson")
     },
-    Subtitle: $"{Model.CourseName} • Current (UTC): {Model.ScheduledStartUtc:yyyy-MM-dd HH:mm}"
+    Subtitle: $"{Model.CourseName} • Current Schedule (UTC): {Model.ScheduledStartUtc:yyyy-MM-dd HH:mm}"
 ))
 
 <div class="container-fluid">
@@ -34,75 +34,309 @@
         <input type="hidden" asp-for="LessonId" />
         <input type="hidden" asp-for="CourseBookingId" />
 
+        <!-- Current Lesson Info Card -->
+        <div class="card mb-3 border-info">
+            <div class="card-header bg-info bg-opacity-10 border-info">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2 text-info"></i>Current Lesson Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-book text-primary fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Course</div>
+                                <div class="fw-semibold">@Model.CourseName</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-calendar-alt text-warning fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Current Schedule (UTC)</div>
+                                <div class="fw-semibold">
+                                    @Model.ScheduledStartUtc.ToString("MMM dd, yyyy")<br />
+                                    <span class="text-muted small">@Model.ScheduledStartUtc.ToString("HH:mm") - @Model.ScheduledEndUtc.ToString("HH:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-redo text-secondary fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Reschedules Used</div>
+                                <div class="fw-semibold">@Model.RescheduleCount / @Model.MaxReschedules</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row g-3">
             <div class="col-lg-4">
                 <div class="card">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">
+                            <i class="fas fa-filter me-2"></i>Search Filters
+                        </h6>
+                    </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label">Date From</label>
+                            <label class="form-label fw-semibold">Start Date <span class="text-danger">*</span></label>
                             <input asp-for="DateFrom" class="form-control" type="date" id="dateFrom" />
+                            <span asp-validation-for="DateFrom" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Date To</label>
+                            <label class="form-label fw-semibold">End Date</label>
                             <input asp-for="DateTo" class="form-control" type="date" id="dateTo" />
+                            <small class="text-muted">Optional - defaults to start date</small>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Duration</label>
+                            <label class="form-label fw-semibold">Lesson Duration <span class="text-danger">*</span></label>
                             <select asp-for="DurationMinutes" class="form-select" id="durationMinutes">
-                                <option value="30">30 minutes</option>
-                                <option value="45">45 minutes</option>
-                                <option value="60">60 minutes</option>
+                                <option value="30" selected="@(Model.DurationMinutes == 30)">30 minutes</option>
+                                <option value="45" selected="@(Model.DurationMinutes == 45)">45 minutes</option>
+                                <option value="60" selected="@(Model.DurationMinutes == 60)">60 minutes</option>
                             </select>
+                            <span asp-validation-for="DurationMinutes" class="text-danger small"></span>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Reason</label>
-                            <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Why are you rescheduling?"></textarea>
-                            <span asp-validation-for="Reason" class="text-danger"></span>
-                        </div>
-                        <div class="text-muted small">Reschedules used: @Model.RescheduleCount / @Model.MaxReschedules</div>
                     </div>
                 </div>
 
                 <div class="card mt-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">
+                            <i class="fas fa-clock me-2"></i>Selected Time Slots
+                        </h6>
+                    </div>
                     <div class="card-body">
-                        <h6 class="mb-2">Selected Options (local)</h6>
-                        <div class="mb-2">
-                            <label class="form-label">Option 1</label>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Option 1 <span class="text-danger">*</span></label>
                             <input asp-for="Option1" class="form-control" type="datetime-local" id="opt1" />
+                            <span asp-validation-for="Option1" class="text-danger small"></span>
                         </div>
-                        <div class="mb-2">
-                            <label class="form-label">Option 2</label>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Option 2 <span class="text-danger">*</span></label>
                             <input asp-for="Option2" class="form-control" type="datetime-local" id="opt2" />
+                            <span asp-validation-for="Option2" class="text-danger small"></span>
                         </div>
-                        <div class="mb-2">
-                            <label class="form-label">Option 3</label>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Option 3 <span class="text-danger">*</span></label>
                             <input asp-for="Option3" class="form-control" type="datetime-local" id="opt3" />
+                            <span asp-validation-for="Option3" class="text-danger small"></span>
                         </div>
-                        <button type="button" class="btn btn-outline-secondary w-100" id="clearSlotsBtn">Clear selected slots</button>
+                        <button type="button" class="btn btn-outline-secondary w-100" id="clearSlotsBtn">
+                            <i class="fas fa-times me-2"></i>Clear All Slots
+                        </button>
+                        <div class="text-muted small mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Select slots from the calendar or enter manually
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">
+                            <i class="fas fa-comment-alt me-2"></i>Reschedule Reason
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <label class="form-label fw-semibold">Reason <span class="text-danger">*</span></label>
+                        <textarea asp-for="Reason" class="form-control" rows="4" placeholder="Please provide a reason for rescheduling this lesson..."></textarea>
+                        <span asp-validation-for="Reason" class="text-danger small"></span>
+                        <small class="text-muted">Required for reschedule requests</small>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-8">
                 <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Pick 3 Available Slots</h5>
-                            <div class="text-muted small">Click any 3 slots. Auto-approval uses the first available preference.</div>
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>Tutor Availability Calendar
+                            </h6>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-secondary" id="calendarPrev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="calendarToday">Today</button>
+                                <button type="button" class="btn btn-outline-secondary" id="calendarNext">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div id="availabilityMsg" class="alert alert-info d-none"></div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div id="availabilityMsg" class="alert alert-info d-none mb-3"></div>
                         <div id="studentAvailabilityCalendar"></div>
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="d-flex flex-wrap gap-3 small">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded" style="width: 16px; height: 16px; background-color: #d1e7dd; border: 1px solid #a3cfbb;"></div>
+                                    <span class="text-muted">Available Slot</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded" style="width: 16px; height: 16px; background-color: #0d6efd; border: 1px solid #0a58ca;"></div>
+                                    <span class="text-muted">Selected Slot</span>
+                                </div>
+                            </div>
+                            <div class="text-muted small mt-2">
+                                <i class="fas fa-mouse-pointer me-1"></i>
+                                Click any 3 available slots below. They'll populate Option 1–3 automatically.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="mt-3 d-flex justify-content-end gap-2">
-            <a class="btn btn-secondary" href="@Url.Action("My","LessonBookings")">Cancel</a>
-            <button class="btn btn-primary" type="submit">Submit Reschedule</button>
+        <div class="mt-4 d-flex justify-content-end gap-2">
+            <a class="btn btn-secondary" href="@Url.Action("My","LessonBookings")">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-paper-plane me-2"></i>Submit Reschedule Request
+            </button>
         </div>
     </form>
 </div>
+
+<link href="/nobleui/vendors/fullcalendar/main.min.css" rel="stylesheet" />
+
+<style>
+    #studentAvailabilityCalendar {
+        font-family: inherit;
+    }
+    
+    /* FullCalendar Professional Styling */
+    #studentAvailabilityCalendar .fc {
+        background: #fff;
+        border-radius: 8px;
+    }
+    
+    .fc-toolbar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .fc-button {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .fc-button:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #212529;
+    }
+    
+    .fc-button-active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+    }
+    
+    .fc-button-active:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+    
+    .fc-daygrid-day {
+        border-color: #e9ecef;
+    }
+    
+    .fc-col-header-cell {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        padding: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    
+    .fc-timegrid-slot {
+        border-color: #f1f3f5;
+        height: 2.5rem;
+    }
+    
+    .fc-timegrid-slot-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        padding: 0.25rem;
+    }
+    
+    .fc-timegrid-now-indicator-line {
+        border-color: #dc3545;
+        border-width: 2px;
+    }
+    
+    .fc-event {
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 0.8rem;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .fc-event:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .fc-event-title {
+        padding: 0;
+    }
+    
+    .fc-day-today {
+        background-color: #fffbf0;
+    }
+    
+    .fc-timegrid-event {
+        border-radius: 4px;
+        margin: 1px 2px;
+    }
+    
+    .fc-event-selected {
+        border: 2px solid #0d6efd !important;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+    }
+    
+    .fc-event-available {
+        background-color: #d1e7dd;
+        border-color: #a3cfbb;
+        color: #0f5132;
+    }
+    
+    .fc-event-selected-slot {
+        background-color: #0d6efd !important;
+        border-color: #0a58ca !important;
+        color: #fff !important;
+        font-weight: 600;
+    }
+</style>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
@@ -114,25 +348,42 @@
 
         const courseBookingId = "@Model.CourseBookingId";
         const sel = [];
+        let calendar = null;
+
         function toLocalInputValue(d) {
           const pad = n => String(n).padStart(2, "0");
           return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
         }
+
         function syncOptions() {
           document.getElementById("opt1").value = sel[0] ? toLocalInputValue(sel[0]) : "";
           document.getElementById("opt2").value = sel[1] ? toLocalInputValue(sel[1]) : "";
           document.getElementById("opt3").value = sel[2] ? toLocalInputValue(sel[2]) : "";
+          updateSelectedEvents();
         }
+
+        function updateSelectedEvents() {
+          if (!calendar) return;
+          const events = calendar.getEvents();
+          events.forEach(event => {
+            const eventTime = new Date(event.start);
+            const isSelected = sel.some(s => Math.abs(s - eventTime) < 60000); // Within 1 minute
+            event.setProp('classNames', isSelected ? ['fc-event-selected-slot'] : ['fc-event-available']);
+          });
+        }
+
         document.getElementById("clearSlotsBtn")?.addEventListener("click", function () {
           sel.splice(0, sel.length);
           syncOptions();
-          cal.refetchEvents();
+          if (calendar) {
+            calendar.refetchEvents();
+          }
         });
 
-        async function loadSlots() {
-          const df = document.getElementById("dateFrom").value;
-          const dt = document.getElementById("dateTo").value || df;
-          const duration = document.getElementById("durationMinutes").value;
+        async function loadSlots(fetchInfo) {
+          const df = document.getElementById("dateFrom")?.value;
+          const dt = document.getElementById("dateTo")?.value || df;
+          const duration = document.getElementById("durationMinutes")?.value || 60;
           const msg = document.getElementById("availabilityMsg");
           const showMsg = (html, kind) => {
             if (!msg) return;
@@ -142,49 +393,169 @@
           };
           const hideMsg = () => { if (msg) msg.classList.add("d-none"); };
 
-          if (!df) { showMsg("Select a start date to see available tutor slots.", "info"); return []; }
-          const fromUtc = new Date(df + "T00:00:00").toISOString();
-          const toUtc = new Date(dt + "T23:59:59").toISOString();
+          if (!df) { 
+            showMsg("<i class='fas fa-info-circle me-2'></i>Select a start date to see available tutor slots.", "info"); 
+            return []; 
+          }
+          
+          const fromUtc = new Date(df + "T00:00:00Z").toISOString();
+          const toUtc = new Date((dt || df) + "T23:59:59Z").toISOString();
           const url = `/api/lessons/availability?courseBookingId=${encodeURIComponent(courseBookingId)}&fromUtc=${encodeURIComponent(fromUtc)}&toUtc=${encodeURIComponent(toUtc)}&durationMinutes=${encodeURIComponent(duration)}`;
-          const res = await fetch(url, { credentials: "include" });
-          if (!res.ok) { showMsg("Unable to load tutor availability right now. Please try again.", "warning"); return []; }
-          const data = await res.json();
-          if (!data.tutorAssigned) { showMsg("No tutor is assigned to this course yet. Please contact admin.", "warning"); return []; }
-          const slots = (data.slots || []);
-          if (slots.length === 0) { showMsg("No available slots found for the selected range. Try a different date range or ask your tutor to set availability.", "info"); return []; }
-          hideMsg();
-          return slots.map(s => ({
-            title: "Available",
-            start: s.startUtc,
-            end: s.endUtc,
-            color: "#d1e7dd"
-          }));
+          
+          try {
+            const res = await fetch(url, { 
+              credentials: "include",
+              headers: {
+                'Accept': 'application/json'
+              }
+            });
+            
+            if (!res.ok) { 
+              showMsg("<i class='fas fa-exclamation-triangle me-2'></i>Unable to load tutor availability right now. Please try again.", "warning"); 
+              return []; 
+            }
+            
+            const data = await res.json();
+            
+            if (!data.tutorAssigned) { 
+              showMsg("<i class='fas fa-exclamation-triangle me-2'></i>No tutor is assigned to this course yet. Please contact admin.", "warning"); 
+              return []; 
+            }
+            
+            const slots = (data.slots || []);
+            
+            if (slots.length === 0) { 
+              showMsg("<i class='fas fa-info-circle me-2'></i>No available slots found for the selected date range. Try a different date range or ask your tutor to set availability.", "info"); 
+              return []; 
+            }
+            
+            hideMsg();
+            
+            return slots.map(s => {
+              const eventTime = new Date(s.startUtc);
+              const isSelected = sel.some(selected => Math.abs(selected - eventTime) < 60000);
+              return {
+                title: "Available",
+                start: s.startUtc,
+                end: s.endUtc,
+                classNames: isSelected ? ['fc-event-selected-slot'] : ['fc-event-available'],
+                extendedProps: {
+                  slotStart: s.startUtc
+                }
+              };
+            });
+          } catch (error) {
+            console.error('Error loading slots:', error);
+            showMsg("<i class='fas fa-exclamation-triangle me-2'></i>Error loading availability: " + error.message, "danger");
+            return [];
+          }
         }
 
-        const cal = new FullCalendar.Calendar(calEl, {
+        // Get initial date from form or use today
+        const initialDate = document.getElementById("dateFrom")?.value 
+          ? new Date(document.getElementById("dateFrom").value + "T00:00:00")
+          : new Date();
+        
+        calendar = new FullCalendar.Calendar(calEl, {
           initialView: "timeGridWeek",
-          height: 650,
+          initialDate: initialDate,
+          headerToolbar: false,
+          height: "auto",
+          aspectRatio: 1.35,
           nowIndicator: true,
+          nowIndicatorClass: "fc-now-indicator",
           allDaySlot: false,
-          events: async function (fetchInfo, successCallback) {
-            successCallback(await loadSlots());
+          slotMinTime: "00:00:00",
+          slotMaxTime: "24:00:00",
+          slotDuration: "00:30:00",
+          slotLabelInterval: "01:00:00",
+          slotLabelFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
           },
+          events: async function (fetchInfo, successCallback, failureCallback) {
+            try {
+              const events = await loadSlots(fetchInfo);
+              successCallback(events);
+              setTimeout(updateSelectedEvents, 100);
+            } catch (error) {
+              console.error('Failed to load events:', error);
+              if (failureCallback) {
+                failureCallback(error);
+              }
+              successCallback([]);
+            }
+          },
+          eventDisplay: 'block',
+          eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          },
+          dayHeaderFormat: {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short'
+          },
+          firstDay: 1,
+          locale: 'en',
           eventClick: function (info) {
             const dt = new Date(info.event.start);
-            const key = dt.toISOString();
-            if (sel.find(x => x.toISOString() === key)) return;
-            if (sel.length >= 3) sel.shift();
-            sel.push(dt);
-            sel.sort((a,b) => a - b);
+            const existingIndex = sel.findIndex(x => Math.abs(x - dt) < 60000);
+            
+            if (existingIndex >= 0) {
+              // Remove if already selected
+              sel.splice(existingIndex, 1);
+            } else {
+              // Add if not selected
+              if (sel.length >= 3) {
+                sel.shift(); // Remove oldest selection
+              }
+              sel.push(dt);
+              sel.sort((a, b) => a - b);
+            }
+            
             syncOptions();
+            info.event.setProp('classNames', sel.some(s => Math.abs(s - dt) < 60000) ? ['fc-event-selected-slot'] : ['fc-event-available']);
+          },
+          eventContent: function(arg) {
+            const isSelected = sel.some(s => Math.abs(s - new Date(arg.event.start)) < 60000);
+            const title = isSelected ? `Selected: ${arg.event.title}` : arg.event.title;
+            return {
+              html: `<div class="fc-event-title">${title}</div>`
+            };
           }
         });
 
-        ["dateFrom","dateTo","durationMinutes"].forEach(id => {
-          document.getElementById(id)?.addEventListener("change", () => cal.refetchEvents());
+        // Custom navigation buttons
+        document.getElementById("calendarPrev")?.addEventListener("click", () => {
+          calendar.prev();
+        });
+        document.getElementById("calendarNext")?.addEventListener("click", () => {
+          calendar.next();
+        });
+        document.getElementById("calendarToday")?.addEventListener("click", () => {
+          calendar.today();
         });
 
-        cal.render();
+        ["dateFrom","dateTo","durationMinutes"].forEach(id => {
+          document.getElementById(id)?.addEventListener("change", () => {
+            if (calendar) {
+              calendar.refetchEvents();
+            }
+          });
+        });
+
+        calendar.render();
+        
+        // Try to load events after a short delay if form is already filled
+        setTimeout(() => {
+          const dateFrom = document.getElementById("dateFrom")?.value;
+          if (dateFrom && calendar) {
+            calendar.refetchEvents();
+          }
+        }, 500);
       })();
     </script>
 }
