@@ -7,6 +7,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: "Edit Test Report",
+    Icon: "fas fa-edit",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Home")),

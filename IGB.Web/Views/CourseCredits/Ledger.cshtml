@@ -5,6 +5,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: "Credit Ledger",
+    Icon: "fas fa-book",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Home")),

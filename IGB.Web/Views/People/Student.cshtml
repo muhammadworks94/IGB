@@ -5,6 +5,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: "Student Profile",
+    Icon: "fas fa-user-graduate",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Portal")),
@@ -266,14 +267,33 @@
                     }
                     else
                     {
-                        <ul class="list-unstyled mb-0">
-                            @foreach (var g in Model.Guardians)
-                            {
-                                <li class="mb-1">
-                                    <a class="text-decoration-none" href="/People/Guardian/@g.GuardianUserId">@g.Name</a>
-                                </li>
-                            }
-                        </ul>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>WhatsApp</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var g in Model.Guardians)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@g.Name</td>
+                                        <td class="text-muted">@(g.Email ?? "-")</td>
+                                        <td class="text-muted">@(g.Phone ?? "-")</td>
+                                        <td class="text-muted">@(g.WhatsApp ?? "-")</td>
+                                        <td class="">
+                                            <a class="btn btn-sm btn-outline-primary" href="/People/Guardian/@g.GuardianUserId">View Profile</a>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
                     }
                 </div>
             </div>

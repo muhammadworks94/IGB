@@ -9,6 +9,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: Model.Id == 0 ? "Create Role" : "Edit Role",
+    Icon: Model.Id == 0 ? "fas fa-plus-circle" : "fas fa-edit",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Home", Url.Action("Index", "Home")),

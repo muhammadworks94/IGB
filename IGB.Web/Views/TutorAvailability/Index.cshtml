@@ -7,6 +7,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: "Availability",
+    Icon: "fas fa-clock",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Home")),
@@ -17,14 +18,14 @@
 ))
 
 <div class="container-fluid">
-    @if (TempData["Error"] != null)
+   @*  @if (TempData["Error"] != null)
     {
         <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Error"]!.ToString()!, Variant: "danger", Dismissible: true))" />
     }
     @if (TempData["Success"] != null)
     {
         <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
-    }
+    } *@
 
     <div class="row g-3">
         <div class="col-lg-7">
@@ -166,17 +167,151 @@
         </div>
 
         <div class="col-lg-5">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="mb-3">Calendar</h5>
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2 text-primary"></i>Availability Calendar
+                        </h6>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary" id="calendarPrev" title="Previous Week">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="calendarToday" title="Today">
+                                <i class="fas fa-calendar-day"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="calendarNext" title="Next Week">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-3">
                     <div id="availabilityCalendar"></div>
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="d-flex flex-wrap gap-3 small">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded" style="width: 16px; height: 16px; background-color: #d1e7dd; border: 1px solid #a3cfbb;"></div>
+                                <span class="text-muted">Available</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded" style="width: 16px; height: 16px; background-color: #f8d7da; border: 1px solid #f5c2c7;"></div>
+                                <span class="text-muted">Blocked</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<link href="/nobleui/vendors/fullcalendar/main.min.css" rel="stylesheet" />
 <script src="/nobleui/vendors/fullcalendar/main.min.js"></script>
+<style>
+    #availabilityCalendar {
+        font-family: inherit;
+    }
+    
+    /* FullCalendar Professional Styling */
+    .fc {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .fc-header-toolbar {
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+    
+    .fc-toolbar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .fc-button {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .fc-button:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #212529;
+    }
+    
+    .fc-button-active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+    }
+    
+    .fc-button-active:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+    
+    .fc-daygrid-day {
+        border-color: #e9ecef;
+    }
+    
+    .fc-col-header-cell {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        padding: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    
+    .fc-timegrid-slot {
+        border-color: #f1f3f5;
+        height: 2.5rem;
+    }
+    
+    .fc-timegrid-slot-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        padding: 0.25rem;
+    }
+    
+    .fc-timegrid-now-indicator-line {
+        border-color: #dc3545;
+        border-width: 2px;
+    }
+    
+    .fc-event {
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 0.8rem;
+        border: none;
+        font-weight: 500;
+    }
+    
+    .fc-event-title {
+        padding: 0;
+    }
+    
+    .fc-day-today {
+        background-color: #fffbf0;
+    }
+    
+    .fc-timegrid-event {
+        border-radius: 4px;
+        margin: 1px 2px;
+    }
+</style>
+
 <script>
   // Convert time inputs to minutes
   function toMinutes(v) {
@@ -205,45 +340,117 @@
   document.getElementById("blockEndLocal")?.addEventListener("change", syncBlockTimes);
   syncBlockTimes();
 
-  // Calendar preview from rules + blocks (simple client-side rendering)
+  // Calendar preview from rules + blocks (professional rendering)
   document.addEventListener("DOMContentLoaded", function () {
     const rules = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Rules));
     const blocks = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Blocks));
     const calEl = document.getElementById("availabilityCalendar");
     if (!calEl || typeof FullCalendar === "undefined") return;
 
-    const events = [];
-    // render weekly rules as background events
-    rules.forEach(r => {
-      if (!r.isActive) return;
-      const start = `${String(Math.floor(r.startMinutes/60)).padStart(2,'0')}:${String(r.startMinutes%60).padStart(2,'0')}`;
-      const end = `${String(Math.floor(r.endMinutes/60)).padStart(2,'0')}:${String(r.endMinutes%60).padStart(2,'0')}`;
-      events.push({
-        title: `Available (${r.slotMinutes}m)`,
-        daysOfWeek: [r.dayOfWeek],
-        startTime: start,
-        endTime: end,
-        display: "background",
-        backgroundColor: "#d1e7dd"
+    let calendar = null;
+
+    function buildEvents() {
+      const events = [];
+      
+      // Render weekly rules as background events (available slots)
+      rules.forEach(r => {
+        if (!r.isActive) return;
+        const startHour = Math.floor(r.startMinutes / 60);
+        const startMin = r.startMinutes % 60;
+        const endHour = Math.floor(r.endMinutes / 60);
+        const endMin = r.endMinutes % 60;
+        const start = `${String(startHour).padStart(2,'0')}:${String(startMin).padStart(2,'0')}`;
+        const end = `${String(endHour).padStart(2,'0')}:${String(endMin).padStart(2,'0')}`;
+        
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        events.push({
+          title: `${start} - ${end} (${r.slotMinutes}m slots)`,
+          daysOfWeek: [r.dayOfWeek === 0 ? 0 : r.dayOfWeek], // Handle Sunday = 0
+          startTime: start,
+          endTime: end,
+          display: "background",
+          backgroundColor: "#d1e7dd",
+          borderColor: "#a3cfbb",
+          classNames: ['availability-slot']
+        });
       });
-    });
-    blocks.forEach(b => {
-      events.push({
-        title: b.reason || "Blocked",
-        start: b.startUtc,
-        end: b.endUtc,
-        color: "#f8d7da"
+      
+      // Render blocked times
+      blocks.forEach(b => {
+        events.push({
+          title: b.reason || "Blocked",
+          start: b.startUtc,
+          end: b.endUtc,
+          backgroundColor: "#f8d7da",
+          borderColor: "#f5c2c7",
+          textColor: "#842029",
+          classNames: ['blocked-slot']
+        });
       });
+      
+      return events;
+    }
+
+    calendar = new FullCalendar.Calendar(calEl, {
+      initialView: "timeGridWeek",
+      headerToolbar: false, // We'll use custom buttons
+      height: "auto",
+      aspectRatio: 1.35,
+      nowIndicator: true,
+      nowIndicatorClass: "fc-now-indicator",
+      allDaySlot: false,
+      slotMinTime: "00:00:00",
+      slotMaxTime: "24:00:00",
+      slotDuration: "00:30:00",
+      slotLabelInterval: "01:00:00",
+      slotLabelFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      },
+      events: buildEvents(),
+      eventDisplay: 'block',
+      eventTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      },
+      dayHeaderFormat: {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short'
+      },
+      firstDay: 1, // Start week on Monday
+      locale: 'en',
+      timeZone: 'UTC',
+      eventContent: function(arg) {
+        if (arg.event.display === 'background') {
+          return {
+            html: `<div class="fc-bg-event-content">${arg.event.title}</div>`
+          };
+        }
+        return {
+          html: `<div class="fc-event-title">${arg.event.title}</div>`
+        };
+      }
     });
 
-    const cal = new FullCalendar.Calendar(calEl, {
-      initialView: "timeGridWeek",
-      height: 650,
-      nowIndicator: true,
-      allDaySlot: false,
-      events
+    calendar.render();
+
+    // Custom navigation buttons
+    document.getElementById("calendarPrev")?.addEventListener("click", () => {
+      calendar.prev();
     });
-    cal.render();
+    document.getElementById("calendarNext")?.addEventListener("click", () => {
+      calendar.next();
+    });
+    document.getElementById("calendarToday")?.addEventListener("click", () => {
+      calendar.today();
+    });
+
+    // Refresh calendar when rules or blocks change (via form submission reload)
+    // Calendar will rebuild on page reload, so no additional refresh needed
   });
 </script>
 

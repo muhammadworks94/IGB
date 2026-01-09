@@ -56,6 +56,7 @@
     // Build page header view model
     var pageHeader = new IGB.Web.ViewModels.PageHeaderViewModel(
         Title: Model.Title,
+        Icon: isTutor ? "fas fa-chalkboard-teacher" : "fas fa-user-graduate",
         Breadcrumbs: breadcrumbs,
         Subtitle: isTutor ? "Manage tutors, their courses, availability, and ratings" : "Manage students, their enrollments, and guardians",
         Search: search,

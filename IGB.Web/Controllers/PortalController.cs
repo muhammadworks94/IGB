@@ -129,33 +129,112 @@ public sealed class PortalController : Controller
         var uid = GetUserId();
         if (!uid.HasValue) return View();
 
+        ViewBag.UserId = uid.Value;
         var wards = await _db.GuardianWards.AsNoTracking()
-            .Where(w => !w.IsDeleted && w.GuardianUserId == uid.Value)
-            .Select(w => w.StudentUserId)
+            .Include(w => w.StudentUser)
+            .Where(w => !w.IsDeleted && w.GuardianUserId == uid.Value && w.StudentUser != null)
             .ToListAsync(ct);
 
         ViewBag.WardCount = wards.Count;
+        ViewBag.Wards = wards.Select(w => new { w.StudentUserId, Name = w.StudentUser!.FullName }).ToList();
 
-        if (wards.Count > 0)
+        var wardIds = wards.Select(w => w.StudentUserId).ToList();
+
+        if (wardIds.Count > 0)
         {
+            // Next lesson
             var nextLesson = await _db.LessonBookings.AsNoTracking()
                 .Include(l => l.Course)
-                .Where(l => !l.IsDeleted && wards.Contains(l.StudentUserId) && l.ScheduledStart.HasValue && (l.Status == LessonStatus.Scheduled || l.Status == LessonStatus.Rescheduled))
+                .Include(l => l.StudentUser)
+                .Where(l => !l.IsDeleted && wardIds.Contains(l.StudentUserId) && l.ScheduledStart.HasValue && (l.Status == LessonStatus.Scheduled || l.Status == LessonStatus.Rescheduled))
                 .OrderBy(l => l.ScheduledStart)
-                .Select(l => new { l.StudentUserId, Course = l.Course != null ? l.Course.Name : "Course", When = l.ScheduledStart!.Value })
+                .Select(l => new { l.StudentUserId, StudentName = l.StudentUser != null ? l.StudentUser.FullName : null, Course = l.Course != null ? l.Course.Name : "Course", When = l.ScheduledStart!.Value })
                 .FirstOrDefaultAsync(ct);
             ViewBag.NextWardLesson = nextLesson;
 
-            // chart: ward progress average (quick approximation)
+            // Progress average
             var courseIds = await _db.CourseBookings.AsNoTracking()
-                .Where(b => !b.IsDeleted && wards.Contains(b.StudentUserId) && b.Status == BookingStatus.Approved)
+                .Where(b => !b.IsDeleted && wardIds.Contains(b.StudentUserId) && b.Status == BookingStatus.Approved)
                 .Select(b => b.CourseId).Distinct().ToListAsync(ct);
             var totalTopics = await _db.CourseTopics.AsNoTracking().CountAsync(t => !t.IsDeleted && courseIds.Contains(t.CourseId), ct);
             var covered = await _db.LessonTopicCoverages.AsNoTracking()
-                .Where(c => !c.IsDeleted && wards.Contains(c.StudentUserId) && courseIds.Contains(c.CourseId))
+                .Where(c => !c.IsDeleted && wardIds.Contains(c.StudentUserId) && courseIds.Contains(c.CourseId))
                 .Select(c => c.CourseTopicId).Distinct().CountAsync(ct);
             var pct = totalTopics == 0 ? 0 : (int)Math.Round((Math.Min(covered, totalTopics) * 100.0) / totalTopics);
             ViewBag.WardAvgProgress = pct;
+
+            // Recent test reports
+            var recentTests = await _db.TestReports.AsNoTracking()
+                .Include(r => r.StudentUser)
+                .Include(r => r.Course)
+                .Where(r => !r.IsDeleted && !r.IsDraft && wardIds.Contains(r.StudentUserId))
+                .OrderByDescending(r => r.TestDate)
+                .ThenByDescending(r => r.CreatedAt)
+                .Take(5)
+                .Select(r => new { 
+                    r.Id, 
+                    r.TestName, 
+                    StudentName = r.StudentUser != null ? r.StudentUser.FullName : null, 
+                    r.StudentUserId,
+                    CourseName = r.Course != null ? r.Course.Name : null,
+                    r.TestDate, 
+                    r.Percentage, 
+                    r.Grade 
+                })
+                .ToListAsync(ct);
+            ViewBag.RecentTests = recentTests;
+
+            // Upcoming lessons (next 7 days)
+            var now = DateTimeOffset.UtcNow;
+            var upcomingLessons = await _db.LessonBookings.AsNoTracking()
+                .Include(l => l.StudentUser)
+                .Include(l => l.Course)
+                .Include(l => l.TutorUser)
+                .Where(l => !l.IsDeleted && wardIds.Contains(l.StudentUserId) && 
+                           l.ScheduledStart.HasValue && 
+                           (l.Status == LessonStatus.Scheduled || l.Status == LessonStatus.Rescheduled) &&
+                           l.ScheduledStart.Value >= now &&
+                           l.ScheduledStart.Value <= now.AddDays(7))
+                .OrderBy(l => l.ScheduledStart)
+                .Take(10)
+                .Select(l => new {
+                    l.Id,
+                    StudentName = l.StudentUser != null ? l.StudentUser.FullName : null,
+                    l.StudentUserId,
+                    CourseName = l.Course != null ? l.Course.Name : null,
+                    TutorName = l.TutorUser != null ? l.TutorUser.FullName : null,
+                    When = l.ScheduledStart!.Value,
+                    l.Status
+                })
+                .ToListAsync(ct);
+            ViewBag.UpcomingLessons = upcomingLessons;
+
+            // Total courses enrolled
+            var totalCourses = await _db.CourseBookings.AsNoTracking()
+                .Where(b => !b.IsDeleted && wardIds.Contains(b.StudentUserId) && (b.Status == BookingStatus.Approved || b.Status == BookingStatus.Completed))
+                .Select(b => b.CourseId)
+                .Distinct()
+                .CountAsync(ct);
+            ViewBag.TotalCourses = totalCourses;
+
+            // Recent activities (lessons completed this week)
+            var weekStart = now.Date.AddDays(-(int)now.DayOfWeek);
+            var recentLessons = await _db.LessonBookings.AsNoTracking()
+                .Include(l => l.StudentUser)
+                .Include(l => l.Course)
+                .Where(l => !l.IsDeleted && wardIds.Contains(l.StudentUserId) && 
+                           l.Status == LessonStatus.Completed &&
+                           l.ScheduledStart.HasValue &&
+                           l.ScheduledStart.Value >= weekStart)
+                .OrderByDescending(l => l.ScheduledStart)
+                .Take(5)
+                .Select(l => new {
+                    StudentName = l.StudentUser != null ? l.StudentUser.FullName : null,
+                    CourseName = l.Course != null ? l.Course.Name : null,
+                    When = l.ScheduledStart!.Value
+                })
+                .ToListAsync(ct);
+            ViewBag.RecentLessons = recentLessons;
         }
 
         return View();

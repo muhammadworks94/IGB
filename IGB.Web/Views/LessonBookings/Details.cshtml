@@ -6,6 +6,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: $"Lesson #{lesson.Id}",
+    Icon: "fas fa-clipboard-list",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Home")),

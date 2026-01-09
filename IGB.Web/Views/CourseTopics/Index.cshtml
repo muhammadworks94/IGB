@@ -6,34 +6,27 @@
     var csrf = Antiforgery.GetAndStoreTokens(Context).RequestToken;
     var mainTopics = Model.Where(t => !t.ParentTopicId.HasValue).OrderBy(t => t.SortOrder).ThenBy(t => t.Title).ToList();
     var byParent = Model.Where(t => t.ParentTopicId.HasValue).GroupBy(t => t.ParentTopicId!.Value).ToDictionary(g => g.Key, g => g.OrderBy(x => x.SortOrder).ThenBy(x => x.Title).ToList());
+    
+    var actionButtons = new List<PageHeaderActionButton>
+    {
+        new("Add Main Topic", Url.Action("Create", "CourseTopics", new { courseId = course.Id }), Icon: "fas fa-plus me-2", ButtonType: "outline-primary"),
+        new("Save order", ButtonType: "outline-primary", Icon: "fas fa-save me-2", OnClick: "document.getElementById('saveOrderBtn')?.click(); return false;")
+    };
 }
 
-<div class="breadcrumb-header">
-    <!-- Breadcrumbs -->
-    <nav aria-label="breadcrumb" class="mb-2">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="#">Courses</a></li>
-            <li class="breadcrumb-item"><a href="@Url.Action("All", "Courses")">All Courses</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Topics - @course.Name</li>
-        </ol>
-    </nav>
-    
-    <!-- Title, and Action Buttons in one row -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
-        <h1 class="breadcrumb-title mb-0">Topics - @course.Name</h1>
-        
-        <div class="d-flex gap-2 align-items-center flex-wrap">
-            <div class="text-muted small">Drag topics to reorder, then click <b>Save order</b>.</div>
-            <a asp-action="Create" asp-route-courseId="@course.Id" class="btn btn-outline-primary btn-sm">
-                <i class="fas fa-plus me-2"></i>Add Main Topic
-            </a>
-            <button type="button" class="btn btn-outline-primary btn-sm" id="saveOrderBtn">
-                <i class="fas fa-save me-2"></i>Save order
-            </button>
-        </div>
-    </div>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: $"Topics - {course.Name}",
+    Icon: "fas fa-list",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Courses"),
+        new("All Courses", Url.Action("All", "Courses")),
+        new("Topics")
+    },
+    Subtitle: "Drag topics to reorder, then click Save order.",
+    ActionButtons: actionButtons
+))
 
 <div class="container-fluid">
     @if (TempData["Error"] != null)
@@ -44,6 +37,9 @@
     {
         <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
     }
+
+    <!-- Hidden button for JavaScript compatibility -->
+    <button type="button" class="d-none" id="saveOrderBtn"></button>
 
     <div class="card">
         <div class="card-body">

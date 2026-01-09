@@ -3,57 +3,332 @@
     var wardCount = (int?)ViewBag.WardCount ?? 0;
     var wardAvg = (int?)ViewBag.WardAvgProgress ?? 0;
     var next = ViewBag.NextWardLesson;
+    var wards = ViewBag.Wards as IEnumerable<dynamic> ?? Array.Empty<dynamic>();
+    var recentTests = ViewBag.RecentTests as IEnumerable<dynamic> ?? Array.Empty<dynamic>();
+    var upcomingLessons = ViewBag.UpcomingLessons as IEnumerable<dynamic> ?? Array.Empty<dynamic>();
+    var recentLessons = ViewBag.RecentLessons as IEnumerable<dynamic> ?? Array.Empty<dynamic>();
+    var totalCourses = (int?)ViewBag.TotalCourses ?? 0;
+    var userId = (long?)ViewBag.UserId;
 }
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: "Parent/Guardian Portal",
-    Subtitle: "View student activity and announcements (features will be expanded in next phases)."
+    Icon: "fas fa-user-shield",
+    Subtitle: "Monitor your ward's progress, schedule, and academic performance"
 ))
 
 <div class="container-fluid">
-    <div class="row g-3 mb-3">
-        <div class="col-md-4">
-            <div class="card"><div class="card-body">
-                <div class="text-muted small">Wards linked</div>
-                <div class="fs-3 fw-semibold">@wardCount</div>
-            </div></div>
-        </div>
-        <div class="col-md-4">
-            <div class="card"><div class="card-body">
-                <div class="text-muted small">Average ward progress</div>
-                <div class="fs-3 fw-semibold">@wardAvg%</div>
-                <div class="progress mt-2" style="height:8px;">
-                    <div class="progress-bar @(wardAvg >= 70 ? "bg-success" : (wardAvg >= 40 ? "bg-warning" : "bg-danger"))" style="width:@wardAvg%"></div>
-                </div>
-            </div></div>
-        </div>
-        <div class="col-md-4">
-            <div class="card"><div class="card-body">
-                <div class="text-muted small">Next lesson</div>
-                @if (next != null)
-                {
-                    <div class="fw-semibold">@next.Course</div>
-                    <div class="text-muted small">@(((DateTimeOffset)next.When).ToString("yyyy-MM-dd HH:mm")) (UTC)</div>
-                }
-                else
-                {
-                    <div class="text-muted">—</div>
-                }
-            </div></div>
-        </div>
-    </div>
+    <style>
+        /* Professional card styling - matches Tutor portal */
+        #widgets .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        #widgets .card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+        #widgets .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Quick action cards */
+        #widgets a.card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(13,110,253,0.2) !important;
+            border-radius: 12px !important;
+        }
+        #widgets a.card:hover {
+            border-color: rgba(13,110,253,0.4) !important;
+            box-shadow: 0 4px 12px rgba(13,110,253,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(13,110,253,0.1) 0%, rgba(13,110,253,0.05) 100%);
+            color: #0d6efd;
+            font-size: 1.25rem;
+        }
+    </style>
 
-    <div class="row g-3">
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="Profile" asp-action="Index">My Profile</a>
+    <div id="widgets" class="row g-3">
+        <!-- Stats KPI Cards -->
+        <div class="col-12">
+            <div class="overview-stats-section">
+                <div class="row g-3">
+                    <div class="col-xl-3 col-md-6">
+                        <a href="@(userId.HasValue ? $"/People/Guardian/{userId.Value}" : "#")" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-blue">
+                                <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value">@wardCount</div>
+                                    <div class="kpi-label">Wards Linked</div>
+                                    <div class="kpi-sub">Students under your care</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <a href="/Progress/Ward" class="text-decoration-none">
+                            <div class="kpi-tile kpi-tile-green">
+                                <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+                                <div class="kpi-body">
+                                    <div class="kpi-value">@wardAvg%</div>
+                                    <div class="kpi-label">Average Progress</div>
+                                    <div class="kpi-sub">Across all courses</div>
+                                    <div class="kpi-accent"></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-tile kpi-tile-amber">
+                            <div class="kpi-icon"><i class="fas fa-book"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-value">@totalCourses</div>
+                                <div class="kpi-label">Total Courses</div>
+                                <div class="kpi-sub">Enrolled courses</div>
+                                <div class="kpi-accent"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-tile kpi-tile-red">
+                            <div class="kpi-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-value">@upcomingLessons.Count()</div>
+                                <div class="kpi-label">Upcoming Lessons</div>
+                                <div class="kpi-sub">Next 7 days</div>
+                                <div class="kpi-accent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="Progress" asp-action="Ward">My Ward Progress</a>
+
+        <!-- Quick Actions -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">
+                            <i class="fas fa-bolt text-warning me-2"></i>Quick Actions
+                        </h6>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Progress/Ward" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="icon-circle"><i class="fas fa-chart-line"></i></div>
+                                <div class="fw-semibold mt-2">Ward Progress</div>
+                                <div class="text-muted small">View academic progress and performance</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/TestReports/Ward" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="d-flex justify-content-between">
+                                    <div class="icon-circle"><i class="fas fa-clipboard-check"></i></div>
+                                    @if (recentTests.Count() > 0)
+                                    {
+                                        <span class="">@recentTests.Count() recent</span>
+                                    }
+                                </div>
+                                <div class="fw-semibold mt-2">Test Reports</div>
+                                <div class="text-muted small">View test results and assessments</div>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <a class="card p-3 text-decoration-none h-100" href="/Profile/Index" style="border:1px solid rgba(13,110,253,0.25);">
+                                <div class="icon-circle"><i class="fas fa-user-circle"></i></div>
+                                <div class="fw-semibold mt-2">My Profile</div>
+                                <div class="text-muted small">Update your profile information</div>
+                            </a>
+                        </div>
+                     
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6 col-lg-4">
-            <a class="btn btn-outline-primary w-100" asp-controller="Schedule" asp-action="My" onclick="alert('Guardian schedule view is via Ward Progress for now.'); return false;">My Ward Schedule</a>
+
+        <!-- Next Lesson & Wards Overview -->
+        <div class="col-12 col-xl-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-3">Next Upcoming Lesson</h6>
+                    @if (next != null)
+                    {
+                        <div class="border rounded p-3 bg-light">
+                            <div class="fw-semibold mb-2">@next.Course</div>
+                            @if (next.StudentName != null)
+                            {
+                                <div class="text-muted small mb-1">
+                                    <i class="fas fa-user me-1"></i>@next.StudentName
+                                </div>
+                            }
+                            <div class="text-muted small">
+                                <i class="fas fa-calendar me-1"></i>@(((DateTimeOffset)next.When).ToString("yyyy-MM-dd HH:mm")) (UTC)
+                            </div>
+                            <div class="mt-2">
+                                <a href="/Schedule/Overview?studentId=@next.StudentUserId" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-calendar-alt me-1"></i>View Schedule
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted text-center py-3">
+                            <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                            <div>No upcoming lessons scheduled</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Test Reports -->
+        <div class="col-12 col-xl-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Recent Test Reports</h6>
+                        <a href="/TestReports/Ward" class="small text-decoration-none">View All</a>
+                    </div>
+                    @if (recentTests.Count() == 0)
+                    {
+                        <div class="text-muted text-center py-4">
+                            <i class="fas fa-clipboard fa-2x mb-2"></i>
+                            <div>No test reports available yet</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Test</th>
+                                    <th>Student</th>
+                                    <th>Course</th>
+                                    <th>Date</th>
+                                    <th class="text-end">Score</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var test in recentTests)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@test.TestName</td>
+                                        <td class="text-muted">@(test.StudentName ?? "-")</td>
+                                        <td class="text-muted">@(test.CourseName ?? "-")</td>
+                                        <td class="text-muted small">@test.TestDate.ToString("yyyy-MM-dd")</td>
+                                        <td class="text-end">
+                                            <span class="fw-semibold">@test.Percentage.ToString("0.#")%</span>
+                                            <span class="badge bg-light text-dark ms-1">@test.Grade</span>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Lessons -->
+        <div class="col-12 col-xl-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Upcoming Lessons (Next 7 Days)</h6>
+                        <a href="/Schedule/Overview" class="small text-decoration-none">View All</a>
+                    </div>
+                    @if (upcomingLessons.Count() == 0)
+                    {
+                        <div class="text-muted text-center py-4">
+                            <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                            <div>No upcoming lessons in the next 7 days</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var lesson in upcomingLessons)
+                            {
+                                <div class="border rounded p-2">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">@(lesson.CourseName ?? "Course")</div>
+                                            <div class="text-muted small">
+                                                <i class="fas fa-user me-1"></i>@(lesson.StudentName ?? "Student")
+                                                @if (lesson.TutorName != null)
+                                                {
+                                                    <span class="ms-2"><i class="fas fa-chalkboard-teacher me-1"></i>@lesson.TutorName</span>
+                                                }
+                                            </div>
+                                            <div class="text-muted small mt-1">
+                                                <i class="fas fa-clock me-1"></i>@(((DateTimeOffset)lesson.When).ToString("yyyy-MM-dd HH:mm")) (UTC)
+                                            </div>
+                                        </div>
+                                        <a href="/People/Student/@lesson.StudentUserId" class="btn btn-sm btn-outline-primary">View</a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Lessons & Activities -->
+        <div class="col-12 col-xl-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Recent Lessons (This Week)</h6>
+                    </div>
+                    @if (recentLessons.Count() == 0)
+                    {
+                        <div class="text-muted text-center py-4">
+                            <i class="fas fa-history fa-2x mb-2"></i>
+                            <div>No lessons completed this week</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var lesson in recentLessons)
+                            {
+                                <div class="border rounded p-2 bg-light">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="fw-semibold">@(lesson.CourseName ?? "Course")</div>
+                                            <div class="text-muted small">
+                                                <i class="fas fa-user me-1"></i>@(lesson.StudentName ?? "Student")
+                                            </div>
+                                            <div class="text-muted small mt-1">
+                                                <i class="fas fa-check-circle text-success me-1"></i>Completed on @(((DateTimeOffset)lesson.When).ToString("MMM dd, yyyy HH:mm"))
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-success">Completed</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-

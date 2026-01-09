@@ -318,7 +318,12 @@ public sealed class PeopleController : Controller
             .Include(g => g.GuardianUser)
             .Where(g => !g.IsDeleted && g.StudentUserId == id)
             .OrderByDescending(g => g.CreatedAt)
-            .Select(g => new GuardianMiniVm(g.GuardianUserId, g.GuardianUser != null ? g.GuardianUser.FullName : g.GuardianUserId.ToString()))
+            .Select(g => new GuardianMiniVm(
+                g.GuardianUserId,
+                g.GuardianUser != null ? g.GuardianUser.FullName : g.GuardianUserId.ToString(),
+                g.GuardianUser != null ? g.GuardianUser.Email : null,
+                g.GuardianUser != null ? g.GuardianUser.LocalNumber : null,
+                g.GuardianUser != null ? g.GuardianUser.WhatsappNumber : null))
             .ToListAsync(ct);
 
         var lessonsTotal = await _db.LessonBookings.AsNoTracking().CountAsync(l => !l.IsDeleted && l.StudentUserId == id, ct);

@@ -4,10 +4,12 @@
     var wards = (IEnumerable<dynamic>?)ViewBag.Wards ?? Array.Empty<dynamic>();
     var selectedId = (long?)ViewBag.SelectedStudentId;
     var selectedName = (string?)ViewBag.SelectedStudentName ?? "Ward";
+    string riskClass(int p) => p >= 70 ? "bg-success" : (p >= 40 ? "bg-warning" : "bg-danger");
 }
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: "Progress",
+    Title: "Ward Progress",
+    Icon: "fas fa-chart-line",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Home")),
@@ -17,27 +19,265 @@
     Subtitle: selectedName
 ))
 
+
 <div class="container-fluid">
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="get" class="row g-2 align-items-end">
-                <div class="col-md-6">
-                    <label class="form-label">Select ward</label>
-                    <select class="form-select" name="studentUserId">
-                        @foreach (var w in wards)
-                        {
-                            <option value="@w.StudentUserId" selected="@(w.StudentUserId == selectedId)">@w.Name</option>
-                        }
-                    </select>
+    <!-- Ward Selector Card -->
+    @if (wards.Count() > 1)
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">
+                    <i class="fas fa-user-friends me-2 text-primary"></i>Select Ward
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="get" id="wardForm" class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Choose a ward to view their progress</label>
+                        <select class="form-select form-select-lg" name="studentUserId" id="wardSelect" onchange="document.getElementById('wardForm').submit();">
+                            @foreach (var w in wards)
+                            {
+                                <option value="@w.StudentUserId" selected="@(w.StudentUserId == selectedId)">@w.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100" type="submit">
+                            <i class="fas fa-search me-2"></i>View Progress
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    <!-- Overview Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                            <i class="fas fa-chart-line fa-lg text-primary"></i>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-muted small mb-1">Overall Progress</div>
+                            <div class="fs-3 fw-bold">@Model.OverallPercent%</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Topics Completed</span>
+                            <span class="fw-semibold">@Model.CompletedTopics / @Model.TotalTopics</span>
+                        </div>
+                        <div class="progress" style="height: 12px; border-radius: 6px;">
+                            <div class="progress-bar @riskClass(Model.OverallPercent) progress-bar-striped" 
+                                 style="width: @Model.OverallPercent%" 
+                                 role="progressbar">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <button class="btn btn-primary" type="submit">View</button>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                            <i class="fas fa-star fa-lg text-success"></i>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-muted small mb-1">Performance Rating</div>
+                            <div class="fs-3 fw-bold">@((Model.PerformanceAvgRating ?? 0).ToString("F1"))</div>
+                            <div class="text-muted small">out of 5.0</div>
+                        </div>
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fas fa-comments me-1"></i>Based on @Model.PerformanceCount feedback @(Model.PerformanceCount == 1 ? "entry" : "entries")
+                    </div>
                 </div>
-            </form>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                            <i class="fas fa-book fa-lg text-info"></i>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-muted small mb-1">Active Courses</div>
+                            <div class="fs-3 fw-bold">@Model.Courses.Count</div>
+                        </div>
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fas fa-check-circle me-1 text-success"></i>@Model.Courses.Count(c => c.Percent >= 70) completed
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <partial name="My" model="Model" />
+    <!-- Courses Section -->
+    @if (Model.Courses.Count > 0)
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2 text-primary"></i>Course Progress
+                    </h5>
+                    <span class="badge bg-primary">@Model.Courses.Count courses</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    @foreach (var c in Model.Courses.OrderByDescending(x => x.Percent))
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card border h-100 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-bold mb-1">@c.CourseName</h6>
+                                            <div class="text-muted small">
+                                                <i class="fas fa-chalkboard-teacher me-1"></i>@(c.TutorName ?? "TBD")
+                                            </div>
+                                        </div>
+                                        <span class="badge @(c.Percent >= 70 ? "bg-success" : c.Percent >= 40 ? "bg-warning" : "bg-danger") rounded-pill">
+                                            @c.Percent%
+                                        </span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between small text-muted mb-1">
+                                            <span>Progress</span>
+                                            <span class="fw-semibold">@c.CompletedTopics / @c.TotalTopics topics</span>
+                                        </div>
+                                        <div class="progress" style="height: 10px; border-radius: 5px;">
+                                            <div class="progress-bar @riskClass(c.Percent)" 
+                                                 style="width: @c.Percent%" 
+                                                 role="progressbar">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Lessons Section -->
+    <div class="row g-4">
+        <!-- Recent Lessons -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2 text-primary"></i>Recent Lessons
+                        </h5>
+                        @if (Model.RecentLessons.Count > 0)
+                        {
+                            <span class="badge bg-secondary">@Model.RecentLessons.Count</span>
+                        }
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentLessons.Count == 0)
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                            <div>No recent lessons</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var l in Model.RecentLessons)
+                            {
+                                <div class="list-group-item px-0 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold mb-1">@l.CourseName</div>
+                                            <div class="text-muted small mb-1">
+                                                <i class="fas fa-clock me-1"></i>@l.WhenUtc.ToString("MMM dd, yyyy HH:mm") (UTC)
+                                            </div>
+                                            <span class="badge @(l.Status == "Completed" ? "bg-success" : l.Status == "Scheduled" ? "bg-primary" : "bg-secondary")">
+                                                @l.Status
+                                            </span>
+                                        </div>
+                                        @if (l.StudentAttended == true)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Attended
+                                            </span>
+                                        }
+                                        else if (l.StudentAttended == false)
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Missed
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Lessons -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-check me-2 text-primary"></i>Upcoming Lessons
+                        </h5>
+                        @if (Model.UpcomingLessons.Count > 0)
+                        {
+                            <span class="badge bg-primary">@Model.UpcomingLessons.Count</span>
+                        }
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.UpcomingLessons.Count == 0)
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                            <div>No upcoming lessons scheduled</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var l in Model.UpcomingLessons)
+                            {
+                                <div class="list-group-item px-0 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold mb-1">@l.CourseName</div>
+                                            <div class="text-muted small mb-1">
+                                                <i class="fas fa-clock me-1"></i>@l.WhenUtc.ToString("MMM dd, yyyy HH:mm") (UTC)
+                                            </div>
+                                            <span class="badge bg-primary">
+                                                @l.Status
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-

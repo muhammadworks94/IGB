@@ -5,6 +5,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: Model.Id.HasValue ? "Edit Course" : "Create Course",
+    Icon: Model.Id.HasValue ? "fas fa-edit" : "fas fa-plus-circle",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Home")),

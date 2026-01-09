@@ -1,50 +1,58 @@
 @model IGB.Web.ViewModels.Reports.AttendanceLogsViewModel
 @{
     ViewData["Title"] = "Attendance Logs";
+    
+    var search = new PageHeaderSearch(
+        Placeholder: "Search...",
+        QueryParamName: "q",
+        CurrentValue: Model.Query,
+        FormAction: Url.Action("AttendanceLogs", "Reports"),
+        FormMethod: "get",
+        ShowClearButton: true,
+        ClearButtonUrl: Url.Action("AttendanceLogs", "Reports", new { from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") })
+    );
+    
+    // Build filters
+    var filters = new List<PageHeaderFilter>
+    {
+        new("From", "from", "date", Model.From?.ToString("yyyy-MM-dd") ?? "", null, "From date"),
+        new("To", "to", "date", Model.To?.ToString("yyyy-MM-dd") ?? "", null, "To date")
+    };
+    
+    // Build action buttons
+    var hasActiveFilters = Model.From.HasValue || Model.To.HasValue || !string.IsNullOrWhiteSpace(Model.Query);
+    var actionButtons = new List<PageHeaderActionButton>
+    {
+        new("Export CSV", Url.Action("AttendanceLogsExportCsv", "Reports", new { q = Model.Query, from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") }), Icon: "fas fa-file-csv me-1", ButtonType: "outline-secondary"),
+        new("PDF", Url.Action("AttendanceLogsExportPdf", "Reports", new { q = Model.Query, from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") }), Icon: "fas fa-file-pdf me-1", ButtonType: "outline-secondary")
+    };
+    
+    if (hasActiveFilters)
+    {
+        actionButtons.Add(new PageHeaderActionButton(
+            "Reset",
+            Url.Action("AttendanceLogs", "Reports"),
+            Icon: "fas fa-rotate-left me-1",
+            ButtonType: "outline-secondary"
+        ));
+    }
 }
 
-<div class="breadcrumb-header">
-    <!-- Breadcrumbs -->
-    <nav aria-label="breadcrumb" class="mb-2">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Reports</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Attendance Logs</li>
-        </ol>
-    </nav>
-    
-    <!-- Title, Search, Filters, and Action Buttons in one row -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-0">
-        <h1 class="breadcrumb-title mb-0">Attendance Logs</h1>
-        
-        <div class="d-flex gap-2 align-items-center flex-wrap">
-            <form method="get" id="attendanceLogsFilterForm" class="d-flex gap-2 align-items-center">
-                <input type="hidden" name="pageSize" value="@Model.Pagination.PageSize" />
-                <div style="width: 200px;">
-                    <input class="form-control form-control-sm" name="q" value="@Model.Query" placeholder="Search..." />
-                </div>
-                <div style="width: 150px;">
-                    <input class="form-control form-control-sm" name="from" type="date" value="@(Model.From?.ToString("yyyy-MM-dd") ?? "")" placeholder="From" />
-                </div>
-                <div style="width: 150px;">
-                    <input class="form-control form-control-sm" name="to" type="date" value="@(Model.To?.ToString("yyyy-MM-dd") ?? "")" placeholder="To" />
-                </div>
-                <button class="btn btn-primary btn-sm" type="submit">
-                    <i class="fas fa-search me-1"></i>Filter
-                </button>
-                <a class="btn btn-outline-secondary btn-sm" id="exportCsvLink" href="@Url.Action("AttendanceLogsExportCsv","Reports", new { q = Model.Query, from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") })">
-                    <i class="fas fa-file-csv me-1"></i>Export CSV
-                </a>
-                <a class="btn btn-outline-secondary btn-sm" target="_blank" id="exportPdfLink" href="@Url.Action("AttendanceLogsExportPdf","Reports", new { q = Model.Query, from = Model.From?.ToString("yyyy-MM-dd"), to = Model.To?.ToString("yyyy-MM-dd") })">
-                    <i class="fas fa-file-pdf me-1"></i>PDF
-                </a>
-            </form>
-        </div>
-    </div>
-</div>
+@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
+    Title: "Attendance Logs",
+    Icon: "fas fa-clipboard-list",
+    Breadcrumbs: new List<BreadcrumbItem>
+    {
+        new("Dashboard", Url.Action("Index", "Home")),
+        new("Reports"),
+        new("Attendance Logs")
+    },
+    Search: search,
+    Filters: filters,
+    ActionButtons: actionButtons
+))
 
 <div class="container-fluid">
-
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
@@ -102,37 +110,60 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('attendanceLogsFilterForm');
-        if (form) {
-            function updateExportLinks() {
-                const q = form.querySelector('[name="q"]')?.value || '';
-                const from = form.querySelector('[name="from"]')?.value || '';
-                const to = form.querySelector('[name="to"]')?.value || '';
-                
-                const csvLink = document.getElementById('exportCsvLink');
-                const pdfLink = document.getElementById('exportPdfLink');
-                
-                if (csvLink) {
-                    csvLink.href = '@Url.Action("AttendanceLogsExportCsv","Reports")' + 
-                        '?q=' + encodeURIComponent(q) + 
-                        '&from=' + encodeURIComponent(from) + 
-                        '&to=' + encodeURIComponent(to);
-                }
-                if (pdfLink) {
-                    pdfLink.href = '@Url.Action("AttendanceLogsExportPdf","Reports")' + 
-                        '?q=' + encodeURIComponent(q) + 
-                        '&from=' + encodeURIComponent(from) + 
-                        '&to=' + encodeURIComponent(to);
-                }
-            }
+        // Update export button URLs based on current filter values
+        const updateExportUrls = function() {
+            const searchInput = document.querySelector('input[name="q"]');
+            const fromInput = document.querySelector('input[name="from"]');
+            const toInput = document.querySelector('input[name="to"]');
+            const q = searchInput?.value || '';
+            const from = fromInput?.value || '';
+            const to = toInput?.value || '';
             
-            form.addEventListener('change', updateExportLinks);
-            form.addEventListener('input', function(e) {
-                if (e.target.name === 'q') {
-                    updateExportLinks();
+            // Find export buttons by their href pattern
+            const exportButtons = document.querySelectorAll('a[href*="AttendanceLogsExport"]');
+            exportButtons.forEach(function(btn) {
+                let baseUrl = btn.getAttribute('data-base-url');
+                if (!baseUrl) {
+                    // Extract base URL from current href
+                    baseUrl = btn.href.split('?')[0];
+                    btn.setAttribute('data-base-url', baseUrl);
                 }
+                const params = [];
+                if (q) params.push('q=' + encodeURIComponent(q));
+                if (from) params.push('from=' + encodeURIComponent(from));
+                if (to) params.push('to=' + encodeURIComponent(to));
+                btn.href = baseUrl + (params.length > 0 ? '?' + params.join('&') : '');
+            });
+        };
+        
+        // Watch for search input changes
+        const searchInput = document.querySelector('input[name="q"]');
+        if (searchInput) {
+            searchInput.addEventListener('input', updateExportUrls);
+        }
+        
+        // Watch for date input changes to update export URLs in real-time
+        const fromInput = document.querySelector('input[name="from"]');
+        const toInput = document.querySelector('input[name="to"]');
+        
+        if (fromInput) {
+            fromInput.addEventListener('change', updateExportUrls);
+        }
+        if (toInput) {
+            toInput.addEventListener('change', updateExportUrls);
+        }
+        
+        // Also update when the date filter form is submitted
+        const dateFiltersForm = document.getElementById('dateFiltersForm');
+        if (dateFiltersForm) {
+            dateFiltersForm.addEventListener('submit', function() {
+                // Update URLs before form submits
+                updateExportUrls();
             });
         }
+        
+        // Initial update on page load
+        updateExportUrls();
     });
 </script>
 

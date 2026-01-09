@@ -39,6 +39,7 @@ public sealed record PageHeaderViewModel(
     IReadOnlyList<BreadcrumbItem>? Breadcrumbs = null,
     string? Subtitle = null,
     bool Centered = false,
+    string? Icon = null, // Font Awesome icon class (e.g., "fas fa-user", "fas fa-book")
     PageHeaderSearch? Search = null,
     IReadOnlyList<PageHeaderActionButton>? ActionButtons = null,
     IReadOnlyList<PageHeaderFilter>? Filters = null

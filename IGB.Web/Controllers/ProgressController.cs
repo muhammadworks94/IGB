@@ -155,8 +155,11 @@ public class ProgressController : Controller
     // Tutor: select student (simple list based on lessons with this tutor)
     [Authorize(Roles = "Tutor")]
     [RequirePermission(PermissionCatalog.Permissions.ProgressManage)]
-    public async Task<IActionResult> Students(string? q, CancellationToken ct)
+    public async Task<IActionResult> Students(string? q, long? courseId, string? progressFilter, int page = 1, int pageSize = 25, CancellationToken ct = default)
     {
+        page = page <= 0 ? 1 : page;
+        pageSize = pageSize is < 5 or > 100 ? 25 : pageSize;
+
         var uidStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!long.TryParse(uidStr, out var tutorId)) return Forbid();
 
@@ -170,15 +173,143 @@ public class ProgressController : Controller
             query = query.Where(l => l.StudentUser!.FirstName.Contains(term) || l.StudentUser.LastName.Contains(term) || l.StudentUser.Email.Contains(term));
         }
 
-        var students = await query
-            .Select(l => l.StudentUser!)
+        if (courseId.HasValue)
+        {
+            query = query.Where(l => l.CourseId == courseId.Value);
+        }
+
+        var studentIds = await query
+            .Select(l => l.StudentUserId)
             .Distinct()
-            .OrderBy(s => s.FirstName).ThenBy(s => s.LastName)
-            .Take(50)
             .ToListAsync(ct);
 
-        ViewBag.Query = q;
-        return View(students);
+        if (studentIds.Count == 0)
+        {
+            ViewBag.Courses = await _db.Courses.AsNoTracking()
+                .Where(c => !c.IsDeleted && c.TutorUserId == tutorId)
+                .OrderBy(c => c.Name)
+                .ToListAsync(ct);
+
+            return View(new TutorStudentsListViewModel
+            {
+                Query = q,
+                CourseId = courseId,
+                ProgressFilter = progressFilter,
+                Pagination = new IGB.Web.ViewModels.Components.PaginationViewModel(page, pageSize, 0, "Students", "Progress", new { q, courseId, progressFilter })
+            });
+        }
+
+        // Get progress data for each student
+        var courseBookings = await _db.CourseBookings.AsNoTracking()
+            .Include(b => b.Course)
+            .Where(b => !b.IsDeleted && studentIds.Contains(b.StudentUserId) && 
+                        (b.Status == BookingStatus.Approved || b.Status == BookingStatus.Completed) && 
+                        b.Course != null)
+            .ToListAsync(ct);
+
+        var allCourseIds = courseBookings.Select(b => b.CourseId).Distinct().ToList();
+        var topicTotals = await _db.CourseTopics.AsNoTracking()
+            .Where(t => !t.IsDeleted && allCourseIds.Contains(t.CourseId))
+            .GroupBy(t => t.CourseId)
+            .Select(g => new { CourseId = g.Key, Total = g.Count() })
+            .ToDictionaryAsync(x => x.CourseId, x => x.Total, ct);
+
+        var completedByStudentAndCourse = await _db.LessonTopicCoverages.AsNoTracking()
+            .Where(c => !c.IsDeleted && studentIds.Contains(c.StudentUserId) && allCourseIds.Contains(c.CourseId))
+            .GroupBy(c => new { c.StudentUserId, c.CourseId })
+            .Select(g => new { g.Key.StudentUserId, g.Key.CourseId, Done = g.Select(x => x.CourseTopicId).Distinct().Count() })
+            .ToListAsync(ct);
+
+        var studentRatings = await _db.StudentFeedbacks.AsNoTracking()
+            .Where(f => !f.IsDeleted && !f.IsFlagged && studentIds.Contains(f.StudentUserId))
+            .GroupBy(f => f.StudentUserId)
+            .Select(g => new { StudentId = g.Key, Avg = g.Average(x => (double)x.Rating), Cnt = g.Count() })
+            .ToDictionaryAsync(x => x.StudentId, x => (Avg: x.Avg, Cnt: x.Cnt), ct);
+
+        var lastLessonDates = await _db.LessonBookings.AsNoTracking()
+            .Where(l => !l.IsDeleted && studentIds.Contains(l.StudentUserId) && l.ScheduledStart.HasValue)
+            .GroupBy(l => l.StudentUserId)
+            .Select(g => new { StudentId = g.Key, LastDate = g.Max(l => l.ScheduledStart) })
+            .ToDictionaryAsync(x => x.StudentId, x => x.LastDate, ct);
+
+        var studentsData = await _db.Users.AsNoTracking()
+            .Where(u => !u.IsDeleted && studentIds.Contains(u.Id))
+            .ToListAsync(ct);
+
+        var rows = new List<TutorStudentsListViewModel.Row>();
+        foreach (var student in studentsData)
+        {
+            var studentCourses = courseBookings.Where(b => b.StudentUserId == student.Id).ToList();
+            
+            // If course filter is set, only calculate progress for that course
+            if (courseId.HasValue)
+            {
+                studentCourses = studentCourses.Where(b => b.CourseId == courseId.Value).ToList();
+                if (studentCourses.Count == 0) continue;
+            }
+
+            int totalTopics = 0, completedTopics = 0;
+            foreach (var booking in studentCourses)
+            {
+                var total = topicTotals.GetValueOrDefault(booking.CourseId, 0);
+                var done = completedByStudentAndCourse
+                    .Where(c => c.StudentUserId == student.Id && c.CourseId == booking.CourseId)
+                    .Sum(c => c.Done);
+                totalTopics += total;
+                completedTopics += Math.Min(done, total);
+            }
+
+            var overallPercent = totalTopics == 0 ? 0 : (int)Math.Round((completedTopics * 100.0) / totalTopics);
+
+            // Apply progress filter
+            if (progressFilter == "high" && overallPercent < 70) continue;
+            if (progressFilter == "medium" && (overallPercent < 40 || overallPercent >= 70)) continue;
+            if (progressFilter == "low" && overallPercent >= 40) continue;
+
+            double? avg = null;
+            int cnt = 0;
+            if (studentRatings.TryGetValue(student.Id, out var rating))
+            {
+                avg = rating.Avg;
+                cnt = rating.Cnt;
+            }
+            lastLessonDates.TryGetValue(student.Id, out var lastDate);
+
+            rows.Add(new TutorStudentsListViewModel.Row(
+                student.Id,
+                student.FullName,
+                student.Email,
+                studentCourses.Select(b => b.CourseId).Distinct().Count(),
+                overallPercent,
+                totalTopics,
+                completedTopics,
+                avg,
+                cnt,
+                lastDate?.UtcDateTime
+            ));
+        }
+
+        var totalCount = rows.Count;
+        var pagedRows = rows
+            .OrderByDescending(r => r.OverallProgressPercent)
+            .ThenBy(r => r.StudentName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        ViewBag.Courses = await _db.Courses.AsNoTracking()
+            .Where(c => !c.IsDeleted && c.TutorUserId == tutorId)
+            .OrderBy(c => c.Name)
+            .ToListAsync(ct);
+
+        return View(new TutorStudentsListViewModel
+        {
+            Query = q,
+            CourseId = courseId,
+            ProgressFilter = progressFilter,
+            Pagination = new IGB.Web.ViewModels.Components.PaginationViewModel(page, pageSize, totalCount, "Students", "Progress", new { q, courseId, progressFilter }),
+            Items = pagedRows
+        });
     }
 
     // Tutor: view student progress (implemented in pg5)

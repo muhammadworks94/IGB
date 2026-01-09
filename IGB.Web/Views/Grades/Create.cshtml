@@ -6,6 +6,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: "Create Grade",
+    Icon: "fas fa-plus-circle",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Grades", Url.Action("Index", "Grades", new { curriculumId })),

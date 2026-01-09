@@ -1,3 +1,5 @@
+using IGB.Web.ViewModels.Components;
+
 namespace IGB.Web.ViewModels.Progress;
 
 public class TutorStudentProgressViewModel
@@ -19,6 +21,29 @@ public class TutorStudentProgressViewModel
     public record AttendanceRow(long LessonId, string CourseName, string Status, DateTimeOffset WhenUtc, bool StudentAttended, bool TutorAttended, bool CanMarkTopics);
     public record NoteRow(DateTime CreatedAtUtc, string TutorName, string CourseName, string Note);
     public record FeedbackRow(DateTime CreatedAtUtc, int Rating, string TutorName, string CourseName, string? Comments);
+}
+
+public class TutorStudentsListViewModel
+{
+    public string? Query { get; set; }
+    public long? CourseId { get; set; }
+    public string? ProgressFilter { get; set; } // "high" (>=70), "medium" (40-69), "low" (<40)
+
+    public PaginationViewModel Pagination { get; set; } = new(1, 25, 0, "Students", "Progress");
+    public List<Row> Items { get; set; } = new();
+
+    public sealed record Row(
+        long StudentId,
+        string StudentName,
+        string Email,
+        int TotalCourses,
+        int OverallProgressPercent,
+        int TotalTopics,
+        int CompletedTopics,
+        double? AverageRating,
+        int RatingCount,
+        DateTime? LastLessonDate
+    );
 }
 
 

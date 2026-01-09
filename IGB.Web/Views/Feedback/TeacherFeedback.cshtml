@@ -11,13 +11,56 @@
         QueryParamName: "q",
         CurrentValue: Model.Query,
         FormAction: Url.Action("TeacherFeedback", "Feedback"),
-        ShowClearButton: true,
-        ClearButtonUrl: Url.Action("TeacherFeedback", "Feedback", new { courseId = Model.CourseId, rating = Model.Rating, flagged = Model.Flagged })
+        ShowClearButton: false
     );
+    
+    // Build filters
+    var courseOptions = new Dictionary<string, string> { { "", "All Courses" } };
+    if (courses != null)
+    {
+        foreach (dynamic c in courses)
+        {
+            courseOptions.Add(c.Id.ToString(), c.Name);
+        }
+    }
+    
+    var ratingOptions = new Dictionary<string, string> { { "", "Any Rating" } };
+    for (var i = 5; i >= 1; i--)
+    {
+        ratingOptions.Add(i.ToString(), i.ToString());
+    }
+    
+    var flaggedOptions = new Dictionary<string, string>
+    {
+        { "", "Any Status" },
+        { "true", "Flagged" },
+        { "false", "Not Flagged" }
+    };
+    
+    var filters = new List<PageHeaderFilter>
+    {
+        new("Course", "courseId", "select", Model.CourseId?.ToString() ?? "", courseOptions),
+        new("Rating", "rating", "select", Model.Rating?.ToString() ?? "", ratingOptions),
+        new("Flagged", "flagged", "select", Model.Flagged?.ToString() ?? "", flaggedOptions)
+    };
+    
+    // Build action buttons - Clear Filters button if any filters are active
+    var hasActiveFilters = Model.CourseId.HasValue || Model.Rating.HasValue || Model.Flagged.HasValue || !string.IsNullOrWhiteSpace(Model.Query);
+    var actionButtons = new List<PageHeaderActionButton>();
+    if (hasActiveFilters)
+    {
+        actionButtons.Add(new PageHeaderActionButton(
+            "Clear Filters",
+            Url.Action("TeacherFeedback", "Feedback"),
+            Icon: "fas fa-times me-1",
+            ButtonType: "outline-secondary"
+        ));
+    }
     
     // Build page header
     var pageHeader = new IGB.Web.ViewModels.PageHeaderViewModel(
         Title: "Teacher Feedback",
+        Icon: "fas fa-chalkboard-teacher",
         Breadcrumbs: new List<BreadcrumbItem>
         {
             new("Dashboard", Url.Action("Index", "Home")),
@@ -25,7 +68,9 @@
             new("Teacher Feedback")
         },
         Subtitle: "View and manage feedback from students to teachers",
-        Search: search
+        Search: search,
+        Filters: filters,
+        ActionButtons: actionButtons.Count > 0 ? actionButtons : null
     );
 }
 
@@ -36,52 +81,6 @@
     {
         <partial name="Components/_Alert" model="@(new IGB.Web.ViewModels.Components.AlertViewModel(TempData["Success"]!.ToString()!, Variant: "success", Dismissible: true))" />
     }
-
-    <!-- Filters Card -->
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="get" class="row g-2 align-items-end">
-                <input type="hidden" name="q" value="@Model.Query" />
-                <div class="col-md-4">
-                    <label class="form-label small">Course</label>
-                    <select class="form-select form-select-sm" name="courseId" onchange="this.form.submit()">
-                        <option value="">All</option>
-                        @if (courses != null)
-                        {
-                            foreach (dynamic c in courses)
-                            {
-                                var selected = (Model.CourseId.HasValue && ((long)c.Id) == Model.CourseId.Value);
-                                <option value="@c.Id" selected="@selected">@c.Name</option>
-                            }
-                        }
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small">Rating</label>
-                    <select class="form-select form-select-sm" name="rating" onchange="this.form.submit()">
-                        <option value="">Any</option>
-                        @for (var i = 5; i >= 1; i--)
-                        {
-                            <option value="@i" selected="@(Model.Rating == i)">@i</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small">Flagged</label>
-                    <select class="form-select form-select-sm" name="flagged" onchange="this.form.submit()">
-                        <option value="">Any</option>
-                        <option value="true" selected="@(Model.Flagged == true)">Flagged</option>
-                        <option value="false" selected="@(Model.Flagged == false)">Not flagged</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <a class="btn btn-outline-secondary btn-sm w-100" href="@Url.Action("TeacherFeedback","Feedback")">
-                        <i class="fas fa-times me-1"></i>Clear Filters
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
 
     @{
         var table = new IGB.Web.ViewModels.Components.TableShellViewModel(

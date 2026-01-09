@@ -13,6 +13,7 @@
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: "Pending Course Bookings",
+    Icon: "fas fa-clock",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Home", Url.Action("Index", "Home")),

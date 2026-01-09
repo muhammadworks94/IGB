@@ -5,109 +5,234 @@
     var topicTitles = Model.Topics.Where(t => !t.IsDeleted && t.CourseTopic != null).Select(t => t.CourseTopic!.Title).ToList();
 }
 
+@{
+    var actionButtons = new List<IGB.Web.ViewModels.PageHeaderActionButton>();
+    actionButtons.Add(new IGB.Web.ViewModels.PageHeaderActionButton(
+        Text: "Download PDF",
+        Url: Url.Action("WardDetailsPdf", "TestReports", new { id = Model.Id, studentUserId = backStudentId }),
+        Icon: "fas fa-file-pdf me-1",
+        ButtonType: "secondary",
+        OnClick: "window.open(this.href, '_blank'); return false;"
+    ));
+}
+
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
     Title: Model.TestName,
+    Icon: "fas fa-clipboard-list",
     Breadcrumbs: new List<BreadcrumbItem>
     {
         new("Dashboard", Url.Action("Index", "Home")),
         new("My Ward", Url.Action("Ward", "TestReports", new { studentUserId = backStudentId })),
         new("Test Reports", Url.Action("Ward", "TestReports", new { studentUserId = backStudentId })),
         new(Model.TestName)
-    }
+    },
+    ActionButtons: actionButtons
 ))
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a class="btn btn-outline-secondary" href="@Url.Action("Ward","TestReports", new { studentUserId = backStudentId })">Back</a>
-        <a class="btn btn-outline-secondary" target="_blank" href="@Url.Action("WardDetailsPdf","TestReports", new { id = Model.Id, studentUserId = backStudentId })">Download Report (PDF)</a>
-    </div>
-
-    <div class="card mb-3">
+    <!-- Test Overview Card -->
+    <div class="card mb-4">
         <div class="card-body">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <div class="text-muted small">Student</div>
-                    <div class="fw-semibold">@Model.StudentUser?.FullName</div>
-                    <div class="text-muted small mt-1">Tutor: @Model.TutorUser?.FullName</div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; flex-shrink: 0;">
+                            <i class="fas fa-user-graduate fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small mb-1">Student</div>
+                            <div class="fs-5 fw-semibold">@Model.StudentUser?.FullName</div>
+                            @if (Model.TutorUser != null)
+                            {
+                                <div class="text-muted small mt-1">
+                                    <i class="fas fa-chalkboard-teacher me-1"></i>Tutor: @Model.TutorUser.FullName
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
-                <div class="text-end">
-                    <div class="text-muted small">Course</div>
-                    <div class="fw-semibold">@Model.Course?.Name</div>
-                    <div class="text-muted small mt-1">@Model.TestDate.ToString("yyyy-MM-dd")</div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; flex-shrink: 0;">
+                            <i class="fas fa-book fa-2x text-info"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small mb-1">Course</div>
+                            <div class="fs-5 fw-semibold">@Model.Course?.Name</div>
+                            <div class="text-muted small mt-1">
+                                <i class="fas fa-calendar me-1"></i>Test Date: @Model.TestDate.ToString("MMM dd, yyyy")
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-3">
+    <div class="row g-4">
+        <!-- Left Column -->
         <div class="col-lg-7">
-            <div class="card mb-3">
+            <!-- Marks Summary Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>Marks Summary
+                    </h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="mb-3">Marks</h5>
-                    <div class="row g-3 align-items-center">
+                    <div class="row g-4 align-items-center">
                         <div class="col-md-4 text-center">
-                            <span class="badge bg-success" style="font-size:1.3rem;">@Model.Grade</span>
-                            <div class="text-muted mt-2">@Model.Percentage.ToString("F2")%</div>
+                            <div class="mb-3">
+                                <span class="badge @(Model.Grade == "A+" || Model.Grade == "A" ? "bg-success" : Model.Grade == "B" || Model.Grade == "B+" ? "bg-info" : Model.Grade == "C" || Model.Grade == "C+" ? "bg-warning" : "bg-danger") rounded-pill px-4 py-3" style="font-size: 1.5rem; font-weight: 600;">
+                                    @Model.Grade
+                                </span>
+                            </div>
+                            <div class="fs-4 fw-semibold text-muted">@Model.Percentage.ToString("F1")%</div>
                         </div>
                         <div class="col-md-8">
-                            <div class="fs-4 fw-semibold">@Model.ObtainedMarks / @Model.TotalMarks</div>
-                            <div class="progress mt-2" style="height:12px;">
-                                <div class="progress-bar bg-success" style="width:@Model.Percentage%"></div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Obtained Marks</span>
+                                <span class="fs-4 fw-bold">@Model.ObtainedMarks / @Model.TotalMarks</span>
+                            </div>
+                            <div class="progress" style="height: 20px; border-radius: 10px;">
+                                <div class="progress-bar @(Model.Percentage >= 80 ? "bg-success" : Model.Percentage >= 60 ? "bg-info" : Model.Percentage >= 40 ? "bg-warning" : "bg-danger") progress-bar-striped progress-bar-animated" 
+                                     style="width: @Model.Percentage%" 
+                                     role="progressbar">
+                                    <span class="fw-semibold">@Model.Percentage.ToString("F1")%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card mb-3">
+            <!-- Topics Covered Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list-check me-2 text-primary"></i>Topics Covered
+                    </h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="mb-3">Topics Covered</h5>
                     @if (topicTitles.Count == 0)
                     {
-                        <div class="text-muted">—</div>
+                        <div class="text-muted text-center py-3">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <div>No topics specified</div>
+                        </div>
                     }
                     else
                     {
-                        <ul class="mb-0">
-                            @foreach (var t in topicTitles)
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var topic in topicTitles)
                             {
-                                <li>@t</li>
+                                <span class="badge bg-light text-dark border px-3 py-2">
+                                    <i class="fas fa-check-circle text-success me-1"></i>@topic
+                                </span>
                             }
-                        </ul>
+                        </div>
                     }
                 </div>
             </div>
 
+            <!-- Tutor Feedback Card -->
             <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments me-2 text-primary"></i>Tutor Feedback
+                    </h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="mb-3">Tutor Notes</h5>
-                    <div class="mb-2"><strong>Strengths:</strong> @(string.IsNullOrWhiteSpace(Model.Strengths) ? "—" : Model.Strengths)</div>
-                    <div class="mb-2"><strong>Areas for Improvement:</strong> @(string.IsNullOrWhiteSpace(Model.AreasForImprovement) ? "—" : Model.AreasForImprovement)</div>
-                    <div class="mb-0"><strong>Comments:</strong> @(string.IsNullOrWhiteSpace(Model.TutorComments) ? "—" : Model.TutorComments)</div>
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-thumbs-up text-success me-2"></i>
+                            <h6 class="mb-0 fw-semibold text-success">Strengths</h6>
+                        </div>
+                        <div class="ps-4">
+                            @if (string.IsNullOrWhiteSpace(Model.Strengths))
+                            {
+                                <p class="mb-0 text-muted">Not provided</p>
+                            }
+                            else
+                            {
+                                <p class="mb-0">@Model.Strengths</p>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            <h6 class="mb-0 fw-semibold text-warning">Areas for Improvement</h6>
+                        </div>
+                        <div class="ps-4">
+                            @if (string.IsNullOrWhiteSpace(Model.AreasForImprovement))
+                            {
+                                <p class="mb-0 text-muted">Not provided</p>
+                            }
+                            else
+                            {
+                                <p class="mb-0">@Model.AreasForImprovement</p>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="mb-0">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-sticky-note text-info me-2"></i>
+                            <h6 class="mb-0 fw-semibold">Additional Comments</h6>
+                        </div>
+                        <div class="ps-4">
+                            @if (string.IsNullOrWhiteSpace(Model.TutorComments))
+                            {
+                                <p class="mb-0 text-muted">No comments provided</p>
+                            }
+                            else
+                            {
+                                <p class="mb-0">@Model.TutorComments</p>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Right Column -->
         <div class="col-lg-5">
+            <!-- Test Paper Card -->
             <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2 text-primary"></i>Test Paper
+                    </h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="mb-3">Test Paper</h5>
                     @if (string.IsNullOrWhiteSpace(Model.TestFileUrl))
                     {
-                        <div class="text-muted">Test paper not uploaded.</div>
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-circle-question fa-3x text-muted mb-3"></i>
+                            <div class="text-muted">Test paper not uploaded</div>
+                        </div>
                     }
                     else
                     {
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="text-muted small">@Model.TestFileName</div>
-                            <a class="btn btn-sm btn-outline-primary" href="@Model.TestFileUrl" target="_blank">Download</a>
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fas fa-file-pdf text-danger"></i>
+                                    <span class="fw-semibold">@Model.TestFileName</span>
+                                </div>
+                                <a class="btn btn-sm btn-outline-danger" href="@Model.TestFileUrl" target="_blank">
+                                    <i class="fas fa-download me-1"></i>Download
+                                </a>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="fas fa-info-circle me-1"></i>Click download to view the test paper
+                            </div>
                         </div>
-                        <div class="text-muted small">Preview available via download link.</div>
                     }
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
