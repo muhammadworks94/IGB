@@ -6,6 +6,18 @@
     var values = ViewBag.TrendValues as List<double> ?? new();
     var isPdf = (Model.TestFileContentType ?? "").Equals("application/pdf", StringComparison.OrdinalIgnoreCase);
     var isImage = (Model.TestFileContentType ?? "").StartsWith("image/", StringComparison.OrdinalIgnoreCase);
+    
+    // Calculate statistics
+    var avg = values.Count == 0 ? 0 : values.Average();
+    var best = values.Count == 0 ? 0 : values.Max();
+    var latest = values.Count == 0 ? 0 : values.Last();
+    var worst = values.Count == 0 ? 0 : values.Min();
+    var gradeVariant = Model.Grade.StartsWith("A") ? "success" : (Model.Grade.StartsWith("B") ? "primary" : (Model.Grade.StartsWith("C") ? "warning" : "danger"));
+    
+    var actionButtons = new List<PageHeaderActionButton>
+    {
+        new("Download PDF", Url.Action("MyDetailsPdf", "TestReports", new { id = Model.Id }), Icon: "fas fa-file-pdf me-1", ButtonType: "outline-primary")
+    };
 }
 
 @await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
@@ -16,132 +28,244 @@
         new("Dashboard", Url.Action("Index", "Home")),
         new("My Tests", Url.Action("My", "TestReports")),
         new(Model.TestName)
-    }
+    },
+    ActionButtons: actionButtons
 ))
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a class="btn btn-outline-secondary" href="@Url.Action("My","TestReports")">Back</a>
-        <a class="btn btn-outline-secondary" target="_blank" href="@Url.Action("MyDetailsPdf","TestReports", new { id = Model.Id })">Download Report (PDF)</a>
-    </div>
-
     <div class="row g-3">
-        <div class="col-lg-7">
-            <div class="card mb-3">
+        <!-- Left Column: Main Content -->
+        <div class="col-lg-8">
+            <!-- Test Info Card -->
+            <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="text-muted small">Course</div>
-                            <div class="fw-semibold">@Model.Course?.Name</div>
-                            <div class="text-muted small mt-1">Tutor: @Model.TutorUser?.FullName</div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="flex-grow-1">
+                                    <div class="text-muted small mb-1">Course</div>
+                                    <div class="fs-5 fw-semibold">@Model.Course?.Name</div>
+                                    <div class="text-muted small mt-2">
+                                        <i class="fas fa-user-tie me-1"></i>@Model.TutorUser?.FullName
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-end">
-                            <div class="text-muted small">Test Date</div>
-                            <div class="fw-semibold">@Model.TestDate.ToString("yyyy-MM-dd")</div>
-                            <div class="text-muted small">(@((DateOnly.FromDateTime(DateTime.UtcNow.Date).DayNumber - Model.TestDate.DayNumber)) days ago)</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="mb-3">Marks Summary</h5>
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-4 text-center">
-                            <span class="badge bg-success" style="font-size:1.3rem;">@Model.Grade</span>
-                            <div class="text-muted mt-2">@Model.Percentage.ToString("F2")%</div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="fs-4 fw-semibold">@Model.ObtainedMarks / @Model.TotalMarks</div>
-                            <div class="progress mt-2" style="height:12px;">
-                                <div class="progress-bar bg-success" style="width:@Model.Percentage%"></div>
+                        <div class="col-md-6 text-md-end">
+                            <div class="text-muted small mb-1">Test Date</div>
+                            <div class="fs-5 fw-semibold">@Model.TestDate.ToString("MMM dd, yyyy")</div>
+                            <div class="text-muted small mt-2">
+                                @{
+                                    var daysAgo = DateOnly.FromDateTime(DateTime.UtcNow.Date).DayNumber - Model.TestDate.DayNumber;
+                                    var daysText = daysAgo == 0 ? "Today" : daysAgo == 1 ? "Yesterday" : $"{daysAgo} days ago";
+                                }
+                                <i class="fas fa-calendar me-1"></i>@daysText
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card mb-3">
+            <!-- Marks Summary Card -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Marks Summary</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="mb-3">Performance Breakdown</h5>
-                    <div class="mb-3">
-                        <div class="fw-semibold">Topics Covered</div>
-                        @if (topicTitles.Count == 0)
-                        {
-                            <div class="text-muted">—</div>
-                        }
-                        else
-                        {
-                            <ul class="mb-0">
-                                @foreach (var t in topicTitles)
-                                {
-                                    <li>@t</li>
+                    <div class="row g-4 align-items-center">
+                        <div class="col-md-4 text-center">
+                            <div class="mb-3">
+                                <span class="badge bg-@gradeVariant" style="font-size: 2rem; padding: 0.75rem 1.5rem;">@Model.Grade</span>
+                            </div>
+                            <div class="fs-3 fw-bold text-@gradeVariant">@Model.Percentage.ToString("F1")%</div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fs-4 fw-semibold">@Model.ObtainedMarks / @Model.TotalMarks</span>
+                                <span class="text-muted">@Model.Percentage.ToString("F2")%</span>
+                            </div>
+                            <div class="progress" style="height: 20px; border-radius: 10px;">
+                                @{
+                                    var progressColor = Model.Percentage >= 80 ? "success" : Model.Percentage >= 60 ? "primary" : Model.Percentage >= 50 ? "warning" : "danger";
                                 }
-                            </ul>
-                        }
-                    </div>
-                    <div class="mb-3">
-                        <div class="fw-semibold text-success">Strengths</div>
-                        <div>@(string.IsNullOrWhiteSpace(Model.Strengths) ? "—" : Model.Strengths)</div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="fw-semibold text-warning">Areas for Improvement</div>
-                        <div>@(string.IsNullOrWhiteSpace(Model.AreasForImprovement) ? "—" : Model.AreasForImprovement)</div>
-                    </div>
-                    <div class="mb-0">
-                        <div class="fw-semibold">Tutor Comments</div>
-                        <div>@(string.IsNullOrWhiteSpace(Model.TutorComments) ? "—" : Model.TutorComments)</div>
-                        <div class="text-muted small mt-1">@Model.TutorUser?.FullName • @Model.TestDate.ToString("yyyy-MM-dd")</div>
+                                <div class="progress-bar bg-@progressColor progress-bar-striped" 
+                                     role="progressbar" 
+                                     style="width: @Model.Percentage%" 
+                                     aria-valuenow="@Model.Percentage" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2 text-muted small">
+                                <span>0</span>
+                                <span>50 (Pass)</span>
+                                <span>100</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Performance Analysis Card -->
             <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Performance Analysis</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="mb-3">Your Progress in @Model.Course?.Name</h5>
-                    <div style="height:260px;">
-                        <canvas id="trendChart"></canvas>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <div class="text-muted small mb-1">Strengths</div>
+                                <div class="text-success">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    @(string.IsNullOrWhiteSpace(Model.Strengths) ? "No specific strengths noted." : Model.Strengths)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <div class="text-muted small mb-1">Areas for Improvement</div>
+                                <div class="text-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    @(string.IsNullOrWhiteSpace(Model.AreasForImprovement) ? "Keep up the good work!" : Model.AreasForImprovement)
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    @{
-                        var avg = values.Count == 0 ? 0 : values.Average();
-                        var best = values.Count == 0 ? 0 : values.Max();
-                        var latest = values.Count == 0 ? 0 : values.Last();
+                    
+                    @if (topicTitles.Count > 0)
+                    {
+                        <div class="mb-3">
+                            <div class="fw-semibold mb-2"><i class="fas fa-book me-1"></i>Topics Covered</div>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var topic in topicTitles)
+                                {
+                                    <span class="badge bg-secondary">@topic</span>
+                                }
+                            </div>
+                        </div>
                     }
-                    <div class="row g-2 mt-3">
-                        <div class="col-md-4"><div class="text-muted small">Average</div><div class="fw-semibold">@avg.ToString("F1")%</div></div>
-                        <div class="col-md-4"><div class="text-muted small">Best</div><div class="fw-semibold">@best.ToString("F1")%</div></div>
-                        <div class="col-md-4"><div class="text-muted small">Latest</div><div class="fw-semibold">@latest.ToString("F1")%</div></div>
-                    </div>
+                    
+                    @if (!string.IsNullOrWhiteSpace(Model.TutorComments))
+                    {
+                        <div class="border-start border-primary border-3 ps-3 mt-3">
+                            <div class="fw-semibold mb-2">
+                                <i class="fas fa-comments me-1"></i>Tutor Comments
+                            </div>
+                            <div class="text-muted">@Model.TutorComments</div>
+                            <div class="text-muted small mt-2">
+                                <i class="fas fa-user me-1"></i>@Model.TutorUser?.FullName • @Model.TestDate.ToString("MMM dd, yyyy")
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
+
+            <!-- Progress Charts Section -->
+            @if (values.Count > 0)
+            {
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>Progress in @Model.Course?.Name</h5>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-primary active" data-chart-type="line">
+                                    <i class="fas fa-chart-line"></i> Trend
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-chart-type="bar">
+                                    <i class="fas fa-chart-bar"></i> Comparison
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Line Chart (Trend) -->
+                        <div id="chartContainer-line" style="height: 300px; position: relative; margin-bottom: 2.5rem; padding-bottom: 1rem;">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                        
+                        <!-- Bar Chart (Comparison) -->
+                        <div id="chartContainer-bar" style="height: 300px; position: relative; display: none; margin-bottom: 2.5rem; padding-bottom: 1rem;">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                        
+                        <!-- Statistics Cards -->
+                        <div class="row g-3 pt-4" style="border-top: 2px solid #e9ecef; margin-top: 1rem;">
+                            <div class="col-6 col-md-3">
+                                <div class="text-center p-3 bg-light rounded shadow-sm">
+                                    <div class="text-muted small mb-2"><i class="fas fa-chart-line me-1"></i>Average</div>
+                                    <div class="fs-4 fw-bold text-primary">@avg.ToString("F1")%</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="text-center p-3 bg-light rounded shadow-sm">
+                                    <div class="text-muted small mb-2"><i class="fas fa-trophy me-1"></i>Best Score</div>
+                                    <div class="fs-4 fw-bold text-success">@best.ToString("F1")%</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="text-center p-3 bg-light rounded shadow-sm">
+                                    <div class="text-muted small mb-2"><i class="fas fa-clock me-1"></i>Latest</div>
+                                    <div class="fs-4 fw-bold text-info">@latest.ToString("F1")%</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="text-center p-3 bg-light rounded shadow-sm">
+                                    <div class="text-muted small mb-2"><i class="fas fa-list-check me-1"></i>Tests Taken</div>
+                                    <div class="fs-4 fw-bold text-secondary">@values.Count</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
 
-        <div class="col-lg-5">
+        <!-- Right Column: Test Paper -->
+        <div class="col-lg-4">
             <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Test Paper</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="mb-3">Test Paper</h5>
                     @if (string.IsNullOrWhiteSpace(Model.TestFileUrl))
                     {
-                        <div class="text-muted">Test paper not uploaded.</div>
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-file-circle-question fa-3x mb-3"></i>
+                            <div>Test paper not uploaded.</div>
+                        </div>
                     }
                     else
                     {
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="text-muted small">@Model.TestFileName</div>
-                            <a class="btn btn-sm btn-outline-primary" href="@Model.TestFileUrl" target="_blank">Download</a>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold small">@Model.TestFileName</div>
+                                <div class="text-muted small">Test document</div>
+                            </div>
+                            <a class="btn btn-sm btn-primary" href="@Model.TestFileUrl" target="_blank">
+                                <i class="fas fa-download me-1"></i>Download
+                            </a>
                         </div>
+                        
                         @if (isPdf)
                         {
-                            <iframe src="@Model.TestFileUrl" style="width:100%;height:520px;border:1px solid #e5e7eb;"></iframe>
+                            <div class="border rounded overflow-hidden">
+                                <iframe src="@Model.TestFileUrl" style="width:100%;height:500px;border:none;"></iframe>
+                            </div>
                         }
                         else if (isImage)
                         {
-                            <img src="@Model.TestFileUrl" alt="Test paper" class="img-fluid rounded border" />
+                            <div class="border rounded overflow-hidden">
+                                <img src="@Model.TestFileUrl" alt="Test paper" class="img-fluid w-100" style="max-height: 500px; object-fit: contain;" />
+                            </div>
                         }
                         else
                         {
-                            <div class="text-muted">Preview not available for this file type.</div>
+                            <div class="text-center py-5 text-muted border rounded">
+                                <i class="fas fa-file fa-3x mb-3"></i>
+                                <div>Preview not available for this file type.</div>
+                                <a class="btn btn-sm btn-primary mt-2" href="@Model.TestFileUrl" target="_blank">Download to View</a>
+                            </div>
                         }
                     }
                 </div>
@@ -155,22 +279,332 @@
     <script>
       (function(){
         if (typeof Chart === 'undefined') return;
+        
         const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(labels));
         const values = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(values));
-        const ctx = document.getElementById('trendChart');
-        if (!ctx) return;
-        new Chart(ctx, {
-          type: 'line',
-          data: { labels, datasets: [{ label: 'Percentage', data: values, borderColor: '#0d6efd', tension: 0.25, fill: false }] },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true, max: 100 } },
-            plugins: { legend: { display: false } }
-          }
+        
+        // Create gradient for line chart
+        const createGradient = (ctx, color1, color2) => {
+          const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+          gradient.addColorStop(0, color1);
+          gradient.addColorStop(1, color2);
+          return gradient;
+        };
+        
+        // Line Chart (Trend) - Enhanced with gradient
+        const trendCtx = document.getElementById('trendChart');
+        let trendChart = null;
+        if (trendCtx && values.length > 0) {
+          const ctx = trendCtx.getContext('2d');
+          const gradientFill = createGradient(ctx, 'rgba(13, 110, 253, 0.25)', 'rgba(13, 110, 253, 0.02)');
+          
+          // Determine color based on latest performance
+          const latestValue = values[values.length - 1];
+          let primaryColor = '#0d6efd'; // blue
+          if (latestValue >= 80) primaryColor = '#198754'; // green
+          else if (latestValue >= 60) primaryColor = '#0dcaf0'; // cyan
+          else if (latestValue >= 50) primaryColor = '#ffc107'; // yellow
+          else primaryColor = '#dc3545'; // red
+          
+          const gradientFill2 = createGradient(ctx, 
+            primaryColor.replace(')', ', 0.25)').replace('rgb', 'rgba'),
+            primaryColor.replace(')', ', 0.02)').replace('rgb', 'rgba')
+          );
+          
+          trendChart = new Chart(ctx, {
+            type: 'line',
+            data: { 
+              labels, 
+              datasets: [{ 
+                label: 'Test Score', 
+                data: values,
+                borderColor: primaryColor,
+                backgroundColor: gradientFill2,
+                tension: 0.5,
+                fill: true,
+                pointRadius: values.length === 1 ? 8 : 6,
+                pointHoverRadius: values.length === 1 ? 10 : 8,
+                pointBackgroundColor: primaryColor,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 3,
+                borderWidth: 3,
+                cubicInterpolationMode: 'monotone'
+              }] 
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                intersect: false,
+                mode: 'index'
+              },
+              plugins: {
+                legend: { 
+                  display: false
+                },
+                tooltip: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                  padding: 16,
+                  titleFont: { 
+                    size: 15, 
+                    weight: 'bold',
+                    family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                  },
+                  bodyFont: { 
+                    size: 14,
+                    family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                  },
+                  borderColor: primaryColor,
+                  borderWidth: 2,
+                  cornerRadius: 8,
+                  displayColors: false,
+                  callbacks: {
+                    title: function(context) {
+                      return 'Test Date: ' + context[0].label;
+                    },
+                    label: function(context) {
+                      const value = context.parsed.y;
+                      const grade = value >= 80 ? 'A' : value >= 70 ? 'B' : value >= 60 ? 'C' : value >= 50 ? 'D' : 'F';
+                      return [
+                        'Score: ' + value.toFixed(1) + '%',
+                        'Grade: ' + grade
+                      ];
+                    }
+                  }
+                }
+              },
+              scales: { 
+                y: { 
+                  beginAtZero: true, 
+                  max: 100,
+                  min: 0,
+                  ticks: {
+                    stepSize: 10,
+                    font: {
+                      size: 12,
+                      weight: '500'
+                    },
+                    color: '#6c757d',
+                    callback: function(value) {
+                      return value + '%';
+                    },
+                    padding: 12
+                  },
+                  grid: {
+                    color: 'rgba(0, 0, 0, 0.08)',
+                    drawBorder: false,
+                    lineWidth: 1
+                  },
+                  border: {
+                    display: false
+                  }
+                },
+                x: {
+                  ticks: {
+                    font: {
+                      size: 12,
+                      weight: '500'
+                    },
+                    color: '#6c757d',
+                    padding: 12,
+                    maxRotation: 45,
+                    minRotation: 0
+                  },
+                  grid: {
+                    display: false,
+                    drawBorder: false
+                  },
+                  border: {
+                    display: false
+                  }
+                }
+              },
+              elements: {
+                line: {
+                  borderCapStyle: 'round',
+                  borderJoinStyle: 'round'
+                },
+                point: {
+                  hoverBorderWidth: 4
+                }
+              }
+            }
+          });
+        }
+        
+        // Bar Chart (Comparison) - Enhanced
+        const comparisonCtx = document.getElementById('comparisonChart');
+        let comparisonChart = null;
+        if (comparisonCtx && values.length > 0) {
+          const ctx2 = comparisonCtx.getContext('2d');
+          
+          const getBarColor = (value) => {
+            if (value >= 80) return { bg: '#198754', border: '#157347' };
+            if (value >= 60) return { bg: '#0dcaf0', border: '#0aa2c0' };
+            if (value >= 50) return { bg: '#ffc107', border: '#ffb300' };
+            return { bg: '#dc3545', border: '#bb2d3b' };
+          };
+          
+          const barColors = values.map(v => getBarColor(v));
+          
+          comparisonChart = new Chart(ctx2, {
+            type: 'bar',
+            data: { 
+              labels, 
+              datasets: [{ 
+                label: 'Test Score', 
+                data: values,
+                backgroundColor: barColors.map(c => c.bg),
+                borderColor: barColors.map(c => c.border),
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false
+              }] 
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                intersect: false,
+                mode: 'index'
+              },
+              plugins: {
+                legend: { 
+                  display: false
+                },
+                tooltip: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                  padding: 16,
+                  titleFont: { 
+                    size: 15, 
+                    weight: 'bold',
+                    family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                  },
+                  bodyFont: { 
+                    size: 14,
+                    family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                  },
+                  borderColor: '#0d6efd',
+                  borderWidth: 2,
+                  cornerRadius: 8,
+                  displayColors: true,
+                  callbacks: {
+                    title: function(context) {
+                      return 'Test Date: ' + context[0].label;
+                    },
+                    label: function(context) {
+                      const value = context.parsed.y;
+                      const grade = value >= 80 ? 'A' : value >= 70 ? 'B' : value >= 60 ? 'C' : value >= 50 ? 'D' : 'F';
+                      return [
+                        'Score: ' + value.toFixed(1) + '%',
+                        'Grade: ' + grade
+                      ];
+                    },
+                    labelColor: function(context) {
+                      const value = context.parsed.y;
+                      const color = getBarColor(value);
+                      return {
+                        borderColor: color.border,
+                        backgroundColor: color.bg
+                      };
+                    }
+                  }
+                }
+              },
+              scales: { 
+                y: { 
+                  beginAtZero: true, 
+                  max: 100,
+                  min: 0,
+                  ticks: {
+                    stepSize: 10,
+                    font: {
+                      size: 12,
+                      weight: '500'
+                    },
+                    color: '#6c757d',
+                    callback: function(value) {
+                      return value + '%';
+                    },
+                    padding: 12
+                  },
+                  grid: {
+                    color: 'rgba(0, 0, 0, 0.08)',
+                    drawBorder: false,
+                    lineWidth: 1
+                  },
+                  border: {
+                    display: false
+                  }
+                },
+                x: {
+                  ticks: {
+                    font: {
+                      size: 12,
+                      weight: '500'
+                    },
+                    color: '#6c757d',
+                    padding: 12,
+                    maxRotation: 45,
+                    minRotation: 0
+                  },
+                  grid: {
+                    display: false,
+                    drawBorder: false
+                  },
+                  border: {
+                    display: false
+                  }
+                }
+              }
+            }
+          });
+        }
+        
+        // Chart Type Toggle
+        const chartTypeButtons = document.querySelectorAll('[data-chart-type]');
+        chartTypeButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const chartType = this.getAttribute('data-chart-type');
+            
+            // Update button states
+            chartTypeButtons.forEach(b => {
+              b.classList.remove('active');
+              b.classList.remove('btn-primary');
+              b.classList.add('btn-outline-primary');
+            });
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('active');
+            this.classList.add('btn-primary');
+            
+            // Show/hide charts
+            if (chartType === 'line') {
+              document.getElementById('chartContainer-line').style.display = 'block';
+              document.getElementById('chartContainer-bar').style.display = 'none';
+              setTimeout(() => {
+                if (trendChart) {
+                  trendChart.resize();
+                  trendChart.update('active');
+                }
+              }, 100);
+            } else {
+              document.getElementById('chartContainer-line').style.display = 'none';
+              document.getElementById('chartContainer-bar').style.display = 'block';
+              setTimeout(() => {
+                if (comparisonChart) {
+                  comparisonChart.resize();
+                  comparisonChart.update('active');
+                }
+              }, 100);
+            }
+          });
         });
+        
+        // Initial resize for proper rendering
+        setTimeout(() => {
+          if (trendChart) trendChart.resize();
+          if (comparisonChart) comparisonChart.resize();
+        }, 300);
       })();
     </script>
 }
-
-
