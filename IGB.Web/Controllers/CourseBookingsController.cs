@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using IGB.Domain.Enums;
 using IGB.Infrastructure.Data;
+using IGB.Web.ViewModels;
+using IGB.Web.ViewModels.Student;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -124,17 +126,108 @@ public class CourseBookingsController : Controller
     }
 
     [Authorize(Roles = "Student")]
-    public async Task<IActionResult> My(CancellationToken cancellationToken)
+    public async Task<IActionResult> My(string? q, long? curriculumId, long? gradeId, long? courseId, string? status, int page = 1, int pageSize = 25, CancellationToken cancellationToken = default)
     {
+        page = page <= 0 ? 1 : page;
+        pageSize = pageSize is < 5 or > 100 ? 25 : pageSize;
+
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!long.TryParse(userId, out var studentId)) return Forbid();
 
-        var bookings = await _db.CourseBookings.AsNoTracking()
-            .Include(b => b.Course).ThenInclude(c => c!.Grade).ThenInclude(g => g!.Curriculum)
-            .Where(b => !b.IsDeleted && b.StudentUserId == studentId)
-            .OrderByDescending(b => b.RequestedAt)
+        var curricula = await _db.Curricula.AsNoTracking()
+            .Where(c => !c.IsDeleted && c.IsActive)
+            .OrderBy(c => c.Name)
+            .Select(c => new IGB.Web.ViewModels.LookupItem(c.Id, c.Name))
             .ToListAsync(cancellationToken);
-        return View(bookings);
+
+        var grades = new List<IGB.Web.ViewModels.LookupItem>();
+        if (curriculumId.HasValue)
+        {
+            grades = await _db.Grades.AsNoTracking()
+                .Where(g => !g.IsDeleted && g.IsActive && g.CurriculumId == curriculumId.Value)
+                .OrderBy(g => g.Level ?? 999).ThenBy(g => g.Name)
+                .Select(g => new IGB.Web.ViewModels.LookupItem(g.Id, g.Name))
+                .ToListAsync(cancellationToken);
+        }
+
+        // Get courses from student's bookings for the filter dropdown (filtered by curriculum/grade if selected)
+        var coursesQuery = _db.CourseBookings.AsNoTracking()
+            .Where(b => !b.IsDeleted && b.StudentUserId == studentId && b.Course != null && !b.Course.IsDeleted);
+        
+        if (curriculumId.HasValue) coursesQuery = coursesQuery.Where(b => b.Course != null && b.Course.Grade != null && b.Course.Grade.CurriculumId == curriculumId.Value);
+        if (gradeId.HasValue) coursesQuery = coursesQuery.Where(b => b.Course != null && b.Course.GradeId == gradeId.Value);
+        
+        var courseIds = await coursesQuery
+            .Select(b => b.CourseId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+        
+        var courses = await _db.Courses.AsNoTracking()
+            .Where(c => !c.IsDeleted && courseIds.Contains(c.Id))
+            .OrderBy(c => c.Name)
+            .Select(c => new IGB.Web.ViewModels.LookupItem(c.Id, c.Name))
+            .ToListAsync(cancellationToken);
+
+        var statusOptions = new Dictionary<string, string>
+        {
+            { "Pending", "Pending" },
+            { "Approved", "Approved" },
+            { "Rejected", "Rejected" },
+            { "Cancelled", "Cancelled" },
+            { "Completed", "Completed" }
+        };
+
+        var query = _db.CourseBookings.AsNoTracking()
+            .Include(b => b.Course).ThenInclude(c => c!.Grade).ThenInclude(g => g!.Curriculum)
+            .Where(b => !b.IsDeleted && b.StudentUserId == studentId);
+
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            var term = q.Trim();
+            query = query.Where(b =>
+                (b.Course != null && b.Course.Name.Contains(term)) ||
+                (b.Course != null && b.Course.Grade != null && b.Course.Grade.Name.Contains(term)) ||
+                (b.Course != null && b.Course.Grade != null && b.Course.Grade.Curriculum != null && b.Course.Grade.Curriculum.Name.Contains(term))
+            );
+        }
+        if (curriculumId.HasValue) query = query.Where(b => b.Course != null && b.Course.Grade != null && b.Course.Grade.CurriculumId == curriculumId.Value);
+        if (gradeId.HasValue) query = query.Where(b => b.Course != null && b.Course.GradeId == gradeId.Value);
+        if (courseId.HasValue) query = query.Where(b => b.CourseId == courseId.Value);
+        if (!string.IsNullOrWhiteSpace(status) && Enum.TryParse<BookingStatus>(status, out var statusEnum))
+        {
+            query = query.Where(b => b.Status == statusEnum);
+        }
+
+        var total = await query.CountAsync(cancellationToken);
+        var items = await query
+            .OrderByDescending(b => b.RequestedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(b => new IGB.Web.ViewModels.Student.MyCourseBookingsViewModel.MyBookingRow(
+                b.Id,
+                b.CourseId,
+                b.Course != null ? b.Course.Name : "Course",
+                b.Course != null && b.Course.Grade != null ? b.Course.Grade.Name : "Grade",
+                b.Course != null && b.Course.Grade != null && b.Course.Grade.Curriculum != null ? b.Course.Grade.Curriculum.Name : "Curriculum",
+                b.Status.ToString(),
+                b.RequestedAt
+            ))
+            .ToListAsync(cancellationToken);
+
+        return View(new IGB.Web.ViewModels.Student.MyCourseBookingsViewModel
+        {
+            Query = q,
+            CurriculumId = curriculumId,
+            GradeId = gradeId,
+            CourseId = courseId,
+            Status = status,
+            Curricula = curricula,
+            Grades = grades,
+            Courses = courses,
+            StatusOptions = statusOptions,
+            Items = items,
+            Pagination = new IGB.Web.ViewModels.Components.PaginationViewModel(page, pageSize, total, Action: "My", Controller: "CourseBookings", RouteValues: new { q, curriculumId, gradeId, courseId, status })
+        });
     }
 }
 

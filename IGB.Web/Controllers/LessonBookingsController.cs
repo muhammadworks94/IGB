@@ -4,6 +4,7 @@ using IGB.Domain.Entities;
 using IGB.Infrastructure.Data;
 using IGB.Web.Zoom;
 using IGB.Web.ViewModels;
+using IGB.Web.ViewModels.Student;
 using IGB.Web.Services;
 using IGB.Shared.Security;
 using IGB.Web.Security;
@@ -178,17 +179,87 @@ public class LessonBookingsController : Controller
 
     // Student: my lessons
     [Authorize(Roles = "Student")]
-    public async Task<IActionResult> My(CancellationToken cancellationToken)
+    public async Task<IActionResult> My(long? courseId, string? status, int page = 1, int pageSize = 25, CancellationToken cancellationToken = default)
     {
+        page = page <= 0 ? 1 : page;
+        pageSize = pageSize is < 5 or > 100 ? 25 : pageSize;
+
         var studentId = GetUserId();
         if (studentId == null) return Forbid();
 
-        var lessons = await _db.LessonBookings.AsNoTracking()
-            .Include(l => l.Course)!.ThenInclude(c => c!.Grade)!.ThenInclude(g => g!.Curriculum)
-            .Where(l => !l.IsDeleted && l.StudentUserId == studentId)
-            .OrderByDescending(l => l.CreatedAt)
+        // Get courses from student's lesson bookings for the filter dropdown
+        var courseIds = await _db.LessonBookings.AsNoTracking()
+            .Where(l => !l.IsDeleted && l.StudentUserId == studentId && l.CourseId > 0)
+            .Select(l => l.CourseId)
+            .Distinct()
             .ToListAsync(cancellationToken);
-        return View(lessons);
+        
+        var courses = await _db.Courses.AsNoTracking()
+            .Where(c => !c.IsDeleted && courseIds.Contains(c.Id))
+            .OrderBy(c => c.Name)
+            .Select(c => new IGB.Web.ViewModels.LookupItem(c.Id, c.Name))
+            .ToListAsync(cancellationToken);
+
+        var statusOptions = new Dictionary<string, string>
+        {
+            { "Pending", "Pending" },
+            { "Scheduled", "Scheduled" },
+            { "Rescheduled", "Rescheduled" },
+            { "Completed", "Completed" },
+            { "Cancelled", "Cancelled" },
+            { "RescheduleRequested", "Reschedule Requested" },
+            { "Rejected", "Rejected" }
+        };
+
+        var query = _db.LessonBookings.AsNoTracking()
+            .Include(l => l.Course)!.ThenInclude(c => c!.Grade)!.ThenInclude(g => g!.Curriculum)
+            .Where(l => !l.IsDeleted && l.StudentUserId == studentId);
+
+        if (courseId.HasValue) query = query.Where(l => l.CourseId == courseId.Value);
+        
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            if (status == "Upcoming")
+            {
+                var now = DateTimeOffset.UtcNow;
+                query = query.Where(l =>
+                    (l.Status == IGB.Domain.Enums.LessonStatus.Scheduled || l.Status == IGB.Domain.Enums.LessonStatus.Rescheduled) &&
+                    (l.ScheduledStart ?? l.Option1) >= now);
+            }
+            else if (Enum.TryParse<IGB.Domain.Enums.LessonStatus>(status, true, out var statusEnum))
+            {
+                query = query.Where(l => l.Status == statusEnum);
+            }
+        }
+
+        var total = await query.CountAsync(cancellationToken);
+        var items = await query
+            .OrderByDescending(l => l.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(l => new IGB.Web.ViewModels.Student.MyLessonsViewModel.MyLessonRow(
+                l.Id,
+                l.CourseId,
+                l.Course != null ? l.Course.Name : "Course",
+                l.Status.ToString(),
+                l.ScheduledStart,
+                l.Option1,
+                l.Option2,
+                l.Option3,
+                l.ZoomJoinUrl,
+                l.ZoomPassword
+            ))
+            .ToListAsync(cancellationToken);
+
+        return View(new IGB.Web.ViewModels.Student.MyLessonsViewModel
+        {
+            CourseId = courseId,
+            Status = status,
+            Courses = courses,
+            StatusOptions = statusOptions,
+            Items = items,
+            Pagination = new IGB.Web.ViewModels.Components.PaginationViewModel(page, pageSize, total, Action: "My", Controller: "LessonBookings", RouteValues: new { courseId, status })
+        });
     }
 
     // Student: request reschedule

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGB.Web.ViewModels.Admin;
 using IGB.Web.ViewModels;
+using IGB.Web.ViewModels.Student;
 
 namespace IGB.Web.Controllers;
 
@@ -413,16 +414,81 @@ public class CoursesController : Controller
 
     // Student view: browse all active courses and book
     [Authorize(Roles = "Student")]
-    public async Task<IActionResult> Browse(CancellationToken cancellationToken)
+    public async Task<IActionResult> Browse(string? q, long? curriculumId, long? gradeId, long? courseId, int page = 1, int pageSize = 25, CancellationToken cancellationToken = default)
     {
-        var courses = await _db.Courses.AsNoTracking()
+        page = page <= 0 ? 1 : page;
+        pageSize = pageSize is < 5 or > 100 ? 25 : pageSize;
+
+        var curricula = await _db.Curricula.AsNoTracking()
+            .Where(c => !c.IsDeleted && c.IsActive)
+            .OrderBy(c => c.Name)
+            .Select(c => new IGB.Web.ViewModels.LookupItem(c.Id, c.Name))
+            .ToListAsync(cancellationToken);
+
+        var grades = new List<IGB.Web.ViewModels.LookupItem>();
+        if (curriculumId.HasValue)
+        {
+            grades = await _db.Grades.AsNoTracking()
+                .Where(g => !g.IsDeleted && g.IsActive && g.CurriculumId == curriculumId.Value)
+                .OrderBy(g => g.Level ?? 999).ThenBy(g => g.Name)
+                .Select(g => new IGB.Web.ViewModels.LookupItem(g.Id, g.Name))
+                .ToListAsync(cancellationToken);
+        }
+
+        // Get courses for the filter dropdown (filtered by curriculum/grade if selected)
+        var coursesQuery = _db.Courses.AsNoTracking()
             .Include(c => c.Grade).ThenInclude(g => g!.Curriculum)
-            .Where(c => !c.IsDeleted && c.IsActive && c.Grade != null && !c.Grade.IsDeleted && c.Grade.Curriculum != null && !c.Grade.Curriculum.IsDeleted)
+            .Where(c => !c.IsDeleted && c.IsActive && c.Grade != null && !c.Grade.IsDeleted && c.Grade.Curriculum != null && !c.Grade.Curriculum.IsDeleted);
+        
+        if (curriculumId.HasValue) coursesQuery = coursesQuery.Where(c => c.Grade!.CurriculumId == curriculumId.Value);
+        if (gradeId.HasValue) coursesQuery = coursesQuery.Where(c => c.GradeId == gradeId.Value);
+        
+        var courses = await coursesQuery
+            .OrderBy(c => c.Name)
+            .Select(c => new IGB.Web.ViewModels.LookupItem(c.Id, c.Name))
+            .ToListAsync(cancellationToken);
+
+        var query = _db.Courses.AsNoTracking()
+            .Include(c => c.Grade).ThenInclude(g => g!.Curriculum)
+            .Where(c => !c.IsDeleted && c.IsActive && c.Grade != null && !c.Grade.IsDeleted && c.Grade.Curriculum != null && !c.Grade.Curriculum.IsDeleted);
+
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            var term = q.Trim();
+            query = query.Where(c => c.Name.Contains(term) || (c.Description != null && c.Description.Contains(term)));
+        }
+        if (curriculumId.HasValue) query = query.Where(c => c.Grade!.CurriculumId == curriculumId.Value);
+        if (gradeId.HasValue) query = query.Where(c => c.GradeId == gradeId.Value);
+        if (courseId.HasValue) query = query.Where(c => c.Id == courseId.Value);
+
+        var total = await query.CountAsync(cancellationToken);
+        var items = await query
             .OrderBy(c => c.Grade!.Curriculum!.Name)
             .ThenBy(c => c.Grade!.Name)
             .ThenBy(c => c.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => new IGB.Web.ViewModels.Student.BrowseCoursesViewModel.BrowseCourseRow(
+                c.Id,
+                c.Name,
+                c.Grade!.Curriculum!.Name,
+                c.Grade!.Name,
+                c.CreditCost
+            ))
             .ToListAsync(cancellationToken);
-        return View(courses);
+
+        return View(new IGB.Web.ViewModels.Student.BrowseCoursesViewModel
+        {
+            Query = q,
+            CurriculumId = curriculumId,
+            GradeId = gradeId,
+            CourseId = courseId,
+            Curricula = curricula,
+            Grades = grades,
+            Courses = courses,
+            Items = items,
+            Pagination = new IGB.Web.ViewModels.Components.PaginationViewModel(page, pageSize, total, Action: "Browse", Controller: "Courses", RouteValues: new { q, curriculumId, gradeId, courseId })
+        });
     }
 
     [Authorize(Roles = "Student")]

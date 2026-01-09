@@ -13,18 +13,28 @@ namespace IGB.Web.Controllers.Api;
 public class LessonAvailabilityController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
+    private readonly ILogger<LessonAvailabilityController> _logger;
 
-    public LessonAvailabilityController(ApplicationDbContext db)
+    public LessonAvailabilityController(ApplicationDbContext db, ILogger<LessonAvailabilityController> logger)
     {
         _db = db;
+        _logger = logger;
     }
 
     // Student: get available slots for a course booking
     // Returns UTC slots; frontend displays in browser timezone.
     [HttpGet("availability")]
     [Authorize(Roles = "Student")]
-    public async Task<IActionResult> Availability(long courseBookingId, DateTimeOffset fromUtc, DateTimeOffset toUtc, int durationMinutes = 60, CancellationToken ct = default)
+    public async Task<IActionResult> Availability(
+        [FromQuery] long courseBookingId, 
+        [FromQuery] DateTimeOffset fromUtc, 
+        [FromQuery] DateTimeOffset toUtc, 
+        [FromQuery] int durationMinutes = 60, 
+        CancellationToken ct = default)
     {
+        _logger.LogInformation("Availability API called: courseBookingId={CourseBookingId}, fromUtc={FromUtc}, toUtc={ToUtc}, durationMinutes={DurationMinutes}", 
+            courseBookingId, fromUtc, toUtc, durationMinutes);
+        
         if (durationMinutes is not (30 or 45 or 60)) return BadRequest("Invalid duration.");
         if (toUtc <= fromUtc) return BadRequest("Invalid range.");
 

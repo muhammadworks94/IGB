@@ -1,106 +1,169 @@
-@model List<IGB.Domain.Entities.LessonBooking>
+@model IGB.Web.ViewModels.Student.MyLessonsViewModel
 @{
     ViewData["Title"] = "My Lessons";
+    
+    var filters = new List<PageHeaderFilter>();
+    
+    if (Model.Courses.Count > 0)
+    {
+        var courseOptions = Model.Courses.Select(c => new KeyValuePair<string, string>(c.Id.ToString(), c.Name)).Prepend(new KeyValuePair<string, string>("", "All")).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        filters.Add(new PageHeaderFilter(
+            Name: "courseId",
+            Label: "Course",
+            Type: "select",
+            Value: Model.CourseId?.ToString(),
+            Options: courseOptions
+        ));
+    }
+    
+    if (Model.StatusOptions != null && Model.StatusOptions.Count > 0)
+    {
+        var statusOptions = Model.StatusOptions.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        statusOptions = new Dictionary<string, string> { { "", "All" } }.Concat(statusOptions).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        filters.Add(new PageHeaderFilter(
+            Name: "status",
+            Label: "Status",
+            Type: "select",
+            Value: Model.Status,
+            Options: statusOptions
+        ));
+    }
+    
+    var actionButtons = new List<PageHeaderActionButton>();
+    actionButtons.Add(new PageHeaderActionButton(
+        Text: "Request Lesson",
+        Url: Url.Action("Create", "LessonBookings"),
+        Icon: "fas fa-plus me-1",
+        ButtonType: "primary"
+    ));
+    actionButtons.Add(new PageHeaderActionButton(
+        Text: "Export iCal",
+        Url: Url.Action("Ical", "LessonBookings"),
+        Icon: "fas fa-calendar-alt me-1",
+        ButtonType: "outline-secondary"
+    ));
+    
+    if (Model.CourseId.HasValue || !string.IsNullOrWhiteSpace(Model.Status))
+    {
+        actionButtons.Add(new PageHeaderActionButton(
+            Text: "Reset",
+            Url: Url.Action("My", "LessonBookings"),
+            Icon: "fas fa-times me-1",
+            ButtonType: "outline-secondary"
+        ));
+    }
+    
+    var pageHeader = new PageHeaderViewModel(
+        Title: "My Lessons",
+        Icon: "fas fa-calendar-check",
+        Breadcrumbs: new List<BreadcrumbItem>
+        {
+            new("Home", Url.Action("Index", "Home")),
+            new("My Lessons")
+        },
+        Filters: filters.Count > 0 ? filters : null,
+        ActionButtons: actionButtons
+    );
 }
 
-@await Html.PartialAsync("_PageHeader", new PageHeaderViewModel(
-    Title: "My Lessons",
-    Icon: "fas fa-calendar-check",
-    Breadcrumbs: new List<BreadcrumbItem>
-    {
-        new("Home", Url.Action("Index", "Home")),
-        new("My Lessons")
-    }
-))
+<partial name="_PageHeader" model="pageHeader" />
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-end mb-3">
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Request Lesson
-        </a>
-        <a asp-action="Ical" class="btn btn-outline-secondary ms-2">
-            <i class="fas fa-calendar-alt me-2"></i>Export iCal
-        </a>
-    </div>
 
     <div class="card">
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                    <tr>
-                        <th>Course</th>
-                        <th>Status</th>
-                        <th>Scheduled</th>
-                        <th>Class Link</th>
-                        <th>Options</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var l in Model)
-                    {
-                        var badge = l.Status switch
-                        {
-                            IGB.Domain.Enums.LessonStatus.Scheduled => "bg-info",
-                            IGB.Domain.Enums.LessonStatus.Completed => "bg-success",
-                            IGB.Domain.Enums.LessonStatus.Cancelled => "bg-secondary",
-                            IGB.Domain.Enums.LessonStatus.RescheduleRequested => "bg-warning",
-                            _ => "bg-primary"
-                        };
+            @if (Model.Items.Count == 0)
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-calendar-check fa-3x mb-3"></i>
+                    <div>No lessons found.</div>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
                         <tr>
-                            <td>@l.Course?.Name</td>
-                            <td><span class="badge @badge">@l.Status</span></td>
-                            <td>@(l.ScheduledStart?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
-                            <td>
-                                @if (!string.IsNullOrWhiteSpace(l.ZoomJoinUrl))
-                                {
-                                    <a href="@l.ZoomJoinUrl" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-video me-1"></i>Join
-                                    </a>
-                                    @if (!string.IsNullOrWhiteSpace(l.ZoomPassword))
-                                    {
-                                        <div class="small text-muted mt-1">Pass: <span class="fw-semibold">@l.ZoomPassword</span></div>
-                                    }
-                                }
-                                else
-                                {
-                                    <span class="text-muted">-</span>
-                                }
-                            </td>
-                            <td>
-                                <div class="small text-muted">
-                                    1) @l.Option1.ToString("yyyy-MM-dd HH:mm")<br/>
-                                    2) @l.Option2.ToString("yyyy-MM-dd HH:mm")<br/>
-                                    3) @l.Option3.ToString("yyyy-MM-dd HH:mm")
-                                </div>
-                            </td>
-                            <td class="text-end">
-                                <a asp-action="Reschedule" asp-route-id="@l.Id" class="btn btn-sm btn-outline-warning">
-                                    <i class="fas fa-rotate me-1"></i>Reschedule
-                                </a>
-                                @if (l.Status == IGB.Domain.Enums.LessonStatus.Completed)
-                                {
-                                    <a class="btn btn-sm btn-outline-primary" href="@Url.Action("RateTutor","Feedback", new { lessonId = l.Id })">
-                                        <i class="fas fa-star me-1"></i>Rate Tutor
-                                    </a>
-                                }
-                                <form asp-action="Cancel" method="post" class="d-inline" onsubmit="return confirm('Cancel this lesson?');">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@l.Id" />
-                                    <input type="hidden" name="reason" value="Cancelled by student" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-ban me-1"></i>Cancel
-                                    </button>
-                                </form>
-                            </td>
+                            <th>Course</th>
+                            <th>Status</th>
+                            <th>Scheduled</th>
+                            <th>Class Link</th>
+                            <th>Options</th>
+                            <th class="text-end">Actions</th>
                         </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                        @foreach (var l in Model.Items)
+                        {
+                            var badge = l.Status switch
+                            {
+                                "Scheduled" => "bg-info",
+                                "Completed" => "bg-success",
+                                "Cancelled" => "bg-secondary",
+                                "RescheduleRequested" => "bg-warning",
+                                "Rescheduled" => "bg-info",
+                                _ => "bg-primary"
+                            };
+                            <tr>
+                                <td>@l.CourseName</td>
+                                <td><span class="badge @badge">@l.Status</span></td>
+                                <td>@(l.ScheduledStart?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(l.ZoomJoinUrl))
+                                    {
+                                        <a href="@l.ZoomJoinUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-video me-1"></i>Join
+                                        </a>
+                                        @if (!string.IsNullOrWhiteSpace(l.ZoomPassword))
+                                        {
+                                            <div class="small text-muted mt-1">Pass: <span class="fw-semibold">@l.ZoomPassword</span></div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="small text-muted">
+                                        1) @l.Option1.ToString("yyyy-MM-dd HH:mm")<br/>
+                                        2) @l.Option2.ToString("yyyy-MM-dd HH:mm")<br/>
+                                        3) @l.Option3.ToString("yyyy-MM-dd HH:mm")
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Reschedule" asp-route-id="@l.Id" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-rotate me-1"></i>Reschedule
+                                    </a>
+                                    @if (l.Status == "Completed")
+                                    {
+                                        <a class="btn btn-sm btn-outline-primary" href="@Url.Action("RateTutor","Feedback", new { lessonId = l.Id })">
+                                            <i class="fas fa-star me-1"></i>Rate Tutor
+                                        </a>
+                                    }
+                                    <form asp-action="Cancel" method="post" class="d-inline" onsubmit="return confirm('Cancel this lesson?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@l.Id" />
+                                        <input type="hidden" name="reason" value="Cancelled by student" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-ban me-1"></i>Cancel
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
     </div>
+
+    @if (Model.Pagination.TotalCount > 0)
+    {
+        <partial name="Components/_Pagination" model="Model.Pagination" />
+    }
 </div>
 
 
